@@ -1,0 +1,37 @@
+translation_unit
+    : expression ';' EOF
+    | expression ';' translation_unit
+    | EOF
+    ;
+
+expression
+    : integer_literal
+    | string_literal
+    | array_literal
+    | variable_name
+    | function_name '(' ')'
+    | function_name '(' expression_list ')'
+    | '(' ')'
+    | '(' expression_list ')'
+    ;
+
+expression_list
+    : expression
+    | expression ',' expression_list
+    ;
+
+array_literal
+    : '{' '}'
+    | '{' expression_list '}'
+    ;
+
+string_literal
+    : '"' [^"]* '"'
+    ;
+
+integer_literal
+    : [0-9]+
+    ;
+
+variable_name : IDENTIFIER;
+function_name : IDENTIFIER;
