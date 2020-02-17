@@ -901,6 +901,36 @@ AstBase* EGA_mod(const args_t& args)
     return NULL;
 }
 
+AstBase* EGA_if(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (AstBase *ast1 = do_eval_ast(args[0]))
+    {
+        int i1 = EGA_int(ast1);
+        delete ast1;
+        if (i1)
+        {
+            if (AstBase *ast2 = do_eval_ast(args[1]))
+            {
+                return ast2;
+            }
+        }
+        else if (args.size() == 3)
+        {
+            if (AstBase *ast3 = do_eval_ast(args[2]))
+            {
+                return ast3;
+            }
+        }
+    }
+
+    return NULL;
+}
+
 bool
 do_add_basic_functions(void)
 {
@@ -930,6 +960,8 @@ do_add_basic_functions(void)
     do_add_function("/", 2, 2, EGA_div);
     do_add_function("mod", 2, 2, EGA_mod);
     do_add_function("%", 2, 2, EGA_mod);
+    do_add_function("if", 2, 3, EGA_if);
+    do_add_function("?:", 2, 3, EGA_if);
     return true;
 }
 
