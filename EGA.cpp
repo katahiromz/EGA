@@ -905,7 +905,7 @@ AstBase* EGA_if(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
+    if (args.size() != 2 && args.size() != 3)
         return NULL;
 
     if (AstBase *ast1 = do_eval_ast(args[0]))
