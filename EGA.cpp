@@ -766,6 +766,141 @@ AstBase* EGA_str_cat(const args_t& args)
     return NULL;
 }
 
+AstBase* EGA_plus(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() == 1)
+    {
+        if (AstBase *ast1 = do_eval_ast(args[0]))
+        {
+            int i1 = EGA_int(ast1);
+            delete ast1;
+            return new AstInt(i1);
+        }
+        return NULL;
+    }
+
+    if (args.size() == 2)
+    {
+        if (AstBase *ast1 = do_eval_ast(args[0]))
+        {
+            if (AstBase *ast2 = do_eval_ast(args[1]))
+            {
+                int i1 = EGA_int(ast1);
+                int i2 = EGA_int(ast2);
+                delete ast1;
+                delete ast2;
+                return new AstInt(i1 + i2);
+            }
+            delete ast1;
+        }
+    }
+    return NULL;
+}
+
+AstBase* EGA_minus(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() == 1)
+    {
+        if (AstBase *ast1 = do_eval_ast(args[0]))
+        {
+            int i1 = EGA_int(ast1);
+            delete ast1;
+            return new AstInt(-i1);
+        }
+        return NULL;
+    }
+
+    if (args.size() == 2)
+    {
+        if (AstBase *ast1 = do_eval_ast(args[0]))
+        {
+            if (AstBase *ast2 = do_eval_ast(args[1]))
+            {
+                int i1 = EGA_int(ast1);
+                int i2 = EGA_int(ast2);
+                delete ast1;
+                delete ast2;
+                return new AstInt(i1 - i2);
+            }
+            delete ast1;
+        }
+    }
+    return NULL;
+}
+
+AstBase* EGA_mul(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (AstBase *ast1 = do_eval_ast(args[0]))
+    {
+        if (AstBase *ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            delete ast1;
+            delete ast2;
+            return new AstInt(i1 * i2);
+        }
+        delete ast1;
+    }
+
+    return NULL;
+}
+
+AstBase* EGA_div(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (AstBase *ast1 = do_eval_ast(args[0]))
+    {
+        if (AstBase *ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            delete ast1;
+            delete ast2;
+            return new AstInt(i1 / i2);
+        }
+        delete ast1;
+    }
+
+    return NULL;
+}
+
+AstBase* EGA_mod(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (AstBase *ast1 = do_eval_ast(args[0]))
+    {
+        if (AstBase *ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            delete ast1;
+            delete ast2;
+            return new AstInt(i1 % i2);
+        }
+        delete ast1;
+    }
+
+    return NULL;
+}
+
 bool
 do_add_basic_functions(void)
 {
@@ -785,6 +920,16 @@ do_add_basic_functions(void)
     do_add_function("print_int", 1, 1, EGA_print_int);
     do_add_function("str_len", 1, 1, EGA_str_len);
     do_add_function("str_cat", 2, 2, EGA_str_cat);
+    do_add_function("plus", 1, 2, EGA_plus);
+    do_add_function("+", 1, 2, EGA_plus);
+    do_add_function("minus", 1, 2, EGA_minus);
+    do_add_function("-", 1, 2, EGA_minus);
+    do_add_function("mul", 2, 2, EGA_mul);
+    do_add_function("*", 2, 2, EGA_mul);
+    do_add_function("div", 2, 2, EGA_div);
+    do_add_function("/", 2, 2, EGA_div);
+    do_add_function("mod", 2, 2, EGA_mod);
+    do_add_function("%", 2, 2, EGA_mod);
     return true;
 }
 
