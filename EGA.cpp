@@ -287,7 +287,7 @@ AstBase *TokenStream::visit_expression()
 
     case TOK_IDENT:
         name = token()->get_str();
-        if (do_get_fn(name))
+        if (EGA_get_fn(name))
         {
             go_next();
             return visit_call(name);
@@ -498,15 +498,14 @@ AstContainer *TokenStream::visit_expression_list(AstType type, const std::string
     #define EVAL_DEBUG() do { puts(__func__); fflush(stdout); } while (0)
 #endif
 
-EGA_FUNCTION *do_get_fn(const std::string& name)
+EGA_FUNCTION *EGA_get_fn(const std::string& name)
 {
     EVAL_DEBUG();
     return s_fn_map[name];
 }
 
 bool
-do_add_function(const std::string& name, size_t min_args, size_t max_args,
-                EGA_PROC proc)
+EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc)
 {
     EGA_FUNCTION *fn = new EGA_FUNCTION { name, min_args, max_args, proc };
     delete s_fn_map[name];
@@ -514,7 +513,7 @@ do_add_function(const std::string& name, size_t min_args, size_t max_args,
     return true;
 }
 
-AstBase *do_eval_var(const std::string& name)
+AstBase *EGA_eval_var(const std::string& name)
 {
     EVAL_DEBUG();
 
@@ -526,10 +525,10 @@ AstBase *do_eval_var(const std::string& name)
 }
 
 AstBase *
-do_eval_function(const std::string& name, const args_t& args)
+EGA_eval_fn(const std::string& name, const args_t& args)
 {
     EVAL_DEBUG();
-    if (EGA_FUNCTION *fn = do_get_fn(name))
+    if (EGA_FUNCTION *fn = EGA_get_fn(name))
     {
         if (fn->min_args <= args.size() && args.size() <= fn->max_args)
             return (*(fn->proc))(args);
@@ -916,7 +915,13 @@ AstBase* EGA_if(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_assign(const args_t& args)
+void EGA_set_var(const std::string& name, const AstBase *ast)
+{
+    delete s_var_map[name];
+    s_var_map[name] = ast->clone();
+}
+
+AstBase* EGA_set(const args_t& args)
 {
     EVAL_DEBUG();
 
@@ -924,8 +929,7 @@ AstBase* EGA_assign(const args_t& args)
         return NULL;
 
     std::string name = static_cast<const AstVar *>(args[0])->get_name();
-    delete s_var_map[name];
-    s_var_map[name] = args[1]->clone();
+    EGA_set_var(name, args[1]);
     return NULL;
 }
 
@@ -941,38 +945,38 @@ AstBase* EGA_eval(const args_t& args)
 
 bool EGA_init(void)
 {
-    do_add_function("equal", 2, 2, EGA_equal);
-    do_add_function("==", 2, 2, EGA_equal);
-    do_add_function("not_equal", 2, 2, EGA_not_equal);
-    do_add_function("!=", 2, 2, EGA_not_equal);
-    do_add_function("less", 2, 2, EGA_less);
-    do_add_function("<", 2, 2, EGA_less);
-    do_add_function("le", 2, 2, EGA_le);
-    do_add_function("<=", 2, 2, EGA_le);
-    do_add_function("greater", 2, 2, EGA_greater);
-    do_add_function(">", 2, 2, EGA_greater);
-    do_add_function("ge", 2, 2, EGA_ge);
-    do_add_function(">=", 2, 2, EGA_ge);
-    do_add_function("print", 0, 16, EGA_print);
-    do_add_function("?", 0, 16, EGA_print);
-    do_add_function("str_len", 1, 1, EGA_str_len);
-    do_add_function("str_cat", 2, 2, EGA_str_cat);
-    do_add_function("plus", 2, 2, EGA_plus);
-    do_add_function("+", 2, 2, EGA_plus);
-    do_add_function("minus", 1, 2, EGA_minus);
-    do_add_function("-", 1, 2, EGA_minus);
-    do_add_function("mul", 2, 2, EGA_mul);
-    do_add_function("*", 2, 2, EGA_mul);
-    do_add_function("div", 2, 2, EGA_div);
-    do_add_function("/", 2, 2, EGA_div);
-    do_add_function("mod", 2, 2, EGA_mod);
-    do_add_function("%", 2, 2, EGA_mod);
-    do_add_function("if", 2, 3, EGA_if);
-    do_add_function("?:", 2, 3, EGA_if);
-    do_add_function("assign", 2, 2, EGA_assign);
-    do_add_function("=", 2, 2, EGA_assign);
-    do_add_function(":=", 2, 2, EGA_assign);
-    do_add_function("eval", 1, 1, EGA_eval);
+    EGA_add_fn("equal", 2, 2, EGA_equal);
+    EGA_add_fn("==", 2, 2, EGA_equal);
+    EGA_add_fn("not_equal", 2, 2, EGA_not_equal);
+    EGA_add_fn("!=", 2, 2, EGA_not_equal);
+    EGA_add_fn("less", 2, 2, EGA_less);
+    EGA_add_fn("<", 2, 2, EGA_less);
+    EGA_add_fn("le", 2, 2, EGA_le);
+    EGA_add_fn("<=", 2, 2, EGA_le);
+    EGA_add_fn("greater", 2, 2, EGA_greater);
+    EGA_add_fn(">", 2, 2, EGA_greater);
+    EGA_add_fn("ge", 2, 2, EGA_ge);
+    EGA_add_fn(">=", 2, 2, EGA_ge);
+    EGA_add_fn("print", 0, 16, EGA_print);
+    EGA_add_fn("?", 0, 16, EGA_print);
+    EGA_add_fn("str_len", 1, 1, EGA_str_len);
+    EGA_add_fn("str_cat", 2, 2, EGA_str_cat);
+    EGA_add_fn("plus", 2, 2, EGA_plus);
+    EGA_add_fn("+", 2, 2, EGA_plus);
+    EGA_add_fn("minus", 1, 2, EGA_minus);
+    EGA_add_fn("-", 1, 2, EGA_minus);
+    EGA_add_fn("mul", 2, 2, EGA_mul);
+    EGA_add_fn("*", 2, 2, EGA_mul);
+    EGA_add_fn("div", 2, 2, EGA_div);
+    EGA_add_fn("/", 2, 2, EGA_div);
+    EGA_add_fn("mod", 2, 2, EGA_mod);
+    EGA_add_fn("%", 2, 2, EGA_mod);
+    EGA_add_fn("if", 2, 3, EGA_if);
+    EGA_add_fn("?:", 2, 3, EGA_if);
+    EGA_add_fn("set", 2, 2, EGA_set);
+    EGA_add_fn("=", 2, 2, EGA_set);
+    EGA_add_fn(":=", 2, 2, EGA_set);
+    EGA_add_fn("eval", 1, 1, EGA_eval);
     return true;
 }
 

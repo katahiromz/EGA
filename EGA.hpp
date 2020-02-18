@@ -35,16 +35,11 @@ struct EGA_FUNCTION
 struct EGA_exception { };
 struct EGA_arg_number_exception : EGA_exception { };
 
-EGA_FUNCTION *do_get_fn(const std::string& name);
-
-bool
-do_add_function(const std::string& name, size_t min_args, size_t max_args,
-                EGA_PROC proc);
-
-AstBase *
-do_eval_function(const std::string& name, const std::vector<AstBase *>& args);
-
-AstBase *do_eval_var(const std::string& name);
+EGA_FUNCTION *EGA_get_fn(const std::string& name);
+bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc);
+AstBase * EGA_eval_fn(const std::string& name, const std::vector<AstBase *>& args);
+AstBase *EGA_eval_var(const std::string& name);
+void EGA_set_var(const std::string& name, const AstBase *ast);
 
 //////////////////////////////////////////////////////////////////////////////
 // TokenType
@@ -424,7 +419,7 @@ public:
 
     virtual AstBase *eval() const
     {
-        return do_eval_var(m_name);
+        return EGA_eval_var(m_name);
     }
 
 protected:
@@ -435,7 +430,7 @@ protected:
 //////////////////////////////////////////////////////////////////////////////
 // AstContainer
 
-AstBase *do_eval_function(const std::string& name, const std::vector<AstBase *>& args);
+AstBase *EGA_eval_fn(const std::string& name, const std::vector<AstBase *>& args);
 
 class AstContainer : public AstBase
 {
@@ -535,7 +530,7 @@ public:
             break;
 
         case AST_CALL:
-            return do_eval_function(m_str, m_children);
+            return EGA_eval_fn(m_str, m_children);
 
         case AST_PROGRAM:
             ptr = NULL;
