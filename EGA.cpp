@@ -797,7 +797,6 @@ AstBase* EGA_cat(const args_t& args)
                 delete ast1;
                 return array;
             }
-            delete ast1;
             break;
 
         default:
