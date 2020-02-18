@@ -5,11 +5,15 @@
 #include "EGA.hpp"
 #include <cstdio>
 #include <cstring>
+#include <map>
 
 static int s_alive_tokens = 0;
 static int s_alive_ast = 0;
 
-static std::vector<EGA_FUNCTION> s_functions;
+typedef std::map<std::string, EGA_FUNCTION *> fn_map_t;
+typedef std::map<std::string, AstBase *> var_map_t;
+static fn_map_t s_fn_map;
+static var_map_t s_var_map;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -497,21 +501,28 @@ AstContainer *TokenStream::visit_expression_list(AstType type, const std::string
 EGA_FUNCTION *do_get_fn(const std::string& name)
 {
     EVAL_DEBUG();
-    for (size_t i = 0; i < s_functions.size(); ++i)
-    {
-        if (s_functions[i].name == name)
-            return &s_functions[i];
-    }
-    return NULL;
+    return s_fn_map[name];
 }
 
 bool
 do_add_function(const std::string& name, size_t min_args, size_t max_args,
                 EGA_PROC proc)
 {
-    EGA_FUNCTION fn = { name, min_args, max_args, proc };
-    s_functions.push_back(fn);
+    EGA_FUNCTION *fn = new EGA_FUNCTION { name, min_args, max_args, proc };
+    delete s_fn_map[name];
+    s_fn_map[name] = fn;
     return true;
+}
+
+AstBase *do_eval_var(const std::string& name)
+{
+    EVAL_DEBUG();
+
+    var_map_t::iterator it = s_var_map.find(name);
+    if (it == s_var_map.end())
+        return NULL;
+
+    return it->second->eval();
 }
 
 AstBase *
@@ -700,32 +711,17 @@ AstBase* EGA_not_equal(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_print_int(const args_t& args)
+AstBase* EGA_print(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 1)
-        return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    for (size_t i = 0; i < args.size(); ++i)
     {
-        int i1 = EGA_int(ast1);
-        delete ast1;
-        printf("%d\n", i1);
-    }
-    return NULL;
-}
-
-AstBase* EGA_print_str(const args_t& args)
-{
-    EVAL_DEBUG();
-    if (args.size() != 1)
-        return NULL;
-
-    if (AstBase *ast1 = do_eval_ast(args[0]))
-    {
-        std::string str = EGA_str(ast1);
-        delete ast1;
-        printf("%s\n", str.c_str());
+        if (AstBase *ast = do_eval_ast(args[i]))
+        {
+            printf("%s\n", ast->dump().c_str());
+            delete ast;
+        }
     }
     return NULL;
 }
@@ -769,17 +765,6 @@ AstBase* EGA_str_cat(const args_t& args)
 AstBase* EGA_plus(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() == 1)
-    {
-        if (AstBase *ast1 = do_eval_ast(args[0]))
-        {
-            int i1 = EGA_int(ast1);
-            delete ast1;
-            return new AstInt(i1);
-        }
-        return NULL;
-    }
 
     if (args.size() == 2)
     {
@@ -931,8 +916,30 @@ AstBase* EGA_if(const args_t& args)
     return NULL;
 }
 
-bool
-do_add_basic_functions(void)
+AstBase* EGA_assign(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2 || args[0]->get_type() != AST_VAR)
+        return NULL;
+
+    std::string name = static_cast<const AstVar *>(args[0])->get_name();
+    delete s_var_map[name];
+    s_var_map[name] = args[1]->clone();
+    return NULL;
+}
+
+AstBase* EGA_eval(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 1)
+        return NULL;
+
+    return args[0]->eval();
+}
+
+bool EGA_init(void)
 {
     do_add_function("equal", 2, 2, EGA_equal);
     do_add_function("==", 2, 2, EGA_equal);
@@ -946,12 +953,12 @@ do_add_basic_functions(void)
     do_add_function(">", 2, 2, EGA_greater);
     do_add_function("ge", 2, 2, EGA_ge);
     do_add_function(">=", 2, 2, EGA_ge);
-    do_add_function("print_str", 1, 1, EGA_print_str);
-    do_add_function("print_int", 1, 1, EGA_print_int);
+    do_add_function("print", 0, 16, EGA_print);
+    do_add_function("?", 0, 16, EGA_print);
     do_add_function("str_len", 1, 1, EGA_str_len);
     do_add_function("str_cat", 2, 2, EGA_str_cat);
-    do_add_function("plus", 1, 2, EGA_plus);
-    do_add_function("+", 1, 2, EGA_plus);
+    do_add_function("plus", 2, 2, EGA_plus);
+    do_add_function("+", 2, 2, EGA_plus);
     do_add_function("minus", 1, 2, EGA_minus);
     do_add_function("-", 1, 2, EGA_minus);
     do_add_function("mul", 2, 2, EGA_mul);
@@ -962,7 +969,27 @@ do_add_basic_functions(void)
     do_add_function("%", 2, 2, EGA_mod);
     do_add_function("if", 2, 3, EGA_if);
     do_add_function("?:", 2, 3, EGA_if);
+    do_add_function("assign", 2, 2, EGA_assign);
+    do_add_function("=", 2, 2, EGA_assign);
+    do_add_function(":=", 2, 2, EGA_assign);
+    do_add_function("eval", 1, 1, EGA_eval);
     return true;
+}
+
+void
+EGA_uninit(void)
+{
+    for (fn_map_t::iterator it = s_fn_map.begin(); it != s_fn_map.end(); ++it)
+    {
+        delete it->second;
+    }
+    s_fn_map.clear();
+
+    for (var_map_t::iterator it = s_var_map.begin(); it != s_var_map.end(); ++it)
+    {
+        delete it->second;
+    }
+    s_var_map.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1013,7 +1040,7 @@ do_file_input_mode(const char *filename)
 int main(int argc, char **argv)
 {
     mstr_unittest();
-    do_add_basic_functions();
+    EGA_init();
 
     if (argc <= 1)
     {
@@ -1023,6 +1050,8 @@ int main(int argc, char **argv)
     {
         do_file_input_mode(argv[1]);
     }
+
+    EGA_uninit();
 
     assert(s_alive_tokens == 0);
     assert(s_alive_ast == 0);

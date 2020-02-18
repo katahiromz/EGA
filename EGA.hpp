@@ -44,6 +44,8 @@ do_add_function(const std::string& name, size_t min_args, size_t max_args,
 AstBase *
 do_eval_function(const std::string& name, const std::vector<AstBase *>& args);
 
+AstBase *do_eval_var(const std::string& name);
+
 //////////////////////////////////////////////////////////////////////////////
 // TokenType
 
@@ -285,13 +287,7 @@ public:
         return m_type;
     }
 
-    virtual std::string dump() const
-    {
-        std::string ret = "(";
-        ret += dump_ast_type(m_type);
-        ret += ")";
-        return ret;
-    }
+    virtual std::string dump() const = 0;
 
     virtual AstBase *clone() const = 0;
 
@@ -336,10 +332,7 @@ public:
 
     virtual std::string dump() const
     {
-        std::string ret = "(AST_INT, ";
-        ret += mstr_to_string(m_value);
-        ret += ")";
-        return ret;
+        return mstr_to_string(m_value);
     }
 
     virtual AstBase *clone() const
@@ -375,9 +368,9 @@ public:
 
     virtual std::string dump() const
     {
-        std::string ret = "(AST_STR, '";
+        std::string ret = "\"";
         ret += m_str;
-        ret += "')";
+        ret += "\"";
         return ret;
     }
 
@@ -401,49 +394,37 @@ protected:
 class AstVar : public AstBase
 {
 public:
-    AstVar(const std::string& name, AstBase *value = NULL)
+    AstVar(const std::string& name)
         : AstBase(AST_VAR)
         , m_name(name)
-        , m_value(value)
     {
     }
 
     ~AstVar()
     {
-        delete m_value;
     }
 
-    std::string& get_name()
+    std::string get_name() const
     {
         return m_name;
     }
 
-    AstBase*& get_value()
-    {
-        return m_value;
-    }
-
-    AstType get_type() const
-    {
-        return m_value->get_type();
-    }
-
     virtual std::string dump() const
     {
-        std::string ret = "(AST_VAR, '";
+        std::string ret = "(AST_VAR, ";
         ret += m_name;
-        ret += "')";
+        ret += ")";
         return ret;
     }
 
     virtual AstBase *clone() const
     {
-        return new AstVar(m_name, m_value ? m_value->clone() : NULL);
+        return new AstVar(m_name);
     }
 
     virtual AstBase *eval() const
     {
-        return m_value->clone();
+        return do_eval_var(m_name);
     }
 
 protected:
@@ -513,11 +494,7 @@ public:
 
     virtual std::string dump() const
     {
-        std::string ret = "(";
-        ret += dump_ast_type(m_type);
-        ret += ", '";
-        ret += m_str;
-        ret += "', (";
+        std::string ret = "{ ";
         if (size() > 0)
         {
             ret += m_children[0]->dump();
@@ -527,7 +504,7 @@ public:
                 ret += m_children[i]->dump();
             }
         }
-        ret += "))";
+        ret += " }";
         return ret;
     }
 
@@ -588,6 +565,8 @@ protected:
 bool do_lexical(TokenStream& stream, const std::string& input);
 AstContainer *do_parse(TokenStream& stream);
 AstContainer *do_parse(const std::string& input);
-bool is_registered_fuction_name(const std::string& str);
+
+bool EGA_init(void);
+void EGA_uninit(void);
 
 #endif  // ndef EGA_HPP_
