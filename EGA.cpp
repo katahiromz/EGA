@@ -729,7 +729,7 @@ AstBase* EGA_print(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_str_len(const args_t& args)
+AstBase* EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 1)
@@ -737,31 +737,76 @@ AstBase* EGA_str_len(const args_t& args)
 
     if (AstBase *ast1 = do_eval_ast(args[0]))
     {
-        std::string str1 = EGA_str(ast1);
-        delete ast1;
-        return new AstInt((int)str1.size());
+        switch (ast1->get_type())
+        {
+        case AST_STR:
+            {
+                int len = int(EGA_str(ast1).size());
+                delete ast1;
+                return new AstInt(len);
+            }
+        case AST_ARRAY:
+            {
+                int len = int(EGA_array(ast1)->size());
+                delete ast1;
+                return new AstInt(len);
+            }
+        default:
+            break;
+        }
     }
     return NULL;
 }
 
-AstBase* EGA_str_cat(const args_t& args)
+AstBase* EGA_cat(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
+    if (args.size() < 1)
         return NULL;
 
     if (AstBase *ast1 = do_eval_ast(args[0]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
+        switch (ast1->get_type())
         {
-            std::string str1 = EGA_str(ast1);
-            std::string str2 = EGA_str(ast2);
+        case AST_STR:
+            {
+                std::string str = EGA_str(ast1);
+                delete ast1;
+                for (size_t i = 1; i < args.size(); ++i)
+                {
+                    ast1 = args[i]->eval();
+                    str += EGA_str(ast1);
+                    delete ast1;
+                }
+                return new AstStr(str);
+            }
+
+        case AST_ARRAY:
+            if (AstArray *array = new AstArray(AST_ARRAY))
+            {
+                for (size_t i = 0; i < args.size(); ++i)
+                {
+                    if (const AstArray *array2 = static_cast<const AstArray *>(args[i]))
+                    {
+                        for (size_t k = 0; k < array2->size(); ++k)
+                        {
+                            array->add((*array2)[k]->eval());
+                        }
+                    }
+                }
+                delete ast1;
+                return array;
+            }
             delete ast1;
-            delete ast2;
-            return new AstStr(str1 + str2);
+            break;
+
+        default:
+            break;
         }
+
         delete ast1;
     }
+
     return NULL;
 }
 
@@ -993,8 +1038,8 @@ bool EGA_init(void)
     EGA_add_fn(">=", 2, 2, EGA_ge);
     EGA_add_fn("print", 0, 16, EGA_print);
     EGA_add_fn("?", 0, 16, EGA_print);
-    EGA_add_fn("str_len", 1, 1, EGA_str_len);
-    EGA_add_fn("str_cat", 2, 2, EGA_str_cat);
+    EGA_add_fn("len", 1, 1, EGA_len);
+    EGA_add_fn("cat", 0, 15, EGA_cat);
     EGA_add_fn("plus", 2, 2, EGA_plus);
     EGA_add_fn("+", 2, 2, EGA_plus);
     EGA_add_fn("minus", 1, 2, EGA_minus);
