@@ -60,7 +60,6 @@ std::string dump_token_type(TokenType type);
 
 enum AstType
 {
-    AST_INVALID,
     AST_INT,
     AST_STR,
     AST_ARRAY,
@@ -519,13 +518,13 @@ public:
         switch (m_type)
         {
         case AST_ARRAY:
-            if (AstContainer *container = new AstContainer(AST_ARRAY, "array"))
+            if (AstContainer *ret = new AstContainer(AST_ARRAY, "array"))
             {
                 for (size_t i = 0; i < size(); ++i)
                 {
-                    container->add(m_children[i]->eval());
+                    ret->add(m_children[i]->eval());
                 }
-                return container;
+                return ret;
             }
             break;
 
@@ -553,6 +552,10 @@ protected:
     std::string m_str;
     std::vector<AstBase *> m_children;
 };
+
+typedef AstContainer AstCall;
+typedef AstContainer AstArray;
+typedef AstContainer AstProgram;
 
 //////////////////////////////////////////////////////////////////////////////
 // global functions

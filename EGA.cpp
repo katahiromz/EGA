@@ -114,7 +114,6 @@ std::string dump_ast_type(AstType type)
 {
     switch (type)
     {
-    case AST_INVALID: return "AST_INVALID";
     case AST_INT: return "AST_INT";
     case AST_STR: return "AST_STR";
     case AST_ARRAY: return "AST_ARRAY";
@@ -339,6 +338,7 @@ AstInt *TokenStream::visit_integer_literal()
 
     if (token_type() != TOK_INT)
         return NULL;
+
     AstInt *ai = new AstInt(token()->get_int());
     go_next();
     return ai;
@@ -457,23 +457,18 @@ AstContainer *TokenStream::visit_expression_list(AstType type, const std::string
 
     for (;;)
     {
-        if (token_type() != TOK_SYMBOL)
+        if (token_type() == TOK_SYMBOL)
         {
-            delete list;
-            get_index() = index;
-            return NULL;
-        }
+            if (token_str() == ",")
+            {
+                go_next();
+                continue;
+            }
 
-        if (token_str() == ",")
-        {
-            go_next();
-            continue;
-        }
-
-        if (token_str() == ")")
-        {
-            go_next();
-            break;
+            if (token_str() == ")" || token_str() == "}")
+            {
+                break;
+            }
         }
 
         expr = visit_expression();
@@ -574,6 +569,14 @@ int EGA_int(AstBase *ast)
     if (ast->get_type() != AST_INT)
         throw new EGA_exception;
     return static_cast<AstInt *>(ast)->get_int();
+}
+
+AstArray *EGA_array(AstBase *ast)
+{
+    EVAL_DEBUG();
+    if (ast->get_type() != AST_ARRAY)
+        throw new EGA_exception;
+    return static_cast<AstArray *>(ast);
 }
 
 std::string EGA_str(AstBase *ast)
@@ -943,6 +946,35 @@ AstBase* EGA_eval(const args_t& args)
     return args[0]->eval();
 }
 
+AstBase* EGA_at(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (AstBase *ast1 = do_eval_ast(args[0]))
+    {
+        if (AstBase *ast2 = do_eval_ast(args[1]))
+        {
+            if (AstArray *array = EGA_array(ast1))
+            {
+                size_t index = EGA_int(ast2);
+                if (index < array->size())
+                {
+                    delete ast1;
+                    delete ast2;
+                    return (*array)[index]->eval();
+                }
+            }
+            delete ast2;
+        }
+        delete ast1;
+    }
+
+    return NULL;
+}
+
 bool EGA_init(void)
 {
     EGA_add_fn("equal", 2, 2, EGA_equal);
@@ -977,6 +1009,8 @@ bool EGA_init(void)
     EGA_add_fn("=", 2, 2, EGA_set);
     EGA_add_fn(":=", 2, 2, EGA_set);
     EGA_add_fn("eval", 1, 1, EGA_eval);
+    EGA_add_fn("[]", 2, 2, EGA_at);
+    EGA_add_fn("at", 2, 2, EGA_at);
     return true;
 }
 
