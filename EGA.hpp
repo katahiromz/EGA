@@ -30,6 +30,14 @@ struct EGA_FUNCTION
     size_t min_args;
     size_t max_args;
     EGA_PROC proc;
+
+    EGA_FUNCTION(std::string n, size_t m1, size_t m2, EGA_PROC p)
+        : name(n)
+        , min_args(m1)
+        , max_args(m2)
+        , proc(p)
+    {
+    }
 };
 
 struct EGA_exception { };
@@ -514,7 +522,6 @@ public:
 
     virtual AstBase *eval() const
     {
-        AstBase *ptr;
         switch (m_type)
         {
         case AST_ARRAY:
@@ -532,13 +539,17 @@ public:
             return EGA_eval_fn(m_str, m_children);
 
         case AST_PROGRAM:
-            ptr = NULL;
-            for (auto& base : m_children)
+            if (size())
             {
-                delete ptr;
-                ptr = base->eval();
+                AstBase *ptr = m_children[0]->eval();
+                for (size_t i = 1; i < size(); ++i)
+                {
+                    delete ptr;
+                    ptr = m_children[i]->eval();
+                }
+                return ptr;
             }
-            return ptr;
+            return NULL;
 
         default:
             assert(0);

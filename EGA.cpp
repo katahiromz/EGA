@@ -2,6 +2,7 @@
 // Copyright (C) 2020 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>
 // This file is public domain software.
 
+#define _CRT_SECURE_NO_WARNINGS
 #include "EGA.hpp"
 #include <cstdio>
 #include <cstring>
@@ -502,7 +503,7 @@ EGA_FUNCTION *EGA_get_fn(const std::string& name)
 bool
 EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc)
 {
-    EGA_FUNCTION *fn = new EGA_FUNCTION { name, min_args, max_args, proc };
+    EGA_FUNCTION *fn = new EGA_FUNCTION(name, min_args, max_args, proc);
     delete s_fn_map[name];
     s_fn_map[name] = fn;
     return true;
@@ -962,9 +963,10 @@ AstBase* EGA_at(const args_t& args)
                 size_t index = EGA_int(ast2);
                 if (index < array->size())
                 {
+                    AstBase *base = (*array)[index]->eval();
                     delete ast1;
                     delete ast2;
-                    return (*array)[index]->eval();
+                    return base;
                 }
             }
             delete ast2;
@@ -1068,11 +1070,12 @@ do_file_input_mode(const char *filename)
         }
         fclose(fp);
 
-        return do_eval_text(str.c_str());
+        do_eval_text(str.c_str());
+        return true;
     }
 
     printf("ERROR: cannot open file '%s'\n", filename);
-    return -1;
+    return false;
 }
 
 int main(int argc, char **argv)
