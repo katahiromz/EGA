@@ -497,7 +497,10 @@ AstContainer *TokenStream::visit_expression_list(AstType type, const std::string
 EGA_FUNCTION *EGA_get_fn(const std::string& name)
 {
     EVAL_DEBUG();
-    return s_fn_map[name];
+    fn_map_t::iterator it = s_fn_map.find(name);
+    if (it == s_fn_map.end())
+        return NULL;
+    return it->second;
 }
 
 bool
@@ -988,7 +991,9 @@ AstBase* EGA_set(const args_t& args)
         return NULL;
 
     std::string name = static_cast<const AstVar *>(args[0])->get_name();
-    EGA_set_var(name, args[1]);
+    AstBase *value = args[1]->eval();
+    EGA_set_var(name, value);
+    delete value;
     return NULL;
 }
 
@@ -1033,6 +1038,33 @@ AstBase* EGA_for(const args_t& args)
                     delete ast3;
                 }
             }
+        }
+    }
+
+    return NULL;
+}
+
+AstBase* EGA_while(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    while (true)
+    {
+        AstBase *ast1 = do_eval_ast(args[0]);
+        if (ast1)
+        {
+            int i1 = EGA_int(ast1);
+            delete ast1;
+            if (!i1)
+                break;
+        }
+
+        if (AstBase *ast2 = do_eval_ast(args[1]))
+        {
+            delete ast2;
         }
     }
 
@@ -1106,6 +1138,7 @@ bool EGA_init(void)
     EGA_add_fn("[]", 2, 2, EGA_at);
     EGA_add_fn("at", 2, 2, EGA_at);
     EGA_add_fn("for", 4, 4, EGA_for);
+    EGA_add_fn("while", 2, 2, EGA_while);
     return true;
 }
 
