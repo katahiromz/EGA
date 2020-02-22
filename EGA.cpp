@@ -524,10 +524,21 @@ AstBase *
 EGA_eval_fn(const std::string& name, const args_t& args)
 {
     EVAL_DEBUG();
-    if (EGA_FUNCTION *fn = EGA_get_fn(name))
+    if (name.size())
     {
-        if (fn->min_args <= args.size() && args.size() <= fn->max_args)
-            return (*(fn->proc))(args);
+        if (EGA_FUNCTION *fn = EGA_get_fn(name))
+        {
+            if (fn->min_args <= args.size() && args.size() <= fn->max_args)
+                return (*(fn->proc))(args);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < args.size(); ++i)
+        {
+            AstBase *ast = args[i]->eval();
+            delete ast;
+        }
     }
     return NULL;
 }
@@ -991,6 +1002,43 @@ AstBase* EGA_eval(const args_t& args)
     return args[0]->eval();
 }
 
+AstBase* EGA_for(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 4)
+        return NULL;
+
+    if (args[0]->get_type() != AST_VAR)
+        return NULL;
+
+    if (AstBase *ast1 = do_eval_ast(args[1]))
+    {
+        int i1 = EGA_int(ast1);
+        delete ast1;
+        if (AstBase *ast2 = do_eval_ast(args[2]))
+        {
+            int i2 = EGA_int(ast2);
+            delete ast2;
+
+            for (int i = i1; i <= i2; ++i)
+            {
+                AstInt *ai = new AstInt(i);
+                const AstVar *var = reinterpret_cast<const AstVar *>(args[0]);
+                EGA_set_var(var->get_name(), ai);
+                delete ai;
+
+                if (AstBase *ast3 = do_eval_ast(args[3]))
+                {
+                    delete ast3;
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
 AstBase* EGA_at(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1057,6 +1105,7 @@ bool EGA_init(void)
     EGA_add_fn("eval", 1, 1, EGA_eval);
     EGA_add_fn("[]", 2, 2, EGA_at);
     EGA_add_fn("at", 2, 2, EGA_at);
+    EGA_add_fn("for", 4, 4, EGA_for);
     return true;
 }
 
