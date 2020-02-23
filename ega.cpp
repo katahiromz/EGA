@@ -324,13 +324,13 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
 
         EGA_do_print("ERROR: invalid character '%c' (%u)\n", *pch, (*pch & 0xFF));
         m_error = -1;
-        return lineno;
+        return false;
     }
 
     add(TOK_EOF, lineno, "");
 
     m_error = 0;
-    return lineno;
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
