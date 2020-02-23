@@ -1,9 +1,9 @@
-// EGA.cpp --- The Programming Language EGA
+// ega.cpp --- The Programming Language EGA
 // Copyright (C) 2020 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>
 // This file is public domain software.
 
 #define _CRT_SECURE_NO_WARNINGS
-#include "EGA.hpp"
+#include "ega.hpp"
 #include <unordered_map>
 #include <algorithm>
 #include <cstdio>

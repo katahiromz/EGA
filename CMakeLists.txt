@@ -36,10 +36,10 @@ endif()
 ##############################################################################
 
 # ega.exe
-add_executable(ega EGA.cpp)
+add_executable(ega ega.cpp)
 
 # libega.a
-add_library(libega STATIC EGA.cpp)
+add_library(libega STATIC ega.cpp)
 set_target_properties(libega PROPERTIES PREFIX "")
 target_compile_definitions(libega PRIVATE -DEGA_LIB)
 
