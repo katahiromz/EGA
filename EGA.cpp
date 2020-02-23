@@ -491,6 +491,40 @@ arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
     #define EVAL_DEBUG() do { puts(__func__); fflush(stdout); } while (0)
 #endif
 
+arg_t AstContainer::eval() const
+{
+    switch (m_type)
+    {
+    case AST_ARRAY:
+        if (auto ret = make_arg<AstContainer>(AST_ARRAY, "array"))
+        {
+            for (size_t i = 0; i < size(); ++i)
+            {
+                ret->add(m_children[i]->eval());
+            }
+            return ret;
+        }
+        break;
+
+    case AST_CALL:
+        return EGA_eval_fn(m_str, m_children);
+
+    case AST_PROGRAM:
+        if (size())
+        {
+            return EGA_eval_program(m_children, true);
+        }
+        return NULL;
+
+    default:
+        assert(0);
+        break;
+    }
+
+    return NULL;
+}
+
+
 fn_t EGA_get_fn(const std::string& name)
 {
     EVAL_DEBUG();
@@ -520,6 +554,33 @@ arg_t EGA_eval_var(const std::string& name)
 }
 
 arg_t
+EGA_eval_program(const args_t& args, bool do_break)
+{
+    arg_t arg;
+
+    for (size_t i = 0; i < args.size(); ++i)
+    {
+        if (do_break)
+        {
+            try
+            {
+                arg = args[i]->eval();
+            }
+            catch (EGA_break_exception&)
+            {
+                ;
+            }
+        }
+        else
+        {
+            arg = args[i]->eval();
+        }
+    }
+
+    return arg;
+}
+
+arg_t
 EGA_eval_fn(const std::string& name, const args_t& args)
 {
     EVAL_DEBUG();
@@ -535,10 +596,7 @@ EGA_eval_fn(const std::string& name, const args_t& args)
     }
     else
     {
-        for (size_t i = 0; i < args.size(); ++i)
-        {
-            args[i]->eval();
-        }
+        return EGA_eval_program(args, false);
     }
     return NULL;
 }
@@ -574,6 +632,16 @@ void do_eval_text_ex(const char *text)
     try
     {
         do_eval_text(text);
+    }
+    catch (EGA_end_exception& e)
+    {
+        if (e.m_arg)
+        {
+            if (auto evaled = EGA_eval(e.m_arg))
+            {
+                evaled->print();
+            }
+        }
     }
     catch (EGA_exception& e)
     {
@@ -1070,6 +1138,21 @@ arg_t EGA_while(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_end(const args_t& args)
+{
+    EVAL_DEBUG();
+    if (args.size() == 1)
+        throw EGA_end_exception(args[0]);
+    else
+        throw EGA_end_exception(NULL);
+}
+
+arg_t EGA_break(const args_t& args)
+{
+    EVAL_DEBUG();
+    throw EGA_break_exception();
+}
+
 arg_t EGA_at(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1374,6 +1457,8 @@ bool EGA_init(void)
     EGA_add_fn("?:", 2, 3, EGA_if);
     EGA_add_fn("for", 4, 4, EGA_for);
     EGA_add_fn("while", 2, 2, EGA_while);
+    EGA_add_fn("end", 0, 1, EGA_end);
+    EGA_add_fn("break", 0, 0, EGA_break);
 
     // comparison
     EGA_add_fn("equal", 2, 2, EGA_equal);

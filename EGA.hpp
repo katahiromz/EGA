@@ -67,6 +67,7 @@ typedef std::shared_ptr<EGA_FUNCTION> fn_t;
 fn_t EGA_get_fn(const std::string& name);
 bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args);
+arg_t EGA_eval_program(const args_t& args, bool do_break);
 arg_t EGA_eval_var(const std::string& name);
 void EGA_set_var(const std::string& name, arg_t ast);
 
@@ -102,18 +103,20 @@ public:
     }
 };
 
-class EGA_break_exception : public EGA_exception
+class EGA_end_exception : public EGA_exception
 {
 public:
-    EGA_break_exception() : EGA_exception("break exception")
+    arg_t m_arg;
+
+    EGA_end_exception(arg_t arg) : EGA_exception("end exception"), m_arg(arg)
     {
     }
 };
 
-class EGA_end_exception : public EGA_exception
+class EGA_break_exception : public EGA_exception
 {
 public:
-    EGA_end_exception() : EGA_exception("end exception")
+    EGA_break_exception() : EGA_exception("break exception")
     {
     }
 };
@@ -580,43 +583,7 @@ public:
         return ret;
     }
 
-    virtual arg_t eval() const
-    {
-        switch (m_type)
-        {
-        case AST_ARRAY:
-            if (auto ret = make_arg<AstContainer>(AST_ARRAY, "array"))
-            {
-                for (size_t i = 0; i < size(); ++i)
-                {
-                    ret->add(m_children[i]->eval());
-                }
-                return ret;
-            }
-            break;
-
-        case AST_CALL:
-            return EGA_eval_fn(m_str, m_children);
-
-        case AST_PROGRAM:
-            if (size())
-            {
-                auto arg = m_children[0]->eval();
-                for (size_t i = 1; i < size(); ++i)
-                {
-                    arg = m_children[i]->eval();
-                }
-                return arg;
-            }
-            return NULL;
-
-        default:
-            assert(0);
-            break;
-        }
-
-        return NULL;
-    }
+    virtual arg_t eval() const;
 
 protected:
     std::string m_str;
