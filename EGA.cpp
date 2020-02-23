@@ -239,10 +239,10 @@ bool TokenStream::do_lexical(const char *input)
 #if defined(NDEBUG) || 1
     #define PARSE_DEBUG()
 #else
-    #define PARSE_DEBUG() do { puts(__func__); do_print_stream(*this); } while (0)
+    #define PARSE_DEBUG() do { puts(__func__); EGA_print_stream(*this); } while (0)
 #endif
 
-void do_print_stream(TokenStream& stream)
+void EGA_print_stream(TokenStream& stream)
 {
     stream.print();
     puts("");
@@ -596,7 +596,7 @@ EGA_eval_fn(const std::string& name, const args_t& args)
     return NULL;
 }
 
-arg_t EGA_eval(arg_t ast, bool do_check)
+arg_t EGA_eval_arg(arg_t ast, bool do_check)
 {
     EVAL_DEBUG();
     if (!ast)
@@ -607,7 +607,7 @@ arg_t EGA_eval(arg_t ast, bool do_check)
     return ret;
 }
 
-void do_eval_text(const char *text)
+void EGA_eval_text(const char *text)
 {
     TokenStream stream;
     if (!stream.do_lexical(text))
@@ -617,24 +617,24 @@ void do_eval_text(const char *text)
     if (!ast)
         throw EGA_syntax_error();
 
-    auto evaled = EGA_eval(ast);
+    auto evaled = EGA_eval_arg(ast);
     if (evaled)
     {
         evaled->print();
     }
 }
 
-void do_eval_text_ex(const char *text)
+void EGA_eval_text_ex(const char *text)
 {
     try
     {
-        do_eval_text(text);
+        EGA_eval_text(text);
     }
     catch (EGA_exit_exception& e)
     {
         if (e.m_arg)
         {
-            if (auto evaled = EGA_eval(e.m_arg))
+            if (auto evaled = EGA_eval_arg(e.m_arg))
             {
                 evaled->print();
             }
@@ -675,8 +675,8 @@ EGA_compare_0(arg_t a1, arg_t a2)
 {
     EVAL_DEBUG();
 
-    auto ast1 = EGA_eval(a1, true);
-    auto ast2 = EGA_eval(a2, true);
+    auto ast1 = EGA_eval_arg(a1, true);
+    auto ast2 = EGA_eval_arg(a2, true);
 
     if (ast1->get_type() < ast2->get_type())
     {
@@ -827,7 +827,7 @@ arg_t EGA_print(const args_t& args)
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        if (auto ast = EGA_eval(args[i]))
+        if (auto ast = EGA_eval_arg(args[i]))
         {
             printf("%s", ast->dump(false).c_str());
         }
@@ -850,7 +850,7 @@ arg_t EGA_dump(const args_t& args)
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        if (auto ast = EGA_eval(args[i]))
+        if (auto ast = EGA_eval_arg(args[i]))
         {
             printf("%s", ast->dump(true).c_str());
         }
@@ -870,7 +870,7 @@ arg_t EGA_dumpln(const args_t& args)
 arg_t EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         switch (ast1->get_type())
         {
@@ -897,7 +897,7 @@ arg_t EGA_cat(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         switch (ast1->get_type())
         {
@@ -941,9 +941,9 @@ arg_t EGA_plus(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -959,7 +959,7 @@ arg_t EGA_minus(const args_t& args)
 
     if (args.size() == 1)
     {
-        if (auto ast1 = EGA_eval(args[0], true))
+        if (auto ast1 = EGA_eval_arg(args[0], true))
         {
             int i1 = EGA_int(ast1);
             return make_arg<AstInt>(-i1);
@@ -969,9 +969,9 @@ arg_t EGA_minus(const args_t& args)
 
     if (args.size() == 2)
     {
-        if (auto ast1 = EGA_eval(args[0], true))
+        if (auto ast1 = EGA_eval_arg(args[0], true))
         {
-            if (auto ast2 = EGA_eval(args[1], true))
+            if (auto ast2 = EGA_eval_arg(args[1], true))
             {
                 int i1 = EGA_int(ast1);
                 int i2 = EGA_int(ast2);
@@ -987,9 +987,9 @@ arg_t EGA_mul(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1004,9 +1004,9 @@ arg_t EGA_div(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1021,9 +1021,9 @@ arg_t EGA_mod(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1038,19 +1038,19 @@ arg_t EGA_if(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         int i1 = EGA_int(ast1);
         if (i1)
         {
-            if (auto ast2 = EGA_eval(args[1]))
+            if (auto ast2 = EGA_eval_arg(args[1]))
             {
                 return ast2;
             }
         }
         else if (args.size() == 3)
         {
-            if (auto ast3 = EGA_eval(args[2]))
+            if (auto ast3 = EGA_eval_arg(args[2]))
             {
                 return ast3;
             }
@@ -1120,9 +1120,9 @@ arg_t EGA_for(const args_t& args)
         throw EGA_type_mismatch();
 
     arg_t arg;
-    if (auto ast1 = EGA_eval(args[1], true))
+    if (auto ast1 = EGA_eval_arg(args[1], true))
     {
-        if (auto ast2 = EGA_eval(args[2], true))
+        if (auto ast2 = EGA_eval_arg(args[2], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1135,7 +1135,7 @@ arg_t EGA_for(const args_t& args)
 
                 try
                 {
-                    arg = EGA_eval(args[3]);
+                    arg = EGA_eval_arg(args[3]);
                 }
                 catch (EGA_break_exception&)
                 {
@@ -1158,7 +1158,7 @@ arg_t EGA_foreach(const args_t& args)
     arg_t arg;
     if (auto var = std::static_pointer_cast<AstVar>(args[0]))
     {
-        if (auto ast = EGA_eval(args[1], true))
+        if (auto ast = EGA_eval_arg(args[1], true))
         {
             if (auto array = EGA_array(ast))
             {
@@ -1168,7 +1168,7 @@ arg_t EGA_foreach(const args_t& args)
 
                     try
                     {
-                        arg = EGA_eval(args[2]);
+                        arg = EGA_eval_arg(args[2]);
                     }
                     catch (EGA_break_exception&)
                     {
@@ -1189,7 +1189,7 @@ arg_t EGA_while(const args_t& args)
     arg_t arg;
     for (;;)
     {
-        auto ast1 = EGA_eval(args[0], true);
+        auto ast1 = EGA_eval_arg(args[0], true);
         if (ast1)
         {
             int i1 = EGA_int(ast1);
@@ -1199,7 +1199,7 @@ arg_t EGA_while(const args_t& args)
 
         try
         {
-            arg = EGA_eval(args[1]);
+            arg = EGA_eval_arg(args[1]);
         }
         catch (EGA_break_exception&)
         {
@@ -1219,7 +1219,7 @@ arg_t EGA_do(const args_t& args)
     {
         try
         {
-            arg = EGA_eval(args[i]);
+            arg = EGA_eval_arg(args[i]);
         }
         catch (EGA_break_exception&)
         {
@@ -1249,9 +1249,9 @@ arg_t EGA_at(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             switch (ast1->get_type())
             {
@@ -1289,7 +1289,7 @@ arg_t EGA_not(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         int i = EGA_int(ast1);
         return make_arg<AstInt>(!i);
@@ -1302,9 +1302,9 @@ arg_t EGA_or(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1319,9 +1319,9 @@ arg_t EGA_and(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1336,7 +1336,7 @@ arg_t EGA_compl(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         int i = EGA_int(ast1);
         return make_arg<AstInt>(~i);
@@ -1349,9 +1349,9 @@ arg_t EGA_bitor(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1366,9 +1366,9 @@ arg_t EGA_bitand(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1383,9 +1383,9 @@ arg_t EGA_xor(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
@@ -1400,9 +1400,9 @@ arg_t EGA_left(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             size_t i2 = EGA_int(ast2);
             switch (ast1->get_type())
@@ -1448,9 +1448,9 @@ arg_t EGA_right(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
             size_t i2 = EGA_int(ast2);
             switch (ast1->get_type())
@@ -1498,11 +1498,11 @@ arg_t EGA_mid(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval(args[1], true))
+        if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            if (auto ast3 = EGA_eval(args[2], true))
+            if (auto ast3 = EGA_eval_arg(args[2], true))
             {
                 size_t i2 = EGA_int(ast2);
                 size_t i3 = EGA_int(ast3);
@@ -1640,8 +1640,7 @@ EGA_uninit(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void
-show_help(void)
+void EGA_show_help(void)
 {
     printf("EGA has the following functions:\n");
     for (auto pair : s_fn_map)
@@ -1650,8 +1649,7 @@ show_help(void)
     }
 }
 
-void
-show_help(const std::string& name)
+void EGA_show_help(const std::string& name)
 {
     auto it = s_fn_map.find(name);
     if (it == s_fn_map.end() || !it->second)
@@ -1674,8 +1672,7 @@ show_help(const std::string& name)
     printf("  usage: %s\n", it->second->help.c_str());
 }
 
-int
-do_interpret_mode(void)
+int EGA_interactive(void)
 {
     char buf[512];
 
@@ -1686,15 +1683,17 @@ do_interpret_mode(void)
         printf("\nEGA> ");
         std::fflush(stdout);
 
-        if (fgets(buf, sizeof(buf), stdin))
+        if (!fgets(buf, sizeof(buf), stdin))
+            break;
 
         mstr_trim(buf, " \t\r\n\f\v;");
+
         if (strcmp(buf, "exit") == 0)
             break;
 
         if (strcmp(buf, "help") == 0)
         {
-            show_help();
+            EGA_show_help();
             continue;
         }
 
@@ -1703,18 +1702,17 @@ do_interpret_mode(void)
         {
             std::string name = &buf[5];
             mstr_trim(name, " \t\r\n\f\v;");
-            show_help(name);
+            EGA_show_help(name);
             continue;
         }
 
-        do_eval_text_ex(buf);
+        EGA_eval_text_ex(buf);
     }
 
     return 0;
 }
 
-bool
-do_file_input_mode(const char *filename)
+bool EGA_file_input(const char *filename)
 {
     std::string str;
     if (FILE *fp = fopen(filename, "r"))
@@ -1726,7 +1724,7 @@ do_file_input_mode(const char *filename)
         }
         fclose(fp);
 
-        do_eval_text_ex(str.c_str());
+        EGA_eval_text_ex(str.c_str());
         return true;
     }
 
@@ -1741,11 +1739,11 @@ int main(int argc, char **argv)
 
     if (argc <= 1)
     {
-        do_interpret_mode();
+        EGA_interactive();
     }
     else
     {
-        do_file_input_mode(argv[1]);
+        EGA_file_input(argv[1]);
     }
 
     EGA_uninit();

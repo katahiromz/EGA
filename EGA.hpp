@@ -629,6 +629,10 @@ void EGA_uninit(void);
 
 arg_t EGA_eval_program(const args_t& args);
 void EGA_set_var(const std::string& name, arg_t ast);
-arg_t EGA_eval(arg_t ast, bool do_check = false);
+arg_t EGA_eval_arg(arg_t ast, bool do_check = false);
+void EGA_eval_text_ex(const char *text);
+
+int EGA_interactive(void);
+bool EGA_file_input(const char *filename);
 
 #endif  // ndef EGA_HPP_
