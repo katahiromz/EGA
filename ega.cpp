@@ -1831,7 +1831,7 @@ bool EGA_init(void)
 
     // array/string manipulation
     EGA_add_fn("len", 1, 1, EGA_len, "len(ary_or_str)");
-    EGA_add_fn("cat", 1, 256, EGA_cat, "len(ary_or_str_1, ary_or_str_2, ...)");
+    EGA_add_fn("cat", 1, 256, EGA_cat, "cat(ary_or_str_1, ary_or_str_2, ...)");
     EGA_add_fn("[]", 2, 2, EGA_at, "at(ary_or_str, index)");
     EGA_add_fn("at", 2, 2, EGA_at, "at(ary_or_str, index)");
     EGA_add_fn("left", 2, 2, EGA_left, "left(ary_or_str, count)");
