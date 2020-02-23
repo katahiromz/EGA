@@ -1,0 +1,4 @@
+set(A, input("A="));
+set(B, input("B="));
+set(C, +(int(A), int(B)));
+print(C);
