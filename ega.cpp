@@ -1970,7 +1970,7 @@ bool EGA_init(void)
     EGA_add_fn("mid", 3, 3, EGA_mid, "mid(ary_or_str, index, count)");
     EGA_add_fn("find", 2, 2, EGA_find, "find(ary_or_str, target)");
     EGA_add_fn("replace", 3, 3, EGA_replace, "replace(ary_or_str, from, to)");
-    EGA_add_fn("remove", 2, 2, EGA_remove, "replace(ary_or_str, target)");
+    EGA_add_fn("remove", 2, 2, EGA_remove, "remove(ary_or_str, target)");
 
     return true;
 }
