@@ -4,9 +4,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "EGA.hpp"
+#include <unordered_map>
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
-#include <unordered_map>
 
 static int s_alive_tokens = 0;
 static int s_alive_ast = 0;
@@ -155,13 +156,12 @@ bool TokenStream::do_lexical(const char *input)
             for (;;)
             {
                 ++pch;
-                if (!is_ident_char(*pch))
+                if (!*pch || !is_ident_char(*pch))
                     break;
                 str += *pch;
             }
 
             add(TOK_IDENT, lineno, str);
-            --pch;
             --pch;
             continue;
         }
@@ -552,7 +552,7 @@ arg_t EGA_eval(const arg_t& ast)
     return ret;
 }
 
-int do_eval_text(const char *text)
+void do_eval_text(const char *text)
 {
     TokenStream stream;
     if (!stream.do_lexical(text))
@@ -567,8 +567,18 @@ int do_eval_text(const char *text)
     {
         evaled->print();
     }
+}
 
-    return 0;
+void do_eval_text_ex(const char *text)
+{
+    try
+    {
+        do_eval_text(text);
+    }
+    catch (EGA_exception& e)
+    {
+        printf("ERROR: %s\n", e.what());
+    }
 }
 
 int EGA_int(arg_t ast)
@@ -1416,7 +1426,7 @@ do_interpret_mode(void)
         if (strcmp(buf, "quit") == 0)
             break;
 
-        do_eval_text(buf);
+        do_eval_text_ex(buf);
         printf("\nEGA> ");
         std::fflush(stdout);
     }
@@ -1437,7 +1447,7 @@ do_file_input_mode(const char *filename)
         }
         fclose(fp);
 
-        do_eval_text(str.c_str());
+        do_eval_text_ex(str.c_str());
         return true;
     }
 
