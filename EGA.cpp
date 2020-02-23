@@ -1012,16 +1012,6 @@ arg_t EGA_set(const args_t& args)
     return NULL;
 }
 
-arg_t EGA_eval(const args_t& args)
-{
-    EVAL_DEBUG();
-
-    if (args.size() != 1)
-        return NULL;
-
-    return args[0]->eval();
-}
-
 arg_t EGA_for(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1252,6 +1242,17 @@ arg_t EGA_xor(const args_t& args)
 
 bool EGA_init(void)
 {
+    // assignment
+    EGA_add_fn("set", 2, 2, EGA_set);
+    EGA_add_fn("=", 2, 2, EGA_set);
+    EGA_add_fn(":=", 2, 2, EGA_set);
+
+    // control structure
+    EGA_add_fn("if", 2, 3, EGA_if);
+    EGA_add_fn("?:", 2, 3, EGA_if);
+    EGA_add_fn("for", 4, 4, EGA_for);
+    EGA_add_fn("while", 2, 2, EGA_while);
+
     // comparison
     EGA_add_fn("equal", 2, 2, EGA_equal);
     EGA_add_fn("==", 2, 2, EGA_equal);
@@ -1308,14 +1309,6 @@ bool EGA_init(void)
     EGA_add_fn("[]", 2, 2, EGA_at);
     EGA_add_fn("at", 2, 2, EGA_at);
 
-    EGA_add_fn("if", 2, 3, EGA_if);
-    EGA_add_fn("?:", 2, 3, EGA_if);
-    EGA_add_fn("set", 2, 2, EGA_set);
-    EGA_add_fn("=", 2, 2, EGA_set);
-    EGA_add_fn(":=", 2, 2, EGA_set);
-    EGA_add_fn("eval", 1, 1, EGA_eval);
-    EGA_add_fn("for", 4, 4, EGA_for);
-    EGA_add_fn("while", 2, 2, EGA_while);
     return true;
 }
 
