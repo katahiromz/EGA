@@ -627,7 +627,7 @@ typedef AstContainer AstProgram;
 bool EGA_init(void);
 void EGA_uninit(void);
 
-arg_t EGA_eval_program(const args_t& args, bool do_break);
+arg_t EGA_eval_program(const args_t& args);
 void EGA_set_var(const std::string& name, arg_t ast);
 arg_t EGA_eval(arg_t ast, bool do_check = false);
 

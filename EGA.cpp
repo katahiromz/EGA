@@ -522,7 +522,7 @@ arg_t AstContainer::eval() const
         return EGA_eval_fn(m_str, m_children);
 
     case AST_PROGRAM:
-        return EGA_eval_program(m_children, true);
+        return EGA_eval_program(m_children);
 
     default:
         assert(0);
@@ -563,27 +563,13 @@ arg_t EGA_eval_var(const std::string& name)
 }
 
 arg_t
-EGA_eval_program(const args_t& args, bool do_break)
+EGA_eval_program(const args_t& args)
 {
     arg_t arg;
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        if (do_break)
-        {
-            try
-            {
-                arg = args[i]->eval();
-            }
-            catch (EGA_break_exception&)
-            {
-                ;
-            }
-        }
-        else
-        {
-            arg = args[i]->eval();
-        }
+        arg = args[i]->eval();
     }
 
     return arg;
@@ -605,7 +591,7 @@ EGA_eval_fn(const std::string& name, const args_t& args)
     }
     else
     {
-        return EGA_eval_program(args, false);
+        return EGA_eval_program(args);
     }
     return NULL;
 }
