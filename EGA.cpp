@@ -522,11 +522,7 @@ arg_t AstContainer::eval() const
         return EGA_eval_fn(m_str, m_children);
 
     case AST_PROGRAM:
-        if (size())
-        {
-            return EGA_eval_program(m_children, true);
-        }
-        return NULL;
+        return EGA_eval_program(m_children, true);
 
     default:
         assert(0);
@@ -560,7 +556,7 @@ arg_t EGA_eval_var(const std::string& name)
 
     var_map_t::iterator it = s_var_map.find(name);
     if (it == s_var_map.end() || !it->second)
-        return NULL;
+        throw EGA_undefined_variable(name);
 
     return it->second->eval();
 }
@@ -645,7 +641,7 @@ void do_eval_text_ex(const char *text)
     {
         do_eval_text(text);
     }
-    catch (EGA_end_exception& e)
+    catch (EGA_exit_exception& e)
     {
         if (e.m_arg)
         {
@@ -1110,6 +1106,7 @@ arg_t EGA_for(const args_t& args)
     if (args[0]->get_type() != AST_VAR)
         throw EGA_type_mismatch();
 
+    arg_t arg;
     if (auto ast1 = EGA_eval(args[1]))
     {
         if (auto ast2 = EGA_eval(args[2]))
@@ -1122,19 +1119,28 @@ arg_t EGA_for(const args_t& args)
                 auto ai = make_arg<AstInt>(i);
                 auto var = std::static_pointer_cast<AstVar>(args[0]);
                 EGA_set_var(var->get_name(), ai);
-                EGA_eval(args[3]);
+
+                try
+                {
+                    arg = EGA_eval(args[3]);
+                }
+                catch (EGA_break_exception&)
+                {
+                    break;
+                }
             }
         }
     }
 
-    return NULL;
+    return arg;
 }
 
 arg_t EGA_while(const args_t& args)
 {
     EVAL_DEBUG();
 
-    while (true)
+    arg_t arg;
+    for (;;)
     {
         auto ast1 = EGA_eval(args[0]);
         if (ast1)
@@ -1144,19 +1150,46 @@ arg_t EGA_while(const args_t& args)
                 break;
         }
 
-        EGA_eval(args[1]);
+        try
+        {
+            arg = EGA_eval(args[1]);
+        }
+        catch (EGA_break_exception&)
+        {
+            break;
+        }
     }
 
-    return NULL;
+    return arg;
 }
 
-arg_t EGA_end(const args_t& args)
+arg_t EGA_do(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    arg_t arg;
+    for (size_t i = 0; i < args.size(); ++i)
+    {
+        try
+        {
+            arg = EGA_eval(args[i]);
+        }
+        catch (EGA_break_exception&)
+        {
+            break;
+        }
+    }
+
+    return arg;
+}
+
+arg_t EGA_exit(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() == 1)
-        throw EGA_end_exception(args[0]);
+        throw EGA_exit_exception(args[0]);
     else
-        throw EGA_end_exception(NULL);
+        throw EGA_exit_exception(NULL);
 }
 
 arg_t EGA_break(const args_t& args)
@@ -1469,7 +1502,8 @@ bool EGA_init(void)
     EGA_add_fn("?:", 2, 3, EGA_if);
     EGA_add_fn("for", 4, 4, EGA_for);
     EGA_add_fn("while", 2, 2, EGA_while);
-    EGA_add_fn("end", 0, 1, EGA_end);
+    EGA_add_fn("do", 0, 256, EGA_do);
+    EGA_add_fn("exit", 0, 1, EGA_exit);
     EGA_add_fn("break", 0, 0, EGA_break);
 
     // comparison

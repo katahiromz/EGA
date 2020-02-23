@@ -94,6 +94,15 @@ public:
     }
 };
 
+class EGA_undefined_variable : public EGA_exception
+{
+public:
+    EGA_undefined_variable(const std::string& name)
+        : EGA_exception("undefined variable: '" + std::string(name) + "'")
+    {
+    }
+};
+
 class EGA_argument_number_exception : public EGA_exception
 {
 public:
@@ -103,12 +112,12 @@ public:
     }
 };
 
-class EGA_end_exception : public EGA_exception
+class EGA_exit_exception : public EGA_exception
 {
 public:
     arg_t m_arg;
 
-    EGA_end_exception(arg_t arg) : EGA_exception("end exception"), m_arg(arg)
+    EGA_exit_exception(arg_t arg) : EGA_exception("exit exception"), m_arg(arg)
     {
     }
 };
