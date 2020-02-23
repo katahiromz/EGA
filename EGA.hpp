@@ -25,7 +25,7 @@ typedef std::shared_ptr<AstBase> arg_t;
 typedef std::vector<arg_t> args_t;
 
 template< class T, class... Args >
-std::shared_ptr<T> make_arg( Args&&... args )
+std::shared_ptr<T> make_arg(Args&&... args)
 {
     return std::make_shared<T>(args...);
 }

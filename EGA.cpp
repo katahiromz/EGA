@@ -1240,6 +1240,88 @@ arg_t EGA_xor(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_left(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            size_t i2 = EGA_int(ast2);
+            switch (ast1->get_type())
+            {
+            case AST_STR:
+                {
+                    std::string str = EGA_str(ast1);
+                    std::string str2 = str.substr(0, i2);
+                    return make_arg<AstStr>(str2);
+                }
+            case AST_ARRAY:
+                {
+                    auto array1 = make_arg<AstArray>(AST_ARRAY);
+                    auto array2 = EGA_array(ast1);
+                    for (size_t i = 0; i < i2; ++i)
+                    {
+                        array1->add((*array2)[i]->clone());
+                    }
+                    return array1;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_right(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            size_t i2 = EGA_int(ast2);
+            switch (ast1->get_type())
+            {
+            case AST_STR:
+                {
+                    std::string str = EGA_str(ast1);
+                    std::string str2 = str.substr(str.size() - i2, i2);
+                    return make_arg<AstStr>(str2);
+                }
+            case AST_ARRAY:
+                {
+                    auto array1 = make_arg<AstArray>(AST_ARRAY);
+                    auto array2 = EGA_array(ast1);
+                    size_t k1 = array2->size() - i2;
+                    size_t k2 = array2->size();
+                    for (size_t i = k1; i < k2; ++i)
+                    {
+                        array1->add((*array2)[i]->clone());
+                    }
+                    return array1;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    return NULL;
+}
+
 bool EGA_init(void)
 {
     // assignment
@@ -1308,6 +1390,8 @@ bool EGA_init(void)
     EGA_add_fn("cat", 0, 15, EGA_cat);
     EGA_add_fn("[]", 2, 2, EGA_at);
     EGA_add_fn("at", 2, 2, EGA_at);
+    EGA_add_fn("left", 2, 2, EGA_left);
+    EGA_add_fn("right", 2, 2, EGA_right);
 
     return true;
 }
