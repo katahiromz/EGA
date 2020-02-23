@@ -1643,21 +1643,21 @@ do_interpret_mode(void)
     char buf[512];
 
     printf("Type 'exit' to exit. Type 'help' to see help.\n");
-    printf("\nEGA> ");
-    std::fflush(stdout);
 
-    while (fgets(buf, sizeof(buf), stdin))
+    for (;;)
     {
-        mstr_trim(buf, " \t\r\n\f\v");
-        if (strcmp(buf, "exit") == 0 || strcmp(buf, "exit;") == 0)
+        printf("\nEGA> ");
+        std::fflush(stdout);
+
+        if (fgets(buf, sizeof(buf), stdin))
+
+        mstr_trim(buf, " \t\r\n\f\v;");
+        if (strcmp(buf, "exit") == 0)
             break;
 
-        if (strcmp(buf, "help") == 0 || strcmp(buf, "help;") == 0)
+        if (strcmp(buf, "help") == 0)
         {
             show_help();
-
-            printf("\nEGA> ");
-            std::fflush(stdout);
             continue;
         }
 
@@ -1667,15 +1667,10 @@ do_interpret_mode(void)
             std::string name = &buf[5];
             mstr_trim(name, " \t\r\n\f\v;");
             show_help(name);
-
-            printf("\nEGA> ");
-            std::fflush(stdout);
             continue;
         }
 
         do_eval_text_ex(buf);
-        printf("\nEGA> ");
-        std::fflush(stdout);
     }
 
     return 0;
