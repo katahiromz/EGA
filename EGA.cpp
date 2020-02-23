@@ -1086,14 +1086,31 @@ arg_t EGA_at(const args_t& args)
     {
         if (auto ast2 = do_eval_ast(args[1]))
         {
-            if (auto array = EGA_array(ast1))
+            switch (ast1->get_type())
             {
-                size_t index = EGA_int(ast2);
-                if (index < array->size())
+            case AST_ARRAY:
+                if (auto array = EGA_array(ast1))
                 {
-                    auto base = (*array)[index]->eval();
-                    return base;
+                    size_t index = EGA_int(ast2);
+                    if (index < array->size())
+                    {
+                        auto base = (*array)[index]->eval();
+                        return base;
+                    }
                 }
+                break;
+            case AST_STR:
+                {
+                    std::string str = EGA_str(ast1);
+                    size_t index = EGA_int(ast2);
+                    if (index < str.size())
+                    {
+                        return make_arg<AstInt>(str[index]);
+                    }
+                }
+                break;
+            default:
+                break;
             }
         }
     }
@@ -1288,6 +1305,8 @@ bool EGA_init(void)
     // array/string manipulation
     EGA_add_fn("len", 1, 1, EGA_len);
     EGA_add_fn("cat", 0, 15, EGA_cat);
+    EGA_add_fn("[]", 2, 2, EGA_at);
+    EGA_add_fn("at", 2, 2, EGA_at);
 
     EGA_add_fn("if", 2, 3, EGA_if);
     EGA_add_fn("?:", 2, 3, EGA_if);
@@ -1295,8 +1314,6 @@ bool EGA_init(void)
     EGA_add_fn("=", 2, 2, EGA_set);
     EGA_add_fn(":=", 2, 2, EGA_set);
     EGA_add_fn("eval", 1, 1, EGA_eval);
-    EGA_add_fn("[]", 2, 2, EGA_at);
-    EGA_add_fn("at", 2, 2, EGA_at);
     EGA_add_fn("for", 4, 4, EGA_for);
     EGA_add_fn("while", 2, 2, EGA_while);
     return true;
