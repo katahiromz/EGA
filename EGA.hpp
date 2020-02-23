@@ -152,6 +152,8 @@ private:
     Token(const Token&);
     Token& operator=(const Token&);
 };
+typedef std::shared_ptr<Token> token_t;
+typedef std::vector<token_t> tokens_t;
 
 //////////////////////////////////////////////////////////////////////////////
 // TokenStream
@@ -170,20 +172,16 @@ public:
 
     virtual ~TokenStream()
     {
-        for (size_t i = 0; i < m_tokens.size(); ++i)
-        {
-            delete m_tokens[i];
-        }
     }
 
-    void add(Token *token)
+    void add(token_t token)
     {
         m_tokens.push_back(token);
     }
 
     void add(TokenType type, int line, const std::string& str)
     {
-        add(new Token(type, line, str));
+        add(std::make_shared<Token>(type, line, str));
     }
 
     bool do_lexical(const char *input);
@@ -200,13 +198,13 @@ public:
 
     arg_t do_parse();
 
-    Token *operator[](size_t index)
+    token_t operator[](size_t index)
     {
         assert(index < size());
         return m_tokens[index];
     }
 
-    const Token *operator[](size_t index) const
+    const token_t& operator[](size_t index) const
     {
         assert(index < size());
         return m_tokens[index];
@@ -222,7 +220,7 @@ public:
         return m_index;
     }
 
-    Token *token()
+    token_t token()
     {
         assert(m_index < size());
         return m_tokens[m_index];
@@ -267,7 +265,7 @@ public:
     }
 
 protected:
-    std::vector<Token *> m_tokens;
+    tokens_t m_tokens;
     int m_error;
     size_t m_index;
 
@@ -379,10 +377,7 @@ public:
 
     virtual std::string dump() const
     {
-        std::string ret = "\"";
-        ret += m_str;
-        ret += "\"";
-        return ret;
+        return m_str;
     }
 
     virtual arg_t clone() const

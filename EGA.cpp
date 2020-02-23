@@ -775,6 +775,15 @@ arg_t EGA_print(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_println(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    EGA_print(args);
+    printf("\n");
+    return NULL;
+}
+
 arg_t EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1108,7 +1117,8 @@ bool EGA_init(void)
     EGA_add_fn("ge", 2, 2, EGA_ge);
     EGA_add_fn(">=", 2, 2, EGA_ge);
     EGA_add_fn("print", 0, 16, EGA_print);
-    EGA_add_fn("?", 0, 16, EGA_print);
+    EGA_add_fn("println", 0, 16, EGA_println);
+    EGA_add_fn("?", 0, 16, EGA_println);
     EGA_add_fn("len", 1, 1, EGA_len);
     EGA_add_fn("cat", 0, 15, EGA_cat);
     EGA_add_fn("plus", 2, 2, EGA_plus);
