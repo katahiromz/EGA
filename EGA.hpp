@@ -20,6 +20,7 @@ class AstStr;
 class AstContainer;
 
 //////////////////////////////////////////////////////////////////////////////
+// arg_t, args_t, make_arg
 
 typedef std::shared_ptr<AstBase> arg_t;
 typedef std::vector<arg_t> args_t;
@@ -45,6 +46,9 @@ std::shared_ptr<T> make_arg(const T1& t1, const T2& t2, const T3& t3)
     return std::make_shared<T>(t1, t2, t3);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// functions
+
 typedef arg_t (*EGA_PROC)(const args_t& args);
 
 struct EGA_FUNCTION
@@ -66,11 +70,11 @@ struct EGA_FUNCTION
 };
 typedef std::shared_ptr<EGA_FUNCTION> fn_t;
 
-fn_t EGA_get_fn(const std::string& name);
 bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc,
                 const std::string& help);
-arg_t EGA_eval_fn(const std::string& name, const args_t& args);
-arg_t EGA_eval_var(const std::string& name);
+
+//////////////////////////////////////////////////////////////////////////////
+// printing
 
 typedef void (*EGA_PRINT_FN)(const char *fmt, va_list va);
 void EGA_set_print_fn(EGA_PRINT_FN fn);
@@ -164,7 +168,7 @@ enum TokenType
     TOK_SYMBOL
 };
 
-std::string dump_token_type(TokenType type);
+std::string EGA_dump_token_type(TokenType type);
 
 //////////////////////////////////////////////////////////////////////////////
 // AstType
@@ -179,22 +183,23 @@ enum AstType
     AST_PROGRAM
 };
 
-std::string dump_ast_type(AstType type);
+std::string EGA_dump_ast_type(AstType type);
 
 //////////////////////////////////////////////////////////////////////////////
 // Token
 
-void token_alive_count(bool add);
-
 class Token
 {
 public:
+    static int s_alive_count;
+    static void alive_count(bool add);
+
     Token(TokenType type, size_t lineno, const std::string& str)
         : m_type(type)
         , m_lineno(lineno)
         , m_str(str)
     {
-        token_alive_count(true);
+        alive_count(true);
 
         if (type == TOK_INT)
             m_int = std::atoi(str.c_str());
@@ -204,7 +209,7 @@ public:
 
     virtual ~Token()
     {
-        token_alive_count(false);
+        alive_count(false);
     }
 
     TokenType& get_type()
@@ -367,14 +372,15 @@ protected:
 //////////////////////////////////////////////////////////////////////////////
 // AstBase
 
-void ast_alive_count(bool add);
-
 class AstBase
 {
 public:
+    static int s_alive_count;
+    static void alive_count(bool add);
+
     virtual ~AstBase()
     {
-        ast_alive_count(false);
+        alive_count(false);
     }
 
     AstType& get_type()
@@ -395,7 +401,7 @@ protected:
 
     AstBase(AstType type) : m_type(type)
     {
-        ast_alive_count(true);
+        alive_count(true);
     }
 
 private:
@@ -459,14 +465,7 @@ public:
 
     virtual std::string dump(bool q) const
     {
-        if (q)
-        {
-            return mstr_quote(m_str);
-        }
-        else
-        {
-            return m_str;
-        }
+        return (q ? mstr_quote(m_str) : m_str);
     }
 
     virtual arg_t clone() const
@@ -514,10 +513,7 @@ public:
         return make_arg<AstVar>(m_name);
     }
 
-    virtual arg_t eval() const
-    {
-        return EGA_eval_var(m_name);
-    }
+    virtual arg_t eval() const;
 
 protected:
     std::string m_name;
@@ -620,9 +616,7 @@ typedef AstContainer AstProgram;
 bool EGA_init(void);
 void EGA_uninit(void);
 
-arg_t EGA_eval_program(const args_t& args);
 void EGA_set_var(const std::string& name, arg_t ast);
-arg_t EGA_eval_arg(arg_t ast, bool do_check = false);
 void EGA_eval_text_ex(const char *text);
 
 int EGA_interactive(void);

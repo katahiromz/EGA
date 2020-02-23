@@ -10,15 +10,18 @@
 #include <cstring>
 #include <cstdarg>
 
-static int s_alive_tokens = 0;
-static int s_alive_ast = 0;
-
 typedef std::unordered_map<std::string, fn_t> fn_map_t;
 typedef std::unordered_map<std::string, arg_t> var_map_t;
 static fn_map_t s_fn_map;
 static var_map_t s_var_map;
 
 #define EGA_FN
+
+fn_t EGA_get_fn(const std::string& name);
+arg_t EGA_eval_fn(const std::string& name, const args_t& args);
+arg_t EGA_eval_var(const std::string& name);
+arg_t EGA_eval_program(const args_t& args);
+arg_t EGA_eval_arg(arg_t ast, bool do_check = false);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -34,31 +37,35 @@ inline bool is_ident_char(char ch)
     return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:", ch) != NULL;
 }
 
-void token_alive_count(bool add)
+/*static*/ int Token::s_alive_count = 0;
+
+/*static*/ void Token::alive_count(bool add)
 {
     if (add)
     {
-        assert(s_alive_tokens >= 0);
-        ++s_alive_tokens;
+        assert(s_alive_count >= 0);
+        ++s_alive_count;
     }
     else
     {
-        --s_alive_tokens;
-        assert(s_alive_tokens >= 0);
+        --s_alive_count;
+        assert(s_alive_count >= 0);
     }
 }
 
-void ast_alive_count(bool add)
+/*static*/ int AstBase::s_alive_count = 0;
+
+/*static*/ void AstBase::alive_count(bool add)
 {
     if (add)
     {
-        assert(s_alive_ast >= 0);
-        ++s_alive_ast;
+        assert(s_alive_count >= 0);
+        ++s_alive_count;
     }
     else
     {
-        --s_alive_ast;
-        assert(s_alive_ast >= 0);
+        --s_alive_count;
+        assert(s_alive_count >= 0);
     }
 }
 
@@ -102,7 +109,7 @@ void AstBase::print() const
     EGA_do_print("%s\n", dump(true).c_str());
 }
 
-std::string dump_token_type(TokenType type)
+std::string EGA_dump_token_type(TokenType type)
 {
     switch (type)
     {
@@ -118,7 +125,7 @@ std::string dump_token_type(TokenType type)
 std::string Token::dump() const
 {
     std::string ret = "(";
-    ret += dump_token_type(m_type);
+    ret += EGA_dump_token_type(m_type);
     ret += ", ";
     ret += mstr_to_string(m_lineno);
     ret += ", '";
@@ -152,7 +159,7 @@ std::string TokenStream::dump() const
     return ret;
 }
 
-std::string dump_ast_type(AstType type)
+std::string EGA_dump_ast_type(AstType type)
 {
     switch (type)
     {
@@ -542,6 +549,11 @@ arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
 #else
     #define EVAL_DEBUG() do { puts(__func__); fflush(stdout); } while (0)
 #endif
+
+arg_t AstVar::eval() const
+{
+    return EGA_eval_var(m_name);
+}
 
 arg_t AstContainer::eval() const
 {
@@ -1788,7 +1800,7 @@ int main(int argc, char **argv)
 
     EGA_uninit();
 
-    assert(s_alive_tokens == 0);
-    assert(s_alive_ast == 0);
+    assert(Token::s_alive_count == 0);
+    assert(AstBase::s_alive_count == 0);
     return 0;
 }
