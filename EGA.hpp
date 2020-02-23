@@ -70,9 +70,7 @@ fn_t EGA_get_fn(const std::string& name);
 bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc,
                 const std::string& help);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args);
-arg_t EGA_eval_program(const args_t& args, bool do_break);
 arg_t EGA_eval_var(const std::string& name);
-void EGA_set_var(const std::string& name, arg_t ast);
 
 //////////////////////////////////////////////////////////////////////////////
 // exceptions
@@ -138,6 +136,14 @@ class EGA_break_exception : public EGA_exception
 {
 public:
     EGA_break_exception() : EGA_exception("break exception")
+    {
+    }
+};
+
+class EGA_illegal_operation : public EGA_exception
+{
+public:
+    EGA_illegal_operation() : EGA_exception("illegal operation")
     {
     }
 };
@@ -620,5 +626,9 @@ typedef AstContainer AstProgram;
 
 bool EGA_init(void);
 void EGA_uninit(void);
+
+arg_t EGA_eval_program(const args_t& args, bool do_break);
+void EGA_set_var(const std::string& name, arg_t ast);
+arg_t EGA_eval(arg_t ast, bool do_check = false);
 
 #endif  // ndef EGA_HPP_
