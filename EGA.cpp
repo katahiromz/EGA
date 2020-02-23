@@ -1787,14 +1787,31 @@ bool EGA_file_input(const char *filename)
 int main(int argc, char **argv)
 {
     mstr_unittest();
-    EGA_init();
 
     if (argc <= 1)
     {
+        EGA_init();
         EGA_interactive();
     }
     else
     {
+        std::string arg = argv[1];
+        if (arg == "--help")
+        {
+            printf("Usage: EGA [options] [input-file]\n");
+            printf("Options:\n");
+            printf("  --help      Show this message.\n");
+            printf("  --version   Show version info.\n");
+            return 0;
+        }
+
+        if (arg == "--version")
+        {
+            printf("EGA Version %d by katahiromz\n", EGA_HPP_);
+            return 0;
+        }
+
+        EGA_init();
         EGA_file_input(argv[1]);
     }
 
