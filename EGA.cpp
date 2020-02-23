@@ -6,13 +6,13 @@
 #include "EGA.hpp"
 #include <cstdio>
 #include <cstring>
-#include <map>
+#include <unordered_map>
 
 static int s_alive_tokens = 0;
 static int s_alive_ast = 0;
 
-typedef std::map<std::string, EGA_FUNCTION *> fn_map_t;
-typedef std::map<std::string, AstBase *> var_map_t;
+typedef std::unordered_map<std::string, fn_t> fn_map_t;
+typedef std::unordered_map<std::string, arg_t> var_map_t;
 static fn_map_t s_fn_map;
 static var_map_t s_var_map;
 
@@ -128,7 +128,7 @@ std::string dump_ast_type(AstType type)
 //////////////////////////////////////////////////////////////////////////////
 // TokenStream
 
-AstContainer *TokenStream::do_parse()
+arg_t TokenStream::do_parse()
 {
     return visit_translation_unit();
 }
@@ -237,18 +237,18 @@ void do_print_stream(TokenStream& stream)
     fflush(stdout);
 }
 
-AstContainer *TokenStream::visit_translation_unit()
+arg_t TokenStream::visit_translation_unit()
 {
     PARSE_DEBUG();
 
-    AstContainer *call = new AstContainer(AST_PROGRAM, "program");
+    auto call = make_arg<AstContainer>(AST_PROGRAM, "program");
 
     for (;;)
     {
         if (token_type() == TOK_EOF)
             return call;
 
-        if (AstBase *expr = visit_expression())
+        if (auto expr = visit_expression())
         {
             call->add(expr);
             if (token_type() == TOK_SYMBOL && token_str() == ";")
@@ -262,12 +262,11 @@ AstContainer *TokenStream::visit_translation_unit()
         }
 
         printf("ERROR: unexpected token (2): '%s'\n", token_str().c_str());
-        delete call;
         return NULL;
     }
 }
 
-AstBase *TokenStream::visit_expression()
+arg_t TokenStream::visit_expression()
 {
     PARSE_DEBUG();
 
@@ -294,7 +293,7 @@ AstBase *TokenStream::visit_expression()
         }
         else
         {
-            AstVar *var = new AstVar(name);
+            auto var = make_arg<AstVar>(name);
             go_next();
             return var;
         }
@@ -333,30 +332,30 @@ AstBase *TokenStream::visit_expression()
     return NULL;
 }
 
-AstInt *TokenStream::visit_integer_literal()
+arg_t TokenStream::visit_integer_literal()
 {
     PARSE_DEBUG();
 
     if (token_type() != TOK_INT)
         return NULL;
 
-    AstInt *ai = new AstInt(token()->get_int());
+    auto ai = make_arg<AstInt>(token()->get_int());
     go_next();
     return ai;
 }
 
-AstStr *TokenStream::visit_string_literal()
+arg_t TokenStream::visit_string_literal()
 {
     PARSE_DEBUG();
 
     if (token_type() != TOK_STR)
         return NULL;
-    AstStr *as = new AstStr(token()->get_str());
+    auto as = make_arg<AstStr>(token()->get_str());
     go_next();
     return as;
 }
 
-AstContainer *TokenStream::visit_array_literal()
+arg_t TokenStream::visit_array_literal()
 {
     PARSE_DEBUG();
 
@@ -368,10 +367,10 @@ AstContainer *TokenStream::visit_array_literal()
     if (token_type() == TOK_SYMBOL && token_str() == "}")
     {
         go_next();
-        return new AstContainer(AST_ARRAY);
+        return make_arg<AstContainer>(AST_ARRAY);
     }
 
-    if (AstContainer *list = visit_expression_list(AST_ARRAY, "array"))
+    if (auto list = visit_expression_list(AST_ARRAY, "array"))
     {
         if (token_type() == TOK_SYMBOL && token_str() == "}")
         {
@@ -380,13 +379,12 @@ AstContainer *TokenStream::visit_array_literal()
         }
 
         printf("ERROR: unexpected token (3): '%s'\n", token_str().c_str());
-        delete list;
     }
 
     return NULL;
 }
 
-AstContainer *TokenStream::visit_call(const std::string& name)
+arg_t TokenStream::visit_call(const std::string& name)
 {
     PARSE_DEBUG();
 
@@ -395,7 +393,7 @@ AstContainer *TokenStream::visit_call(const std::string& name)
 
     go_next();
 
-    AstContainer *list = new AstContainer(AST_CALL, name);
+    auto list = make_arg<AstContainer>(AST_CALL, name);
 
     if (token_type() == TOK_SYMBOL)
     {
@@ -406,13 +404,12 @@ AstContainer *TokenStream::visit_call(const std::string& name)
         }
     }
 
-    if (AstBase *expr = visit_expression())
+    if (auto expr = visit_expression())
     {
         list->add(expr);
     }
     else
     {
-        delete list;
         return NULL;
     }
 
@@ -425,12 +422,11 @@ AstContainer *TokenStream::visit_call(const std::string& name)
         }
         else if (token_str() != ",")
         {
-            delete list;
             return NULL;
         }
         go_next();
 
-        if (AstBase *expr = visit_expression())
+        if (auto expr = visit_expression())
         {
             list->add(expr);
         }
@@ -443,17 +439,17 @@ AstContainer *TokenStream::visit_call(const std::string& name)
     return list;
 }
 
-AstContainer *TokenStream::visit_expression_list(AstType type, const std::string& name)
+arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
 {
     PARSE_DEBUG();
 
     size_t index = get_index();
 
-    AstBase *expr = visit_expression();
+    auto expr = visit_expression();
     if (!expr)
         return NULL;
 
-    AstContainer *list = new AstContainer(type, name);
+    auto list = make_arg<AstContainer>(type, name);
     list->add(expr);
 
     for (;;)
@@ -475,7 +471,6 @@ AstContainer *TokenStream::visit_expression_list(AstType type, const std::string
         expr = visit_expression();
         if (!expr)
         {
-            delete list;
             get_index() = index;
             return NULL;
         }
@@ -494,7 +489,7 @@ AstContainer *TokenStream::visit_expression_list(AstType type, const std::string
     #define EVAL_DEBUG() do { puts(__func__); fflush(stdout); } while (0)
 #endif
 
-EGA_FUNCTION *EGA_get_fn(const std::string& name)
+fn_t EGA_get_fn(const std::string& name)
 {
     EVAL_DEBUG();
     fn_map_t::iterator it = s_fn_map.find(name);
@@ -506,13 +501,12 @@ EGA_FUNCTION *EGA_get_fn(const std::string& name)
 bool
 EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc)
 {
-    EGA_FUNCTION *fn = new EGA_FUNCTION(name, min_args, max_args, proc);
-    delete s_fn_map[name];
+    auto fn = std::make_shared<EGA_FUNCTION>(name, min_args, max_args, proc);
     s_fn_map[name] = fn;
     return true;
 }
 
-AstBase *EGA_eval_var(const std::string& name)
+arg_t EGA_eval_var(const std::string& name)
 {
     EVAL_DEBUG();
 
@@ -523,13 +517,13 @@ AstBase *EGA_eval_var(const std::string& name)
     return it->second->eval();
 }
 
-AstBase *
+arg_t
 EGA_eval_fn(const std::string& name, const args_t& args)
 {
     EVAL_DEBUG();
     if (name.size())
     {
-        if (EGA_FUNCTION *fn = EGA_get_fn(name))
+        if (auto fn = EGA_get_fn(name))
         {
             if (fn->min_args <= args.size() && args.size() <= fn->max_args)
                 return (*(fn->proc))(args);
@@ -539,14 +533,13 @@ EGA_eval_fn(const std::string& name, const args_t& args)
     {
         for (size_t i = 0; i < args.size(); ++i)
         {
-            AstBase *ast = args[i]->eval();
-            delete ast;
+            args[i]->eval();
         }
     }
     return NULL;
 }
 
-AstBase *do_eval_ast(const AstBase *ast)
+arg_t do_eval_ast(const arg_t& ast)
 {
     EVAL_DEBUG();
     if (!ast)
@@ -559,16 +552,14 @@ int do_eval_text(const char *text)
     TokenStream stream;
     if (stream.do_lexical(text))
     {
-        if (AstContainer *ast = stream.do_parse())
+        if (auto ast = stream.do_parse())
         {
             //ast->print();
-            AstBase *evaled = do_eval_ast(ast);
+            auto evaled = do_eval_ast(ast);
             if (evaled)
             {
                 evaled->print();
-                delete evaled;
             }
-            delete ast;
             return 0;
         }
         printf("do_parse failed\n");
@@ -578,92 +569,93 @@ int do_eval_text(const char *text)
     return -1;
 }
 
-int EGA_int(AstBase *ast)
+int EGA_int(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_INT)
         throw new EGA_exception;
-    return static_cast<AstInt *>(ast)->get_int();
+    return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
-AstArray *EGA_array(AstBase *ast)
+std::shared_ptr<AstArray> EGA_array(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)
         throw new EGA_exception;
-    return static_cast<AstArray *>(ast);
+    return std::static_pointer_cast<AstArray>(ast);
 }
 
-std::string EGA_str(AstBase *ast)
+std::string EGA_str(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_STR)
         throw new EGA_exception;
-    return static_cast<AstStr *>(ast)->get_str();
+    return std::static_pointer_cast<AstStr>(ast)->get_str();
 }
 
-AstInt *EGA_compare_0(AstBase *ast1, AstBase *ast2)
+std::shared_ptr<AstInt>
+EGA_compare_0(arg_t ast1, arg_t ast2)
 {
     EVAL_DEBUG();
 
     if (ast1->get_type() < ast2->get_type())
     {
-        return new AstInt(-1);
+        return make_arg<AstInt>(-1);
     }
 
     if (ast1->get_type() > ast2->get_type())
     {
-        return new AstInt(1);
+        return make_arg<AstInt>(1);
     }
 
     switch (ast1->get_type())
     {
     case AST_ARRAY:
         {
-            AstContainer *array1 = reinterpret_cast<AstContainer *>(ast1);
-            AstContainer *array2 = reinterpret_cast<AstContainer *>(ast2);
+            auto array1 = std::static_pointer_cast<AstContainer>(ast1);
+            auto array2 = std::static_pointer_cast<AstContainer>(ast2);
             size_t size = std::min(array1->size(), array2->size());
             for (size_t i = 0; i < size; ++i)
             {
-                AstInt *ai = EGA_compare_0((*array1)[i], (*array2)[i]);
+                auto ai = EGA_compare_0((*array1)[i], (*array2)[i]);
                 if (ai == NULL)
                 {
                     return NULL;
                 }
-                if (ai->get_int() != 0)
+                if (EGA_int(ai) != 0)
                 {
                     return ai;
                 }
             }
             if (array1->size() < array2->size())
             {
-                return new AstInt(-1);
+                return make_arg<AstInt>(-1);
             }
             if (array1->size() > array2->size())
             {
-                return new AstInt(1);
+                return make_arg<AstInt>(1);
             }
-            return new AstInt(0);
+            return make_arg<AstInt>(0);
         }
     case AST_INT:
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
             if (i1 < i2)
-                return new AstInt(-1);
+                return make_arg<AstInt>(-1);
             if (i1 > i2)
-                return new AstInt(1);
-            return new AstInt(0);
+                return make_arg<AstInt>(1);
+            return make_arg<AstInt>(0);
         }
     case AST_STR:
         {
             std::string str1 = EGA_str(ast1);
             std::string str2 = EGA_str(ast2);
             if (str1 < str2)
-                return new AstInt(-1);
+                return make_arg<AstInt>(-1);
             if (str1 > str2)
-                return new AstInt(1);
-            return new AstInt(0);
+                return make_arg<AstInt>(1);
+            return make_arg<AstInt>(0);
         }
     default:
         break;
@@ -672,26 +664,26 @@ AstInt *EGA_compare_0(AstBase *ast1, AstBase *ast2)
     return NULL;
 }
 
-AstBase *EGA_compare(const args_t& args)
+arg_t EGA_compare(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         return ai;
     }
     return NULL;
 }
 
-AstBase* EGA_less(const args_t& args)
+arg_t EGA_less(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() < 0);
         return ai;
@@ -699,13 +691,13 @@ AstBase* EGA_less(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_greater(const args_t& args)
+arg_t EGA_greater(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() > 0);
         return ai;
@@ -713,13 +705,13 @@ AstBase* EGA_greater(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_le(const args_t& args)
+arg_t EGA_le(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() <= 0);
         return ai;
@@ -727,13 +719,13 @@ AstBase* EGA_le(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_ge(const args_t& args)
+arg_t EGA_ge(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() >= 0);
         return ai;
@@ -741,13 +733,13 @@ AstBase* EGA_ge(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_equal(const args_t& args)
+arg_t EGA_equal(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() == 0);
         return ai;
@@ -755,13 +747,13 @@ AstBase* EGA_equal(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_not_equal(const args_t& args)
+arg_t EGA_not_equal(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() != 0);
         return ai;
@@ -769,42 +761,39 @@ AstBase* EGA_not_equal(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_print(const args_t& args)
+arg_t EGA_print(const args_t& args)
 {
     EVAL_DEBUG();
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        if (AstBase *ast = do_eval_ast(args[i]))
+        if (auto ast = do_eval_ast(args[i]))
         {
             printf("%s\n", ast->dump().c_str());
-            delete ast;
         }
     }
     return NULL;
 }
 
-AstBase* EGA_len(const args_t& args)
+arg_t EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 1)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
         switch (ast1->get_type())
         {
         case AST_STR:
             {
                 int len = int(EGA_str(ast1).size());
-                delete ast1;
-                return new AstInt(len);
+                return make_arg<AstInt>(len);
             }
         case AST_ARRAY:
             {
                 int len = int(EGA_array(ast1)->size());
-                delete ast1;
-                return new AstInt(len);
+                return make_arg<AstInt>(len);
             }
         default:
             break;
@@ -813,35 +802,33 @@ AstBase* EGA_len(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_cat(const args_t& args)
+arg_t EGA_cat(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() < 1)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
         switch (ast1->get_type())
         {
         case AST_STR:
             {
                 std::string str = EGA_str(ast1);
-                delete ast1;
                 for (size_t i = 1; i < args.size(); ++i)
                 {
                     ast1 = args[i]->eval();
                     str += EGA_str(ast1);
-                    delete ast1;
                 }
-                return new AstStr(str);
+                return make_arg<AstStr>(str);
             }
 
         case AST_ARRAY:
-            if (AstArray *array = new AstArray(AST_ARRAY))
+            if (auto array = make_arg<AstArray>(AST_ARRAY))
             {
                 for (size_t i = 0; i < args.size(); ++i)
                 {
-                    if (const AstArray *array2 = static_cast<const AstArray *>(args[i]))
+                    if (auto array2 = std::static_pointer_cast<AstArray>(args[i]))
                     {
                         for (size_t k = 0; k < array2->size(); ++k)
                         {
@@ -849,7 +836,6 @@ AstBase* EGA_cat(const args_t& args)
                         }
                     }
                 }
-                delete ast1;
                 return array;
             }
             break;
@@ -857,158 +843,139 @@ AstBase* EGA_cat(const args_t& args)
         default:
             break;
         }
-
-        delete ast1;
     }
 
     return NULL;
 }
 
-AstBase* EGA_plus(const args_t& args)
+arg_t EGA_plus(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() == 2)
     {
-        if (AstBase *ast1 = do_eval_ast(args[0]))
+        if (auto ast1 = do_eval_ast(args[0]))
         {
-            if (AstBase *ast2 = do_eval_ast(args[1]))
+            if (auto ast2 = do_eval_ast(args[1]))
             {
                 int i1 = EGA_int(ast1);
                 int i2 = EGA_int(ast2);
-                delete ast1;
-                delete ast2;
-                return new AstInt(i1 + i2);
+                return make_arg<AstInt>(i1 + i2);
             }
-            delete ast1;
         }
     }
     return NULL;
 }
 
-AstBase* EGA_minus(const args_t& args)
+arg_t EGA_minus(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() == 1)
     {
-        if (AstBase *ast1 = do_eval_ast(args[0]))
+        if (auto ast1 = do_eval_ast(args[0]))
         {
             int i1 = EGA_int(ast1);
-            delete ast1;
-            return new AstInt(-i1);
+            return make_arg<AstInt>(-i1);
         }
         return NULL;
     }
 
     if (args.size() == 2)
     {
-        if (AstBase *ast1 = do_eval_ast(args[0]))
+        if (auto ast1 = do_eval_ast(args[0]))
         {
-            if (AstBase *ast2 = do_eval_ast(args[1]))
+            if (auto ast2 = do_eval_ast(args[1]))
             {
                 int i1 = EGA_int(ast1);
                 int i2 = EGA_int(ast2);
-                delete ast1;
-                delete ast2;
-                return new AstInt(i1 - i2);
+                return make_arg<AstInt>(i1 - i2);
             }
-            delete ast1;
         }
     }
     return NULL;
 }
 
-AstBase* EGA_mul(const args_t& args)
+arg_t EGA_mul(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
+        if (auto ast2 = do_eval_ast(args[1]))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 * i2);
+            return make_arg<AstInt>(i1 * i2);
         }
-        delete ast1;
     }
 
     return NULL;
 }
 
-AstBase* EGA_div(const args_t& args)
+arg_t EGA_div(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
+        if (auto ast2 = do_eval_ast(args[1]))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 / i2);
+            return make_arg<AstInt>(i1 / i2);
         }
-        delete ast1;
     }
 
     return NULL;
 }
 
-AstBase* EGA_mod(const args_t& args)
+arg_t EGA_mod(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
+        if (auto ast2 = do_eval_ast(args[1]))
         {
             int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 % i2);
+            return make_arg<AstInt>(i1 % i2);
         }
-        delete ast1;
     }
 
     return NULL;
 }
 
-AstBase* EGA_if(const args_t& args)
+arg_t EGA_if(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() != 2 && args.size() != 3)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
         int i1 = EGA_int(ast1);
-        delete ast1;
         if (i1)
         {
-            if (AstBase *ast2 = do_eval_ast(args[1]))
+            if (auto ast2 = do_eval_ast(args[1]))
             {
                 return ast2;
             }
         }
         else if (args.size() == 3)
         {
-            if (AstBase *ast3 = do_eval_ast(args[2]))
+            if (auto ast3 = do_eval_ast(args[2]))
             {
                 return ast3;
             }
@@ -1018,27 +985,25 @@ AstBase* EGA_if(const args_t& args)
     return NULL;
 }
 
-void EGA_set_var(const std::string& name, const AstBase *ast)
+void EGA_set_var(const std::string& name, arg_t arg)
 {
-    delete s_var_map[name];
-    s_var_map[name] = ast->clone();
+    s_var_map[name] = arg;
 }
 
-AstBase* EGA_set(const args_t& args)
+arg_t EGA_set(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() != 2 || args[0]->get_type() != AST_VAR)
         return NULL;
 
-    std::string name = static_cast<const AstVar *>(args[0])->get_name();
-    AstBase *value = args[1]->eval();
+    std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
+    auto value = args[1]->eval();
     EGA_set_var(name, value);
-    delete value;
     return NULL;
 }
 
-AstBase* EGA_eval(const args_t& args)
+arg_t EGA_eval(const args_t& args)
 {
     EVAL_DEBUG();
 
@@ -1048,7 +1013,7 @@ AstBase* EGA_eval(const args_t& args)
     return args[0]->eval();
 }
 
-AstBase* EGA_for(const args_t& args)
+arg_t EGA_for(const args_t& args)
 {
     EVAL_DEBUG();
 
@@ -1058,26 +1023,19 @@ AstBase* EGA_for(const args_t& args)
     if (args[0]->get_type() != AST_VAR)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[1]))
+    if (auto ast1 = do_eval_ast(args[1]))
     {
-        int i1 = EGA_int(ast1);
-        delete ast1;
-        if (AstBase *ast2 = do_eval_ast(args[2]))
+        if (auto ast2 = do_eval_ast(args[2]))
         {
+            int i1 = EGA_int(ast1);
             int i2 = EGA_int(ast2);
-            delete ast2;
 
             for (int i = i1; i <= i2; ++i)
             {
-                AstInt *ai = new AstInt(i);
-                const AstVar *var = reinterpret_cast<const AstVar *>(args[0]);
+                auto ai = make_arg<AstInt>(i);
+                auto var = std::static_pointer_cast<AstVar>(args[0]);
                 EGA_set_var(var->get_name(), ai);
-                delete ai;
-
-                if (AstBase *ast3 = do_eval_ast(args[3]))
-                {
-                    delete ast3;
-                }
+                do_eval_ast(args[3]);
             }
         }
     }
@@ -1085,7 +1043,7 @@ AstBase* EGA_for(const args_t& args)
     return NULL;
 }
 
-AstBase* EGA_while(const args_t& args)
+arg_t EGA_while(const args_t& args)
 {
     EVAL_DEBUG();
 
@@ -1094,49 +1052,41 @@ AstBase* EGA_while(const args_t& args)
 
     while (true)
     {
-        AstBase *ast1 = do_eval_ast(args[0]);
+        auto ast1 = do_eval_ast(args[0]);
         if (ast1)
         {
             int i1 = EGA_int(ast1);
-            delete ast1;
             if (!i1)
                 break;
         }
 
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            delete ast2;
-        }
+        do_eval_ast(args[1]);
     }
 
     return NULL;
 }
 
-AstBase* EGA_at(const args_t& args)
+arg_t EGA_at(const args_t& args)
 {
     EVAL_DEBUG();
 
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (auto ast1 = do_eval_ast(args[0]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
+        if (auto ast2 = do_eval_ast(args[1]))
         {
-            if (AstArray *array = EGA_array(ast1))
+            if (auto array = EGA_array(ast1))
             {
                 size_t index = EGA_int(ast2);
                 if (index < array->size())
                 {
-                    AstBase *base = (*array)[index]->eval();
-                    delete ast1;
-                    delete ast2;
+                    auto base = (*array)[index]->eval();
                     return base;
                 }
             }
-            delete ast2;
         }
-        delete ast1;
     }
 
     return NULL;
@@ -1187,16 +1137,8 @@ bool EGA_init(void)
 void
 EGA_uninit(void)
 {
-    for (fn_map_t::iterator it = s_fn_map.begin(); it != s_fn_map.end(); ++it)
-    {
-        delete it->second;
-    }
     s_fn_map.clear();
 
-    for (var_map_t::iterator it = s_var_map.begin(); it != s_var_map.end(); ++it)
-    {
-        delete it->second;
-    }
     s_var_map.clear();
 }
 

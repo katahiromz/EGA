@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <cstdlib>
 #include <cctype>
 #include <cassert>
@@ -20,9 +21,16 @@ class AstContainer;
 
 //////////////////////////////////////////////////////////////////////////////
 
-typedef std::vector<AstBase *> args_t;
+typedef std::shared_ptr<AstBase> arg_t;
+typedef std::vector<arg_t> args_t;
 
-typedef AstBase* (*EGA_PROC)(const args_t& args);
+template< class T, class... Args >
+std::shared_ptr<T> make_arg( Args&&... args )
+{
+    return std::make_shared<T>(args...);
+}
+
+typedef arg_t (*EGA_PROC)(const args_t& args);
 
 struct EGA_FUNCTION
 {
@@ -39,15 +47,16 @@ struct EGA_FUNCTION
     {
     }
 };
+typedef std::shared_ptr<EGA_FUNCTION> fn_t;
 
 struct EGA_exception { };
 struct EGA_arg_number_exception : EGA_exception { };
 
-EGA_FUNCTION *EGA_get_fn(const std::string& name);
+fn_t EGA_get_fn(const std::string& name);
 bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc);
-AstBase * EGA_eval_fn(const std::string& name, const std::vector<AstBase *>& args);
-AstBase *EGA_eval_var(const std::string& name);
-void EGA_set_var(const std::string& name, const AstBase *ast);
+arg_t EGA_eval_fn(const std::string& name, const args_t& args);
+arg_t EGA_eval_var(const std::string& name);
+void EGA_set_var(const std::string& name, arg_t ast);
 
 //////////////////////////////////////////////////////////////////////////////
 // TokenType
@@ -189,7 +198,7 @@ public:
         return m_error;
     }
 
-    AstContainer *do_parse();
+    arg_t do_parse();
 
     Token *operator[](size_t index)
     {
@@ -262,13 +271,13 @@ protected:
     int m_error;
     size_t m_index;
 
-    AstContainer *visit_translation_unit();
-    AstBase *visit_expression();
-    AstInt *visit_integer_literal();
-    AstStr *visit_string_literal();
-    AstContainer *visit_array_literal();
-    AstContainer *visit_call(const std::string& name);
-    AstContainer *visit_expression_list(AstType type, const std::string& name = "");
+    arg_t visit_translation_unit();
+    arg_t visit_expression();
+    arg_t visit_integer_literal();
+    arg_t visit_string_literal();
+    arg_t visit_array_literal();
+    arg_t visit_call(const std::string& name);
+    arg_t visit_expression_list(AstType type, const std::string& name = "");
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -291,9 +300,9 @@ public:
 
     virtual std::string dump() const = 0;
 
-    virtual AstBase *clone() const = 0;
+    virtual arg_t clone() const = 0;
 
-    virtual AstBase *eval() const = 0;
+    virtual arg_t eval() const = 0;
 
     void print() const
     {
@@ -337,12 +346,12 @@ public:
         return mstr_to_string(m_value);
     }
 
-    virtual AstBase *clone() const
+    virtual arg_t clone() const
     {
-        return new AstInt(m_value);
+        return make_arg<AstInt>(m_value);
     }
 
-    virtual AstBase *eval() const
+    virtual arg_t eval() const
     {
         return clone();
     }
@@ -376,12 +385,12 @@ public:
         return ret;
     }
 
-    virtual AstBase *clone() const
+    virtual arg_t clone() const
     {
-        return new AstStr(m_str.c_str());
+        return make_arg<AstStr>(m_str.c_str());
     }
 
-    virtual AstBase *eval() const
+    virtual arg_t eval() const
     {
         return clone();
     }
@@ -419,12 +428,12 @@ public:
         return ret;
     }
 
-    virtual AstBase *clone() const
+    virtual arg_t clone() const
     {
-        return new AstVar(m_name);
+        return make_arg<AstVar>(m_name);
     }
 
-    virtual AstBase *eval() const
+    virtual arg_t eval() const
     {
         return EGA_eval_var(m_name);
     }
@@ -451,19 +460,15 @@ public:
 
     ~AstContainer()
     {
-        for (size_t i = 0; i < m_children.size(); ++i)
-        {
-            delete m_children[i];
-        }
     }
 
-    AstBase *operator[](size_t index)
+    arg_t& operator[](size_t index)
     {
         assert(index < size());
         return m_children[index];
     }
 
-    const AstBase *operator[](size_t index) const
+    const arg_t& operator[](size_t index) const
     {
         assert(index < size());
         return m_children[index];
@@ -479,12 +484,12 @@ public:
         return size() == 0;
     }
 
-    void add(AstBase *ast)
+    void add(arg_t ast)
     {
         m_children.push_back(ast);
     }
 
-    std::vector<AstBase *>& children()
+    std::vector<arg_t>& children()
     {
         return m_children;
     }
@@ -510,9 +515,9 @@ public:
         return ret;
     }
 
-    virtual AstBase *clone() const
+    virtual arg_t clone() const
     {
-        AstContainer *ret = new AstContainer(m_type, m_str);
+        auto ret = make_arg<AstContainer>(m_type, m_str);
         for (size_t i = 0; i < size(); ++i)
         {
             ret->add(m_children[i]->clone());
@@ -520,12 +525,12 @@ public:
         return ret;
     }
 
-    virtual AstBase *eval() const
+    virtual arg_t eval() const
     {
         switch (m_type)
         {
         case AST_ARRAY:
-            if (AstContainer *ret = new AstContainer(AST_ARRAY, "array"))
+            if (auto ret = make_arg<AstContainer>(AST_ARRAY, "array"))
             {
                 for (size_t i = 0; i < size(); ++i)
                 {
@@ -541,13 +546,12 @@ public:
         case AST_PROGRAM:
             if (size())
             {
-                AstBase *ptr = m_children[0]->eval();
+                auto arg = m_children[0]->eval();
                 for (size_t i = 1; i < size(); ++i)
                 {
-                    delete ptr;
-                    ptr = m_children[i]->eval();
+                    arg = m_children[i]->eval();
                 }
-                return ptr;
+                return arg;
             }
             return NULL;
 
@@ -561,7 +565,7 @@ public:
 
 protected:
     std::string m_str;
-    std::vector<AstBase *> m_children;
+    std::vector<arg_t> m_children;
 };
 
 typedef AstContainer AstCall;
