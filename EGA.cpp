@@ -602,23 +602,99 @@ std::string EGA_str(AstBase *ast)
     return static_cast<AstStr *>(ast)->get_str();
 }
 
+AstInt *EGA_compare_0(AstBase *ast1, AstBase *ast2)
+{
+    EVAL_DEBUG();
+
+    if (ast1->get_type() < ast2->get_type())
+    {
+        return new AstInt(-1);
+    }
+
+    if (ast1->get_type() > ast2->get_type())
+    {
+        return new AstInt(1);
+    }
+
+    switch (ast1->get_type())
+    {
+    case AST_ARRAY:
+        {
+            AstContainer *array1 = reinterpret_cast<AstContainer *>(ast1);
+            AstContainer *array2 = reinterpret_cast<AstContainer *>(ast2);
+            size_t size = std::min(array1->size(), array2->size());
+            for (size_t i = 0; i < size; ++i)
+            {
+                AstInt *ai = EGA_compare_0((*array1)[i], (*array2)[i]);
+                if (ai == NULL)
+                {
+                    return NULL;
+                }
+                if (ai->get_int() != 0)
+                {
+                    return ai;
+                }
+            }
+            if (array1->size() < array2->size())
+            {
+                return new AstInt(-1);
+            }
+            if (array1->size() > array2->size())
+            {
+                return new AstInt(1);
+            }
+            return new AstInt(0);
+        }
+    case AST_INT:
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            if (i1 < i2)
+                return new AstInt(-1);
+            if (i1 > i2)
+                return new AstInt(1);
+            return new AstInt(0);
+        }
+    case AST_STR:
+        {
+            std::string str1 = EGA_str(ast1);
+            std::string str2 = EGA_str(ast2);
+            if (str1 < str2)
+                return new AstInt(-1);
+            if (str1 > str2)
+                return new AstInt(1);
+            return new AstInt(0);
+        }
+    default:
+        break;
+    }
+
+    return NULL;
+}
+
+AstBase *EGA_compare(const args_t& args)
+{
+    EVAL_DEBUG();
+    if (args.size() != 2)
+        return NULL;
+
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
+    {
+        return ai;
+    }
+    return NULL;
+}
+
 AstBase* EGA_less(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 < i2);
-        }
-        delete ast1;
+        ai->get_int() = (ai->get_int() < 0);
+        return ai;
     }
     return NULL;
 }
@@ -629,17 +705,10 @@ AstBase* EGA_greater(const args_t& args)
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 > i2);
-        }
-        delete ast1;
+        ai->get_int() = (ai->get_int() > 0);
+        return ai;
     }
     return NULL;
 }
@@ -650,17 +719,10 @@ AstBase* EGA_le(const args_t& args)
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 <= i2);
-        }
-        delete ast1;
+        ai->get_int() = (ai->get_int() <= 0);
+        return ai;
     }
     return NULL;
 }
@@ -671,17 +733,10 @@ AstBase* EGA_ge(const args_t& args)
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 >= i2);
-        }
-        delete ast1;
+        ai->get_int() = (ai->get_int() >= 0);
+        return ai;
     }
     return NULL;
 }
@@ -692,17 +747,10 @@ AstBase* EGA_equal(const args_t& args)
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 == i2);
-        }
-        delete ast1;
+        ai->get_int() = (ai->get_int() == 0);
+        return ai;
     }
     return NULL;
 }
@@ -713,17 +761,10 @@ AstBase* EGA_not_equal(const args_t& args)
     if (args.size() != 2)
         return NULL;
 
-    if (AstBase *ast1 = do_eval_ast(args[0]))
+    if (AstInt *ai = EGA_compare_0(args[0], args[1]))
     {
-        if (AstBase *ast2 = do_eval_ast(args[1]))
-        {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
-            delete ast1;
-            delete ast2;
-            return new AstInt(i1 != i2);
-        }
-        delete ast1;
+        ai->get_int() = (ai->get_int() != 0);
+        return ai;
     }
     return NULL;
 }
@@ -1107,6 +1148,7 @@ bool EGA_init(void)
     EGA_add_fn("==", 2, 2, EGA_equal);
     EGA_add_fn("not_equal", 2, 2, EGA_not_equal);
     EGA_add_fn("!=", 2, 2, EGA_not_equal);
+    EGA_add_fn("compare", 2, 2, EGA_compare);
     EGA_add_fn("less", 2, 2, EGA_less);
     EGA_add_fn("<", 2, 2, EGA_less);
     EGA_add_fn("le", 2, 2, EGA_le);
