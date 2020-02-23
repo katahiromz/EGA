@@ -1623,11 +1623,9 @@ arg_t EGA_FN EGA_right(const args_t& args)
     return NULL;
 }
 
-arg_t EGA_FN EGA_mid(const args_t& args)
+static arg_t EGA_mid3(const args_t& args)
 {
-    EVAL_DEBUG();
-
-    if (auto ast1 = EGA_eval_arg(args[0], true))
+   if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
@@ -1655,8 +1653,8 @@ arg_t EGA_FN EGA_mid(const args_t& args)
                         auto array2 = EGA_get_array(ast1);
                         if (i2 <= array2->size() && i2 + i3 <= array2->size())
                         {
-                            size_t k1 = array2->size() - i2;
-                            size_t k2 = k1 + i3;
+                            size_t k1 = i2;
+                            size_t k2 = i2 + i3;
                             for (size_t i = k1; i < k2; ++i)
                             {
                                 array1->add((*array2)[i]->clone());
@@ -1673,6 +1671,79 @@ arg_t EGA_FN EGA_mid(const args_t& args)
             }
         }
     }
+
+    return NULL;
+}
+
+static arg_t EGA_mid4(const args_t& args)
+{
+   if (auto ast1 = EGA_eval_arg(args[0], true))
+    {
+        if (auto ast2 = EGA_eval_arg(args[1], true))
+        {
+            if (auto ast3 = EGA_eval_arg(args[2], true))
+            {
+                if (auto ast4 = EGA_eval_arg(args[3], true))
+                {
+                    size_t i2 = EGA_get_int(ast2);
+                    size_t i3 = EGA_get_int(ast3);
+                    switch (ast1->get_type())
+                    {
+                    case AST_STR:
+                        {
+                            std::string str1 = EGA_get_str(ast1);
+                            std::string str2 = EGA_get_str(ast4);
+                            if (i2 <= str1.size() && i2 + i3 <= str1.size())
+                            {
+                                str1.replace(i2, i3, str2);
+                                return make_arg<AstStr>(str1);
+                            }
+                            else
+                                throw EGA_index_out_of_range();
+                        }
+                        break;
+                    case AST_ARRAY:
+                        {
+                            auto array1 = make_arg<AstArray>(AST_ARRAY);
+                            auto array2 = EGA_get_array(ast1);
+                            if (i2 <= array2->size() && i2 + i3 <= array2->size())
+                            {
+                                size_t k1 = i2;
+                                size_t k2 = i2 + i3;
+                                for (size_t i = 0; i < k1; ++i)
+                                {
+                                    array1->add((*array2)[i]->clone());
+                                }
+                                array1->add(ast4);
+                                for (size_t i = k2; i < array2->size(); ++i)
+                                {
+                                    array1->add((*array2)[i]->clone());
+                                }
+                                return array1;
+                            }
+                            else
+                                throw EGA_index_out_of_range();
+                        }
+                        break;
+                    default:
+                        throw EGA_type_mismatch();
+                    }
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_FN EGA_mid(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() == 3)
+        return EGA_mid3(args);
+    if (args.size() == 4)
+        return EGA_mid4(args);
 
     return NULL;
 }
@@ -1967,7 +2038,7 @@ bool EGA_init(void)
     EGA_add_fn("at", 2, 2, EGA_at, "at(ary_or_str, index)");
     EGA_add_fn("left", 2, 2, EGA_left, "left(ary_or_str, count)");
     EGA_add_fn("right", 2, 2, EGA_right, "right(ary_or_str, count)");
-    EGA_add_fn("mid", 3, 3, EGA_mid, "mid(ary_or_str, index, count)");
+    EGA_add_fn("mid", 3, 4, EGA_mid, "mid(ary_or_str, index, count[, value])");
     EGA_add_fn("find", 2, 2, EGA_find, "find(ary_or_str, target)");
     EGA_add_fn("replace", 3, 3, EGA_replace, "replace(ary_or_str, from, to)");
     EGA_add_fn("remove", 2, 2, EGA_remove, "remove(ary_or_str, target)");
