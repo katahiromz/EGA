@@ -759,10 +759,10 @@ bool EGA_eval_text_ex(const char *text)
     }
     catch (EGA_exception& e)
     {
-        if (s_interactive || e.m_lineno == 0)
+        if (s_interactive || e.get_lineno() == 0)
             EGA_do_print("ERROR: %s\n", e.what());
         else
-            EGA_do_print("ERROR: %s at Line %d\n", e.what(), e.m_lineno);
+            EGA_do_print("ERROR: %s at Line %d\n", e.what(), e.get_lineno());
     }
     return true;
 }

@@ -96,12 +96,19 @@ bool EGA_do_input(char *buf, size_t buflen);
 class EGA_exception : public std::runtime_error
 {
 public:
-    int m_lineno;
     EGA_exception(const std::string& what, int lineno = 0)
         : std::runtime_error(what)
         , m_lineno(lineno)
     {
     }
+
+    int get_lineno() const
+    {
+        return m_lineno;
+    }
+
+protected:
+    int m_lineno;
 };
 
 class EGA_syntax_error : public EGA_exception
