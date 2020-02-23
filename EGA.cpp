@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <cstdarg>
 
 static int s_alive_tokens = 0;
 static int s_alive_ast = 0;
@@ -63,6 +64,43 @@ void ast_alive_count(bool add)
 
 //////////////////////////////////////////////////////////////////////////////
 // Dumping
+
+void EGA_default_print(const char *fmt, va_list va)
+{
+    vprintf(fmt, va);
+}
+
+static EGA_PRINT_FN s_print_fn = EGA_default_print;
+
+void EGA_set_print_fn(EGA_PRINT_FN fn)
+{
+    s_print_fn = fn;
+}
+
+void EGA_do_print(const char *fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+    s_print_fn(fmt, va);
+    va_end(va);
+}
+
+void Token::print() const
+{
+    EGA_do_print("%s", dump().c_str());
+    fflush(stdout);
+}
+
+void TokenStream::print() const
+{
+    EGA_do_print("%s", dump().c_str());
+    fflush(stdout);
+}
+
+void AstBase::print() const
+{
+    EGA_do_print("%s\n", dump(true).c_str());
+}
 
 std::string dump_token_type(TokenType type)
 {
@@ -224,7 +262,7 @@ bool TokenStream::do_lexical(const char *input)
         if (*pch == 0x7F) // EOF
             break;
 
-        printf("ERROR: invalid character '%c' (%u)\n", *pch, (*pch & 0xFF));
+        EGA_do_print("ERROR: invalid character '%c' (%u)\n", *pch, (*pch & 0xFF));
         m_error = -1;
         return false;
     }
@@ -275,7 +313,7 @@ arg_t TokenStream::visit_translation_unit()
             continue;
         }
 
-        printf("ERROR: unexpected token (2): '%s'\n", token_str().c_str());
+        EGA_do_print("ERROR: unexpected token (2): '%s'\n", token_str().c_str());
         return NULL;
     }
 }
@@ -394,7 +432,7 @@ arg_t TokenStream::visit_array_literal()
             return list;
         }
 
-        printf("ERROR: unexpected token (3): '%s'\n", token_str().c_str());
+        EGA_do_print("ERROR: unexpected token (3): '%s'\n", token_str().c_str());
     }
 
     return NULL;
@@ -644,7 +682,7 @@ void EGA_eval_text_ex(const char *text)
     }
     catch (EGA_exception& e)
     {
-        printf("ERROR: %s\n", e.what());
+        EGA_do_print("ERROR: %s\n", e.what());
     }
 }
 
@@ -831,7 +869,7 @@ arg_t EGA_FN EGA_print(const args_t& args)
     {
         if (auto ast = EGA_eval_arg(args[i]))
         {
-            printf("%s", ast->dump(false).c_str());
+            EGA_do_print("%s", ast->dump(false).c_str());
         }
     }
     return NULL;
@@ -842,7 +880,7 @@ arg_t EGA_FN EGA_println(const args_t& args)
     EVAL_DEBUG();
 
     EGA_print(args);
-    printf("\n");
+    EGA_do_print("\n");
     return NULL;
 }
 
@@ -854,7 +892,7 @@ arg_t EGA_FN EGA_dump(const args_t& args)
     {
         if (auto ast = EGA_eval_arg(args[i]))
         {
-            printf("%s", ast->dump(true).c_str());
+            EGA_do_print("%s", ast->dump(true).c_str());
         }
     }
     return NULL;
@@ -865,7 +903,7 @@ arg_t EGA_FN EGA_dumpln(const args_t& args)
     EVAL_DEBUG();
 
     EGA_dump(args);
-    printf("\n");
+    EGA_do_print("\n");
     return NULL;
 }
 
@@ -1644,10 +1682,10 @@ EGA_uninit(void)
 
 void EGA_show_help(void)
 {
-    printf("EGA has the following functions:\n");
+    EGA_do_print("EGA has the following functions:\n");
     for (auto pair : s_fn_map)
     {
-        printf("  %s\n", pair.second->name.c_str());
+        EGA_do_print("  %s\n", pair.second->name.c_str());
     }
 }
 
@@ -1656,33 +1694,33 @@ void EGA_show_help(const std::string& name)
     auto it = s_fn_map.find(name);
     if (it == s_fn_map.end() || !it->second)
     {
-        printf("ERROR: No such function: '%s'\n", name.c_str());
+        EGA_do_print("ERROR: No such function: '%s'\n", name.c_str());
         return;
     }
 
-    printf("EGA function '%s':\n", name.c_str());
+    EGA_do_print("EGA function '%s':\n", name.c_str());
 
     if (it->second->min_args == it->second->max_args)
     {
-        printf("  argument number: %d\n", int(it->second->min_args));
+        EGA_do_print("  argument number: %d\n", int(it->second->min_args));
     }
     else
     {
-        printf("  argument number: %d..%d\n", int(it->second->min_args), int(it->second->max_args));
+        EGA_do_print("  argument number: %d..%d\n", int(it->second->min_args), int(it->second->max_args));
     }
 
-    printf("  usage: %s\n", it->second->help.c_str());
+    EGA_do_print("  usage: %s\n", it->second->help.c_str());
 }
 
 int EGA_interactive(void)
 {
     char buf[512];
 
-    printf("Type 'exit' to exit. Type 'help' to see help.\n");
+    EGA_do_print("Type 'exit' to exit. Type 'help' to see help.\n");
 
     for (;;)
     {
-        printf("\nEGA> ");
+        EGA_do_print("\nEGA> ");
         std::fflush(stdout);
 
         if (!fgets(buf, sizeof(buf), stdin))
@@ -1730,7 +1768,7 @@ bool EGA_file_input(const char *filename)
         return true;
     }
 
-    printf("ERROR: cannot open file '%s'\n", filename);
+    EGA_do_print("ERROR: cannot open file '%s'\n", filename);
     return false;
 }
 

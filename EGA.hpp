@@ -72,6 +72,10 @@ bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_P
 arg_t EGA_eval_fn(const std::string& name, const args_t& args);
 arg_t EGA_eval_var(const std::string& name);
 
+typedef void (*EGA_PRINT_FN)(const char *fmt, va_list va);
+void EGA_set_print_fn(EGA_PRINT_FN fn);
+void EGA_default_print(const char *fmt, va_list va);
+
 //////////////////////////////////////////////////////////////////////////////
 // exceptions
 
@@ -225,11 +229,7 @@ public:
 
     virtual std::string dump() const;
 
-    void print() const
-    {
-        printf("%s", dump().c_str());
-        fflush(stdout);
-    }
+    void print() const;
 
 protected:
     TokenType m_type;
@@ -348,11 +348,7 @@ public:
 
     std::string dump() const;
 
-    void print() const
-    {
-        printf("%s", dump().c_str());
-        fflush(stdout);
-    }
+    void print() const;
 
 protected:
     tokens_t m_tokens;
@@ -388,10 +384,7 @@ public:
 
     virtual std::string dump(bool q) const = 0;
 
-    void print() const
-    {
-        printf("%s\n", dump(true).c_str());
-    }
+    void print() const;
 
     virtual arg_t clone() const = 0;
 
