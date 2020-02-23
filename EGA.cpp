@@ -1124,7 +1124,7 @@ arg_t EGA_not(const args_t& args)
     return NULL;
 }
 
-arg_t EGA_logical_or(const args_t& args)
+arg_t EGA_or(const args_t& args)
 {
     EVAL_DEBUG();
 
@@ -1144,7 +1144,7 @@ arg_t EGA_logical_or(const args_t& args)
     return NULL;
 }
 
-arg_t EGA_logical_and(const args_t& args)
+arg_t EGA_and(const args_t& args)
 {
     EVAL_DEBUG();
 
@@ -1437,10 +1437,10 @@ bool EGA_init(void)
     // logical
     EGA_add_fn("not", 2, 2, EGA_not);
     EGA_add_fn("!", 2, 2, EGA_not);
-    EGA_add_fn("or", 2, 2, EGA_logical_or);
-    EGA_add_fn("||", 2, 2, EGA_logical_or);
-    EGA_add_fn("and", 2, 2, EGA_logical_and);
-    EGA_add_fn("&&", 2, 2, EGA_logical_and);
+    EGA_add_fn("or", 2, 2, EGA_or);
+    EGA_add_fn("||", 2, 2, EGA_or);
+    EGA_add_fn("and", 2, 2, EGA_and);
+    EGA_add_fn("&&", 2, 2, EGA_and);
 
     // bit operation
     EGA_add_fn("compl", 2, 2, EGA_compl);
