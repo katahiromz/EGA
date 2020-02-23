@@ -1695,9 +1695,15 @@ EGA_uninit(void)
 void EGA_show_help(void)
 {
     EGA_do_print("EGA has the following functions:\n");
+    std::vector<std::string> names;
     for (auto pair : s_fn_map)
     {
-        EGA_do_print("  %s\n", pair.second->name.c_str());
+        names.push_back(pair.first);
+    }
+    std::sort(names.begin(), names.end());
+    for (auto& name : names)
+    {
+        EGA_do_print("  %s\n", name.c_str());
     }
 }
 
