@@ -1770,7 +1770,7 @@ bool EGA_init(void)
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
     EGA_add_fn("?:", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
     EGA_add_fn("for", 4, 4, EGA_for, "for(var, min, max, expr)");
-    EGA_add_fn("foreach", 3, 3, EGA_foreach, "foreach(var, array, expr)");
+    EGA_add_fn("foreach", 3, 3, EGA_foreach, "foreach(var, ary, expr)");
     EGA_add_fn("while", 2, 2, EGA_while, "while(cond, expr)");
     EGA_add_fn("do", 0, 256, EGA_do, "do(expr, ...)");
     EGA_add_fn("exit", 0, 1, EGA_exit, "exit([value])");
@@ -1830,13 +1830,13 @@ bool EGA_init(void)
     EGA_add_fn("^", 2, 2, EGA_xor, "xor(value1, value2)");
 
     // array/string manipulation
-    EGA_add_fn("len", 1, 1, EGA_len, "len(array_or_string)");
-    EGA_add_fn("cat", 1, 256, EGA_cat, "len(array_or_string_1, array_or_string_2, ...)");
-    EGA_add_fn("[]", 2, 2, EGA_at, "at(array_or_string, index)");
-    EGA_add_fn("at", 2, 2, EGA_at, "at(array_or_string, index)");
-    EGA_add_fn("left", 2, 2, EGA_left, "left(array_or_string, count)");
-    EGA_add_fn("right", 2, 2, EGA_right, "right(array_or_string, count)");
-    EGA_add_fn("mid", 3, 3, EGA_mid, "mid(array_or_string, index, count)");
+    EGA_add_fn("len", 1, 1, EGA_len, "len(ary_or_str)");
+    EGA_add_fn("cat", 1, 256, EGA_cat, "len(ary_or_str_1, ary_or_str_2, ...)");
+    EGA_add_fn("[]", 2, 2, EGA_at, "at(ary_or_str, index)");
+    EGA_add_fn("at", 2, 2, EGA_at, "at(ary_or_str, index)");
+    EGA_add_fn("left", 2, 2, EGA_left, "left(ary_or_str, count)");
+    EGA_add_fn("right", 2, 2, EGA_right, "right(ary_or_str, count)");
+    EGA_add_fn("mid", 3, 3, EGA_mid, "mid(ary_or_str, index, count)");
 
     return true;
 }
