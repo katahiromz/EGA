@@ -78,6 +78,7 @@ bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_P
 typedef void (*EGA_PRINT_FN)(const char *fmt, va_list va);
 void EGA_set_print_fn(EGA_PRINT_FN fn);
 void EGA_default_print(const char *fmt, va_list va);
+void EGA_do_print(const char *fmt, ...);
 
 //////////////////////////////////////////////////////////////////////////////
 // inputing
@@ -85,6 +86,7 @@ void EGA_default_print(const char *fmt, va_list va);
 typedef bool (*EGA_INPUT_FN)(char *buf, size_t buflen);
 void EGA_set_input_fn(EGA_INPUT_FN fn);
 bool EGA_default_input(char *buf, size_t buflen);
+bool EGA_do_input(char *buf, size_t buflen);
 
 //////////////////////////////////////////////////////////////////////////////
 // exceptions

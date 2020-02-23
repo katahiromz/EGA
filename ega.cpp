@@ -85,6 +85,12 @@ void EGA_set_input_fn(EGA_INPUT_FN fn)
     s_input_fn = fn;
 }
 
+bool EGA_do_input(char *buf, size_t buflen)
+{
+    buf[0] = 0;
+    return (*s_input_fn)(buf, buflen);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Dumping
 
@@ -963,6 +969,33 @@ arg_t EGA_FN EGA_dumpln(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_FN EGA_input(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    char buf[512];
+
+    if (args.size() == 1)
+    {
+        if (auto ast = EGA_eval_arg(args[0], true))
+        {
+            std::string str = EGA_str(ast);
+            EGA_do_print("%s? ", str.c_str());
+        }
+    }
+    else
+    {
+        EGA_do_print("? ");
+    }
+
+    if (EGA_do_input(buf, sizeof(buf)))
+    {
+        mstr_trim(buf, " \t\r\n\f\v;");
+        return make_arg<AstStr>(buf);
+    }
+    return NULL;
+}
+
 arg_t EGA_FN EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1696,12 +1729,13 @@ bool EGA_init(void)
     EGA_add_fn("greater_equal", 2, 2, EGA_greater_equal, "greater_equal(value1, value2)");
     EGA_add_fn(">=", 2, 2, EGA_greater_equal, "greater_equal(value1, value2)");
 
-    // print
+    // print/input
     EGA_add_fn("print", 0, 256, EGA_print, "print(value, ...)");
     EGA_add_fn("println", 0, 256, EGA_println, "println(value, ...)");
     EGA_add_fn("dump", 0, 256, EGA_dump, "dump(value, ...)");
     EGA_add_fn("dumpln", 0, 256, EGA_dumpln, "dumpln(value, ...)");
     EGA_add_fn("?", 0, 256, EGA_dumpln, "dumpln(value, ...)");
+    EGA_add_fn("input", 0, 1, EGA_input, "input([message])");
 
     // arithmetic
     EGA_add_fn("plus", 2, 2, EGA_plus, "plus(int1, int2)");
