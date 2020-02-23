@@ -756,12 +756,12 @@ static int EGA_get_int(arg_t ast)
     return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
-static std::shared_ptr<AstArray> EGA_get_array(arg_t ast)
+static std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)
         throw EGA_type_mismatch();
-    return std::static_pointer_cast<AstArray>(ast);
+    return std::static_pointer_cast<AstContainer>(ast);
 }
 
 static std::string EGA_get_str(arg_t ast)
@@ -1042,11 +1042,11 @@ arg_t EGA_FN EGA_cat(const args_t& args)
             }
 
         case AST_ARRAY:
-            if (auto array = make_arg<AstArray>(AST_ARRAY))
+            if (auto array = make_arg<AstContainer>(AST_ARRAY))
             {
                 for (size_t i = 0; i < args.size(); ++i)
                 {
-                    if (auto array2 = std::static_pointer_cast<AstArray>(args[i]))
+                    if (auto array2 = std::static_pointer_cast<AstContainer>(args[i]))
                     {
                         for (size_t k = 0; k < array2->size(); ++k)
                         {
@@ -1550,7 +1550,7 @@ arg_t EGA_FN EGA_left(const args_t& args)
                 break;
             case AST_ARRAY:
                 {
-                    auto array1 = make_arg<AstArray>(AST_ARRAY);
+                    auto array1 = make_arg<AstContainer>(AST_ARRAY);
                     auto array2 = EGA_get_array(ast1);
                     if (i2 <= array2->size())
                     {
@@ -1598,7 +1598,7 @@ arg_t EGA_FN EGA_right(const args_t& args)
                 break;
             case AST_ARRAY:
                 {
-                    auto array1 = make_arg<AstArray>(AST_ARRAY);
+                    auto array1 = make_arg<AstContainer>(AST_ARRAY);
                     auto array2 = EGA_get_array(ast1);
                     if (i2 <= array2->size())
                     {
@@ -1649,7 +1649,7 @@ static arg_t EGA_mid3(const args_t& args)
                     break;
                 case AST_ARRAY:
                     {
-                        auto array1 = make_arg<AstArray>(AST_ARRAY);
+                        auto array1 = make_arg<AstContainer>(AST_ARRAY);
                         auto array2 = EGA_get_array(ast1);
                         if (i2 <= array2->size() && i2 + i3 <= array2->size())
                         {
@@ -1704,7 +1704,7 @@ static arg_t EGA_mid4(const args_t& args)
                         break;
                     case AST_ARRAY:
                         {
-                            auto array1 = make_arg<AstArray>(AST_ARRAY);
+                            auto array1 = make_arg<AstContainer>(AST_ARRAY);
                             auto array2 = EGA_get_array(ast1);
                             if (i2 <= array2->size() && i2 + i3 <= array2->size())
                             {
@@ -1809,7 +1809,7 @@ arg_t EGA_FN EGA_replace(const args_t& args)
                     }
                 case AST_ARRAY:
                     {
-                        auto ary1 = make_arg<AstArray>(AST_ARRAY);
+                        auto ary1 = make_arg<AstContainer>(AST_ARRAY);
                         auto ary2 = EGA_get_array(ast1);
                         for (size_t i = 0; i < ary2->size(); ++i)
                         {
@@ -1855,7 +1855,7 @@ arg_t EGA_FN EGA_remove(const args_t& args)
                 }
             case AST_ARRAY:
                 {
-                    auto ary1 = make_arg<AstArray>(AST_ARRAY);
+                    auto ary1 = make_arg<AstContainer>(AST_ARRAY);
                     auto ary2 = EGA_get_array(ast1);
                     for (size_t i = 0; i < ary2->size(); ++i)
                     {
@@ -1942,7 +1942,7 @@ arg_t EGA_FN EGA_array(const args_t& args)
 {
     EVAL_DEBUG();
 
-    auto array = make_arg<AstArray>(AST_ARRAY);
+    auto array = make_arg<AstContainer>(AST_ARRAY);
     for (auto arg : args)
     {
         array->add(arg->eval());

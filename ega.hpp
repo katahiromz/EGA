@@ -592,10 +592,6 @@ protected:
     std::vector<arg_t> m_children;
 };
 
-typedef AstContainer AstCall;
-typedef AstContainer AstArray;
-typedef AstContainer AstProgram;
-
 //////////////////////////////////////////////////////////////////////////////
 // global functions
 
