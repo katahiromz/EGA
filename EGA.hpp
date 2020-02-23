@@ -435,13 +435,10 @@ public:
 
 protected:
     std::string m_name;
-    AstBase *m_value;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 // AstContainer
-
-AstBase *EGA_eval_fn(const std::string& name, const std::vector<AstBase *>& args);
 
 class AstContainer : public AstBase
 {
@@ -569,10 +566,6 @@ typedef AstContainer AstProgram;
 
 //////////////////////////////////////////////////////////////////////////////
 // global functions
-
-bool do_lexical(TokenStream& stream, const std::string& input);
-AstContainer *do_parse(TokenStream& stream);
-AstContainer *do_parse(const std::string& input);
 
 bool EGA_init(void);
 void EGA_uninit(void);
