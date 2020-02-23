@@ -1718,6 +1718,96 @@ arg_t EGA_FN EGA_find(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_FN EGA_replace(const args_t& args)
+{
+    if (auto ast1 = EGA_eval_arg(args[0], true))
+    {
+        if (auto ast2 = EGA_eval_arg(args[1], true))
+        {
+            if (auto ast3 = EGA_eval_arg(args[2], true))
+            {
+                switch (ast1->get_type())
+                {
+                case AST_STR:
+                    {
+                        std::string str1 = EGA_get_str(ast1);
+                        std::string str2 = EGA_get_str(ast2);
+                        std::string str3 = EGA_get_str(ast3);
+                        mstr_replace_all(str1, str2, str3);
+                        return make_arg<AstStr>(str1);
+                    }
+                case AST_ARRAY:
+                    {
+                        auto ary1 = make_arg<AstArray>(AST_ARRAY);
+                        auto ary2 = EGA_get_array(ast1);
+                        for (size_t i = 0; i < ary2->size(); ++i)
+                        {
+                            auto arg = (*ary2)[i];
+                            if (auto ai = EGA_compare_0(arg, ast2))
+                            {
+                                if (ai->get_int() == 0)
+                                {
+                                    ary1->add(ast3);
+                                }
+                                else
+                                {
+                                    ary1->add(arg);
+                                }
+                            }
+                        }
+                        return ary1;
+                    }
+                default:
+                    throw EGA_type_mismatch();
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_FN EGA_remove(const args_t& args)
+{
+    if (auto ast1 = EGA_eval_arg(args[0], true))
+    {
+        if (auto ast2 = EGA_eval_arg(args[1], true))
+        {
+            switch (ast1->get_type())
+            {
+            case AST_STR:
+                {
+                    std::string str1 = EGA_get_str(ast1);
+                    std::string str2 = EGA_get_str(ast2);
+                    mstr_replace_all(str1, str2, "");
+                    return make_arg<AstStr>(str1);
+                }
+            case AST_ARRAY:
+                {
+                    auto ary1 = make_arg<AstArray>(AST_ARRAY);
+                    auto ary2 = EGA_get_array(ast1);
+                    for (size_t i = 0; i < ary2->size(); ++i)
+                    {
+                        auto arg = (*ary2)[i];
+                        if (auto ai = EGA_compare_0(arg, ast2))
+                        {
+                            if (ai->get_int() != 0)
+                            {
+                                ary1->add(arg);
+                            }
+                        }
+                    }
+                    return ary1;
+                }
+            default:
+                throw EGA_type_mismatch();
+            }
+        }
+    }
+
+    return NULL;
+}
+
 arg_t EGA_FN EGA_typeid(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1879,6 +1969,8 @@ bool EGA_init(void)
     EGA_add_fn("right", 2, 2, EGA_right, "right(ary_or_str, count)");
     EGA_add_fn("mid", 3, 3, EGA_mid, "mid(ary_or_str, index, count)");
     EGA_add_fn("find", 2, 2, EGA_find, "find(ary_or_str, target)");
+    EGA_add_fn("replace", 3, 3, EGA_replace, "replace(ary_or_str, from, to)");
+    EGA_add_fn("remove", 2, 2, EGA_remove, "replace(ary_or_str, target)");
 
     return true;
 }

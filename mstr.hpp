@@ -138,6 +138,22 @@ mstr_to_string(long value)
     return ret;
 }
 
+inline bool
+mstr_replace_all(std::string& str, const std::string& from, const std::string& to)
+{
+    bool ret = false;
+    size_t i = 0;
+    for (;;) {
+        i = str.find(from, i);
+        if (i == std::string::npos)
+            break;
+        ret = true;
+        str.replace(i, from.size(), to);
+        i += to.size();
+    }
+    return ret;
+}
+
 inline void
 mstr_unittest(void)
 {
