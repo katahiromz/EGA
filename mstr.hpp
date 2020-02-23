@@ -9,6 +9,21 @@
 #include <cstring>
 #include <cassert>
 
+inline std::string
+mstr_quote(const std::string& str)
+{
+    std::string ret = "\"";
+    for (auto ch : str)
+    {
+        if (ch == '"')
+            ret += "\"\"";
+        else
+            ret += ch;
+    }
+    ret += "\"";
+    return ret;
+}
+
 inline void
 mstr_trim(std::string& str, const char *spaces)
 {

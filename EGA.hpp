@@ -356,17 +356,16 @@ public:
         return m_type;
     }
 
-    virtual std::string dump() const = 0;
+    virtual std::string dump(bool q) const = 0;
+
+    void print() const
+    {
+        printf("%s\n", dump(true).c_str());
+    }
 
     virtual arg_t clone() const = 0;
 
     virtual arg_t eval() const = 0;
-
-    void print() const
-    {
-        printf("%s", dump().c_str());
-        fflush(stdout);
-    }
 
 protected:
     AstType m_type;
@@ -399,7 +398,7 @@ public:
         return m_value;
     }
 
-    virtual std::string dump() const
+    virtual std::string dump(bool q) const
     {
         return mstr_to_string(m_value);
     }
@@ -435,9 +434,16 @@ public:
         return m_str;
     }
 
-    virtual std::string dump() const
+    virtual std::string dump(bool q) const
     {
-        return m_str;
+        if (q)
+        {
+            return mstr_quote(m_str);
+        }
+        else
+        {
+            return m_str;
+        }
     }
 
     virtual arg_t clone() const
@@ -475,12 +481,9 @@ public:
         return m_name;
     }
 
-    virtual std::string dump() const
+    virtual std::string dump(bool q) const
     {
-        std::string ret = "(AST_VAR, ";
-        ret += m_name;
-        ret += ")";
-        return ret;
+        return m_name;
     }
 
     virtual arg_t clone() const
@@ -551,16 +554,16 @@ public:
         return m_str;
     }
 
-    virtual std::string dump() const
+    virtual std::string dump(bool q) const
     {
         std::string ret = "{ ";
         if (size() > 0)
         {
-            ret += m_children[0]->dump();
+            ret += m_children[0]->dump(q);
             for (size_t i = 1; i < size(); ++i)
             {
                 ret += ", ";
-                ret += m_children[i]->dump();
+                ret += m_children[i]->dump(q);
             }
         }
         ret += " }";

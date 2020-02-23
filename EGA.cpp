@@ -513,7 +513,7 @@ arg_t EGA_eval_var(const std::string& name)
     EVAL_DEBUG();
 
     var_map_t::iterator it = s_var_map.find(name);
-    if (it == s_var_map.end())
+    if (it == s_var_map.end() || !it->second)
         return NULL;
 
     return it->second->eval();
@@ -549,8 +549,6 @@ arg_t EGA_eval(const arg_t& ast)
     if (!ast)
         throw EGA_syntax_error();
     auto ret = ast->eval();
-    if (!ret)
-        throw EGA_syntax_error();
     return ret;
 }
 
@@ -766,7 +764,7 @@ arg_t EGA_print(const args_t& args)
     {
         if (auto ast = EGA_eval(args[i]))
         {
-            printf("%s", ast->dump().c_str());
+            printf("%s", ast->dump(false).c_str());
         }
     }
     return NULL;
@@ -777,6 +775,29 @@ arg_t EGA_println(const args_t& args)
     EVAL_DEBUG();
 
     EGA_print(args);
+    printf("\n");
+    return NULL;
+}
+
+arg_t EGA_dump(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    for (size_t i = 0; i < args.size(); ++i)
+    {
+        if (auto ast = EGA_eval(args[i]))
+        {
+            printf("%s", ast->dump(true).c_str());
+        }
+    }
+    return NULL;
+}
+
+arg_t EGA_dumpln(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    EGA_dump(args);
     printf("\n");
     return NULL;
 }
@@ -987,7 +1008,19 @@ arg_t EGA_set(const args_t& args)
     std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
     auto value = args[1]->eval();
     EGA_set_var(name, value);
-    return NULL;
+    return value;
+}
+
+arg_t EGA_define(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args[0]->get_type() != AST_VAR)
+        throw EGA_type_mismatch();
+
+    std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
+    EGA_set_var(name, args[1]->clone());
+    return args[1];
 }
 
 arg_t EGA_for(const args_t& args)
@@ -1333,7 +1366,8 @@ bool EGA_init(void)
     // assignment
     EGA_add_fn("set", 2, 2, EGA_set);
     EGA_add_fn("=", 2, 2, EGA_set);
-    EGA_add_fn(":=", 2, 2, EGA_set);
+    EGA_add_fn("define", 2, 2, EGA_define);
+    EGA_add_fn(":=", 2, 2, EGA_define);
 
     // control structure
     EGA_add_fn("if", 2, 3, EGA_if);
@@ -1357,9 +1391,11 @@ bool EGA_init(void)
     EGA_add_fn(">=", 2, 2, EGA_greater_equal);
 
     // print
-    EGA_add_fn("print", 0, 16, EGA_print);
-    EGA_add_fn("println", 0, 16, EGA_println);
-    EGA_add_fn("?", 0, 16, EGA_println);
+    EGA_add_fn("print", 0, 256, EGA_print);
+    EGA_add_fn("println", 0, 256, EGA_println);
+    EGA_add_fn("dump", 0, 256, EGA_dump);
+    EGA_add_fn("dumpln", 0, 256, EGA_dumpln);
+    EGA_add_fn("?", 0, 256, EGA_dumpln);
 
     // arithmetic
     EGA_add_fn("plus", 2, 2, EGA_plus);
