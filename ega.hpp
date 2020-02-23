@@ -93,12 +93,21 @@ bool EGA_do_input(char *buf, size_t buflen);
 
 #include <stdexcept>
 
-typedef std::runtime_error EGA_exception;
+class EGA_exception : public std::runtime_error
+{
+public:
+    int m_lineno;
+    EGA_exception(const std::string& what, int lineno = 0)
+        : std::runtime_error(what)
+        , m_lineno(lineno)
+    {
+    }
+};
 
 class EGA_syntax_error : public EGA_exception
 {
 public:
-    EGA_syntax_error() : EGA_exception("syntax error")
+    EGA_syntax_error(int lineno) : EGA_exception("syntax error", lineno)
     {
     }
 };
@@ -106,7 +115,7 @@ public:
 class EGA_type_mismatch : public EGA_exception
 {
 public:
-    EGA_type_mismatch() : EGA_exception("type mismatch")
+    EGA_type_mismatch(int lineno) : EGA_exception("type mismatch", lineno)
     {
     }
 };
@@ -114,8 +123,8 @@ public:
 class EGA_undefined_variable : public EGA_exception
 {
 public:
-    EGA_undefined_variable(const std::string& name)
-        : EGA_exception("undefined variable: '" + std::string(name) + "'")
+    EGA_undefined_variable(const std::string& name, int lineno)
+        : EGA_exception("undefined variable: '" + std::string(name) + "'", lineno)
     {
     }
 };
@@ -123,8 +132,8 @@ public:
 class EGA_argument_number_exception : public EGA_exception
 {
 public:
-    EGA_argument_number_exception()
-        : EGA_exception("argument number mismatch")
+    EGA_argument_number_exception(int lineno)
+        : EGA_exception("argument number mismatch", lineno)
     {
     }
 };
@@ -132,8 +141,8 @@ public:
 class EGA_index_out_of_range : public EGA_exception
 {
 public:
-    EGA_index_out_of_range()
-        : EGA_exception("index out of range")
+    EGA_index_out_of_range(int lineno)
+        : EGA_exception("index out of range", lineno)
     {
     }
 };
@@ -159,7 +168,7 @@ public:
 class EGA_illegal_operation : public EGA_exception
 {
 public:
-    EGA_illegal_operation() : EGA_exception("illegal operation")
+    EGA_illegal_operation(int lineno) : EGA_exception("illegal operation", lineno)
     {
     }
 };
@@ -287,11 +296,11 @@ public:
         add(std::make_shared<Token>(type, line, str));
     }
 
-    bool do_lexical(const char *input);
+    bool do_lexical(const char *input, int& lineno);
 
-    bool do_lexical(const std::string& input)
+    bool do_lexical(const std::string& input, int& lineno)
     {
-        return do_lexical(input.c_str());
+        return do_lexical(input.c_str(), lineno);
     }
 
     int get_error() const
@@ -337,6 +346,11 @@ public:
     std::string& token_str()
     {
         return token()->get_str();
+    }
+
+    int get_lineno()
+    {
+        return token()->get_lineno();
     }
 
     bool go_next()
@@ -404,10 +418,18 @@ public:
 
     virtual arg_t eval() const = 0;
 
+    int get_lineno() const
+    {
+        return m_lineno;
+    }
+
 protected:
     AstType m_type;
+    int m_lineno;
 
-    AstBase(AstType type) : m_type(type)
+    AstBase(AstType type, int lineno)
+        : m_type(type)
+        , m_lineno(lineno)
     {
         alive_count(true);
     }
@@ -424,8 +446,8 @@ private:
 class AstInt : public AstBase
 {
 public:
-    AstInt(int value = 0)
-        : AstBase(AST_INT)
+    AstInt(int value = 0, int lineno = 0)
+        : AstBase(AST_INT, lineno)
         , m_value(value)
     {
     }
@@ -460,8 +482,8 @@ protected:
 class AstStr : public AstBase
 {
 public:
-    AstStr(const std::string& str)
-        : AstBase(AST_STR)
+    AstStr(const std::string& str, int lineno = 0)
+        : AstBase(AST_STR, lineno)
         , m_str(str)
     {
     }
@@ -496,8 +518,8 @@ protected:
 class AstVar : public AstBase
 {
 public:
-    AstVar(const std::string& name)
-        : AstBase(AST_VAR)
+    AstVar(const std::string& name, int lineno = 0)
+        : AstBase(AST_VAR, lineno)
         , m_name(name)
     {
     }
@@ -518,7 +540,7 @@ public:
 
     virtual arg_t clone() const
     {
-        return make_arg<AstVar>(m_name);
+        return make_arg<AstVar>(m_name, m_lineno);
     }
 
     virtual arg_t eval() const;
@@ -533,8 +555,8 @@ protected:
 class AstContainer : public AstBase
 {
 public:
-    AstContainer(AstType type, const std::string& str = "")
-        : AstBase(type)
+    AstContainer(AstType type, int lineno = 0, const std::string& str = "")
+        : AstBase(type, lineno)
         , m_str(str)
     {
         assert(type == AST_ARRAY || type == AST_CALL || type == AST_PROGRAM);

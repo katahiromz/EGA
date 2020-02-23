@@ -13,16 +13,20 @@
 
 typedef std::unordered_map<std::string, fn_t> fn_map_t;
 typedef std::unordered_map<std::string, arg_t> var_map_t;
+
 static fn_map_t s_fn_map;
 static var_map_t s_var_map;
+static bool s_interactive = false;
 
 #define EGA_FN
 
 fn_t EGA_get_fn(const std::string& name);
-arg_t EGA_eval_fn(const std::string& name, const args_t& args);
-arg_t EGA_eval_var(const std::string& name);
+arg_t EGA_eval_fn(const std::string& name, const args_t& args, int lineno);
+arg_t EGA_eval_var(const std::string& name, int lineno);
 arg_t EGA_eval_program(const args_t& args);
-arg_t EGA_eval_arg(arg_t ast, bool do_check = false);
+arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check);
+arg_t EGA_eval_arg(arg_t ast, bool do_check);
+arg_t EGA_eval_arg(arg_t ast);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -149,7 +153,7 @@ std::string AstContainer::dump(bool q) const
 
 arg_t AstContainer::clone() const
 {
-    auto ret = make_arg<AstContainer>(m_type, m_str);
+    auto ret = make_arg<AstContainer>(m_type, m_lineno, m_str);
     for (size_t i = 0; i < size(); ++i)
     {
         ret->add(m_children[i]->clone());
@@ -229,9 +233,9 @@ arg_t TokenStream::do_parse()
     return visit_translation_unit();
 }
 
-bool TokenStream::do_lexical(const char *input)
+bool TokenStream::do_lexical(const char *input, int& lineno)
 {
-    int lineno = 1;
+    lineno = 1;
     const char *pch = input;
 
     for (; *pch; ++pch)
@@ -319,13 +323,13 @@ bool TokenStream::do_lexical(const char *input)
 
         EGA_do_print("ERROR: invalid character '%c' (%u)\n", *pch, (*pch & 0xFF));
         m_error = -1;
-        return false;
+        return lineno;
     }
 
     add(TOK_EOF, lineno, "");
 
     m_error = 0;
-    return true;
+    return lineno;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -348,7 +352,7 @@ arg_t TokenStream::visit_translation_unit()
 {
     PARSE_DEBUG();
 
-    auto call = make_arg<AstContainer>(AST_PROGRAM, "program");
+    auto call = make_arg<AstContainer>(AST_PROGRAM, get_lineno());
 
     for (;;)
     {
@@ -400,10 +404,10 @@ arg_t TokenStream::visit_expression()
         }
         else
         {
-            auto var = make_arg<AstVar>(name);
+            auto var = make_arg<AstVar>(name, get_lineno());
             go_next();
             if (token()->get_str() == "(")
-                throw EGA_syntax_error();
+                throw EGA_syntax_error(get_lineno());
             return var;
         }
 
@@ -448,7 +452,7 @@ arg_t TokenStream::visit_integer_literal()
     if (token_type() != TOK_INT)
         return NULL;
 
-    auto ai = make_arg<AstInt>(token()->get_int());
+    auto ai = make_arg<AstInt>(token()->get_int(), get_lineno());
     go_next();
     return ai;
 }
@@ -459,7 +463,7 @@ arg_t TokenStream::visit_string_literal()
 
     if (token_type() != TOK_STR)
         return NULL;
-    auto as = make_arg<AstStr>(token()->get_str());
+    auto as = make_arg<AstStr>(token()->get_str(), get_lineno());
     go_next();
     return as;
 }
@@ -476,7 +480,7 @@ arg_t TokenStream::visit_array_literal()
     if (token_type() == TOK_SYMBOL && token_str() == "}")
     {
         go_next();
-        return make_arg<AstContainer>(AST_ARRAY);
+        return make_arg<AstContainer>(AST_ARRAY, get_lineno());
     }
 
     if (auto list = visit_expression_list(AST_ARRAY, "array"))
@@ -502,7 +506,7 @@ arg_t TokenStream::visit_call(const std::string& name)
 
     go_next();
 
-    auto list = make_arg<AstContainer>(AST_CALL, name);
+    auto list = make_arg<AstContainer>(AST_CALL, get_lineno(), name);
 
     if (token_type() == TOK_SYMBOL)
     {
@@ -558,7 +562,7 @@ arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
     if (!expr)
         return NULL;
 
-    auto list = make_arg<AstContainer>(type, name);
+    auto list = make_arg<AstContainer>(type, get_lineno(), name);
     list->add(expr);
 
     for (;;)
@@ -600,7 +604,7 @@ arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
 
 arg_t AstVar::eval() const
 {
-    return EGA_eval_var(m_name);
+    return EGA_eval_var(m_name, get_lineno());
 }
 
 arg_t AstContainer::eval() const
@@ -608,7 +612,7 @@ arg_t AstContainer::eval() const
     switch (m_type)
     {
     case AST_ARRAY:
-        if (auto ret = make_arg<AstContainer>(AST_ARRAY, "array"))
+        if (auto ret = make_arg<AstContainer>(AST_ARRAY))
         {
             for (size_t i = 0; i < size(); ++i)
             {
@@ -619,7 +623,7 @@ arg_t AstContainer::eval() const
         break;
 
     case AST_CALL:
-        return EGA_eval_fn(m_str, m_children);
+        return EGA_eval_fn(m_str, m_children, m_lineno);
 
     case AST_PROGRAM:
         return EGA_eval_program(m_children);
@@ -651,13 +655,13 @@ EGA_add_fn(const std::string& name, size_t min_args, size_t max_args,
     return true;
 }
 
-arg_t EGA_eval_var(const std::string& name)
+arg_t EGA_eval_var(const std::string& name, int lineno)
 {
     EVAL_DEBUG();
 
     var_map_t::iterator it = s_var_map.find(name);
     if (it == s_var_map.end() || !it->second)
-        throw EGA_undefined_variable(name);
+        throw EGA_undefined_variable(name, lineno);
 
     return it->second->eval();
 }
@@ -676,7 +680,7 @@ EGA_eval_program(const args_t& args)
 }
 
 arg_t
-EGA_eval_fn(const std::string& name, const args_t& args)
+EGA_eval_fn(const std::string& name, const args_t& args, int lineno)
 {
     EVAL_DEBUG();
     if (name.size())
@@ -686,7 +690,7 @@ EGA_eval_fn(const std::string& name, const args_t& args)
             if (fn->min_args <= args.size() && args.size() <= fn->max_args)
                 return (*(fn->proc))(args);
             else
-                throw EGA_argument_number_exception();
+                throw EGA_argument_number_exception(lineno);
         }
     }
     else
@@ -696,28 +700,39 @@ EGA_eval_fn(const std::string& name, const args_t& args)
     return NULL;
 }
 
-arg_t EGA_eval_arg(arg_t ast, bool do_check)
+arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check)
 {
     EVAL_DEBUG();
     if (!ast)
-        throw EGA_syntax_error();
+        throw EGA_syntax_error(0);
     auto ret = ast->eval();
     if (!ret && do_check)
-        throw EGA_illegal_operation();
+        throw EGA_illegal_operation(0);
     return ret;
+}
+
+arg_t EGA_eval_arg(arg_t ast, bool do_check)
+{
+    return EGA_eval_arg(ast, ast->get_lineno(), do_check);
+}
+
+arg_t EGA_eval_arg(arg_t ast)
+{
+    return EGA_eval_arg(ast, false);
 }
 
 void EGA_eval_text(const char *text)
 {
     TokenStream stream;
-    if (!stream.do_lexical(text))
-        throw EGA_syntax_error();
+    int lineno = 1;
+    if (!stream.do_lexical(text, lineno))
+        throw EGA_syntax_error(lineno);
 
     auto ast = stream.do_parse();
     if (!ast)
-        throw EGA_syntax_error();
+        throw EGA_syntax_error(stream.get_lineno());
 
-    auto evaled = EGA_eval_arg(ast);
+    auto evaled = EGA_eval_arg(ast, false);
     if (evaled)
     {
         evaled->print();
@@ -734,7 +749,7 @@ bool EGA_eval_text_ex(const char *text)
     {
         if (e.m_arg)
         {
-            if (auto evaled = EGA_eval_arg(e.m_arg))
+            if (auto evaled = EGA_eval_arg(e.m_arg, false))
             {
                 evaled->print();
             }
@@ -743,7 +758,10 @@ bool EGA_eval_text_ex(const char *text)
     }
     catch (EGA_exception& e)
     {
-        EGA_do_print("ERROR: %s\n", e.what());
+        if (s_interactive)
+            EGA_do_print("ERROR: %s\n", e.what());
+        else
+            EGA_do_print("ERROR: %s at Line %d\n", e.what(), e.m_lineno);
     }
     return true;
 }
@@ -752,7 +770,7 @@ static int EGA_get_int(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_INT)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(ast->get_lineno());
     return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
@@ -760,7 +778,7 @@ static std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(ast->get_lineno());
     return std::static_pointer_cast<AstContainer>(ast);
 }
 
@@ -768,7 +786,7 @@ static std::string EGA_get_str(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_STR)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(ast->get_lineno());
     return std::static_pointer_cast<AstStr>(ast)->get_str();
 }
 
@@ -840,7 +858,7 @@ EGA_compare_0(arg_t a1, arg_t a2)
             return make_arg<AstInt>(0);
         }
     default:
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(a1->get_lineno());
     }
 
     return NULL;
@@ -929,7 +947,7 @@ arg_t EGA_FN EGA_print(const args_t& args)
 
     for (size_t i = 0; i < args.size(); ++i)
     {
-        if (auto ast = EGA_eval_arg(args[i]))
+        if (auto ast = EGA_eval_arg(args[i], false))
         {
             EGA_do_print("%s", ast->dump(false).c_str());
         }
@@ -1016,7 +1034,7 @@ arg_t EGA_FN EGA_len(const args_t& args)
             }
 
         default:
-            throw EGA_type_mismatch();
+            throw EGA_type_mismatch(args[0]->get_lineno());
         }
     }
     return NULL;
@@ -1059,7 +1077,7 @@ arg_t EGA_FN EGA_cat(const args_t& args)
             break;
 
         default:
-            throw EGA_type_mismatch();
+            throw EGA_type_mismatch(args[0]->get_lineno());
         }
     }
 
@@ -1109,7 +1127,7 @@ arg_t EGA_FN EGA_minus(const args_t& args)
         }
     }
 
-    throw EGA_argument_number_exception();
+    return NULL;
 }
 
 arg_t EGA_FN EGA_mul(const args_t& args)
@@ -1202,7 +1220,7 @@ arg_t EGA_FN EGA_set(const args_t& args)
     EVAL_DEBUG();
 
     if (args[0]->get_type() != AST_VAR)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(args[0]->get_lineno());
 
     std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
 
@@ -1224,7 +1242,7 @@ arg_t EGA_FN EGA_define(const args_t& args)
     EVAL_DEBUG();
 
     if (args[0]->get_type() != AST_VAR)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(args[0]->get_lineno());
 
     std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
 
@@ -1246,7 +1264,7 @@ arg_t EGA_FN EGA_for(const args_t& args)
     EVAL_DEBUG();
 
     if (args[0]->get_type() != AST_VAR)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(args[0]->get_lineno());
 
     arg_t arg;
     if (auto ast1 = EGA_eval_arg(args[1], true))
@@ -1282,7 +1300,7 @@ arg_t EGA_FN EGA_foreach(const args_t& args)
     EVAL_DEBUG();
 
     if (args[0]->get_type() != AST_VAR)
-        throw EGA_type_mismatch();
+        throw EGA_type_mismatch(args[0]->get_lineno());
 
     arg_t arg;
     if (auto var = std::static_pointer_cast<AstVar>(args[0]))
@@ -1545,7 +1563,7 @@ arg_t EGA_FN EGA_left(const args_t& args)
                         return make_arg<AstStr>(str2);
                     }
                     else
-                        throw EGA_index_out_of_range();
+                        throw EGA_index_out_of_range(args[1]->get_lineno());
                 }
                 break;
             case AST_ARRAY:
@@ -1561,11 +1579,11 @@ arg_t EGA_FN EGA_left(const args_t& args)
                         return array1;
                     }
                     else
-                        throw EGA_index_out_of_range();
+                        throw EGA_index_out_of_range(args[1]->get_lineno());
                 }
                 break;
             default:
-                throw EGA_type_mismatch();
+                throw EGA_type_mismatch(args[0]->get_lineno());
             }
         }
     }
@@ -1593,7 +1611,7 @@ arg_t EGA_FN EGA_right(const args_t& args)
                         return make_arg<AstStr>(str2);
                     }
                     else
-                        throw EGA_index_out_of_range();
+                        throw EGA_index_out_of_range(args[1]->get_lineno());
                 }
                 break;
             case AST_ARRAY:
@@ -1611,11 +1629,11 @@ arg_t EGA_FN EGA_right(const args_t& args)
                         return array1;
                     }
                     else
-                        throw EGA_index_out_of_range();
+                        throw EGA_index_out_of_range(args[1]->get_lineno());
                 }
                 break;
             default:
-                throw EGA_type_mismatch();
+                throw EGA_type_mismatch(args[0]->get_lineno());
             }
         }
     }
@@ -1644,7 +1662,7 @@ static arg_t EGA_mid3(const args_t& args)
                             return make_arg<AstStr>(str2);
                         }
                         else
-                            throw EGA_index_out_of_range();
+                            throw EGA_index_out_of_range(args[1]->get_lineno());
                     }
                     break;
                 case AST_ARRAY:
@@ -1662,11 +1680,11 @@ static arg_t EGA_mid3(const args_t& args)
                             return array1;
                         }
                         else
-                            throw EGA_index_out_of_range();
+                            throw EGA_index_out_of_range(args[1]->get_lineno());
                     }
                     break;
                 default:
-                    throw EGA_type_mismatch();
+                    throw EGA_type_mismatch(args[0]->get_lineno());
                 }
             }
         }
@@ -1699,7 +1717,7 @@ static arg_t EGA_mid4(const args_t& args)
                                 return make_arg<AstStr>(str1);
                             }
                             else
-                                throw EGA_index_out_of_range();
+                                throw EGA_index_out_of_range(args[1]->get_lineno());
                         }
                         break;
                     case AST_ARRAY:
@@ -1722,11 +1740,11 @@ static arg_t EGA_mid4(const args_t& args)
                                 return array1;
                             }
                             else
-                                throw EGA_index_out_of_range();
+                                throw EGA_index_out_of_range(args[1]->get_lineno());
                         }
                         break;
                     default:
-                        throw EGA_type_mismatch();
+                        throw EGA_type_mismatch(args[1]->get_lineno());
                     }
                 }
             }
@@ -1781,7 +1799,7 @@ arg_t EGA_FN EGA_find(const args_t& args)
                     return make_arg<AstInt>(-1);
                 }
             default:
-                throw EGA_type_mismatch();
+                throw EGA_type_mismatch(args[0]->get_lineno());
             }
         }
     }
@@ -1829,7 +1847,7 @@ arg_t EGA_FN EGA_replace(const args_t& args)
                         return ary1;
                     }
                 default:
-                    throw EGA_type_mismatch();
+                    throw EGA_type_mismatch(args[0]->get_lineno());
                 }
             }
         }
@@ -1871,7 +1889,7 @@ arg_t EGA_FN EGA_remove(const args_t& args)
                     return ary1;
                 }
             default:
-                throw EGA_type_mismatch();
+                throw EGA_type_mismatch(args[0]->get_lineno());
             }
         }
     }
@@ -1918,7 +1936,7 @@ arg_t EGA_FN EGA_int(const args_t& args)
                 return make_arg<AstInt>(i);
             }
         default:
-            throw EGA_type_mismatch();
+            throw EGA_type_mismatch(args[0]->get_lineno());
         }
     }
 
@@ -1953,6 +1971,7 @@ arg_t EGA_FN EGA_array(const args_t& args)
 
 bool EGA_init(void)
 {
+    s_interactive = true;
     EGA_set_input_fn(EGA_default_input);
     EGA_set_print_fn(EGA_default_print);
 
@@ -2098,6 +2117,8 @@ int EGA_interactive(bool echo)
 {
     char buf[512];
 
+    s_interactive = true;
+
     EGA_do_print("Type 'exit' to exit. Type 'help' to see help.\n");
 
     for (;;)
@@ -2140,6 +2161,8 @@ int EGA_interactive(bool echo)
 
 bool EGA_file_input(const char *filename)
 {
+    s_interactive = false;
+
     std::string str;
     if (FILE *fp = fopen(filename, "r"))
     {
