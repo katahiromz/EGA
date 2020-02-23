@@ -1649,10 +1649,10 @@ do_interpret_mode(void)
     while (fgets(buf, sizeof(buf), stdin))
     {
         mstr_trim(buf, " \t\r\n\f\v");
-        if (strcmp(buf, "exit") == 0)
+        if (strcmp(buf, "exit") == 0 || strcmp(buf, "exit;") == 0)
             break;
 
-        if (strcmp(buf, "help") == 0)
+        if (strcmp(buf, "help") == 0 || strcmp(buf, "help;") == 0)
         {
             show_help();
 
@@ -1665,7 +1665,7 @@ do_interpret_mode(void)
             std::isspace(buf[4]))
         {
             std::string name = &buf[5];
-            mstr_trim(name, " \t\r\n\f\v");
+            mstr_trim(name, " \t\r\n\f\v;");
             show_help(name);
 
             printf("\nEGA> ");
