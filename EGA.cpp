@@ -1730,7 +1730,7 @@ void EGA_show_help(const std::string& name)
     EGA_do_print("  usage: %s\n", it->second->help.c_str());
 }
 
-int EGA_interactive(void)
+int EGA_interactive(bool echo)
 {
     char buf[512];
 
@@ -1743,6 +1743,9 @@ int EGA_interactive(void)
 
         if (!fgets(buf, sizeof(buf), stdin))
             break;
+
+        if (echo)
+            EGA_do_print("%s", buf);
 
         mstr_trim(buf, " \t\r\n\f\v;");
 
@@ -1790,6 +1793,7 @@ bool EGA_file_input(const char *filename)
     return false;
 }
 
+#ifndef EGA_LIB
 int main(int argc, char **argv)
 {
     mstr_unittest();
@@ -1827,3 +1831,4 @@ int main(int argc, char **argv)
     assert(AstBase::s_alive_count == 0);
     return 0;
 }
+#endif  // ndef EGA_LIB
