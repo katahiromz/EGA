@@ -1744,10 +1744,10 @@ int EGA_interactive(bool echo)
         if (!fgets(buf, sizeof(buf), stdin))
             break;
 
-        if (echo)
-            EGA_do_print("%s", buf);
-
         mstr_trim(buf, " \t\r\n\f\v;");
+
+        if (echo)
+            EGA_do_print("%s;", buf);
 
         if (strcmp(buf, "exit") == 0)
             break;
