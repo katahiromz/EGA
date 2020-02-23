@@ -1603,10 +1603,10 @@ arg_t EGA_FN EGA_mid(const args_t& args)
 bool EGA_init(void)
 {
     // assignment
-    EGA_add_fn("set", 1, 2, EGA_set, "set(var, value)");
-    EGA_add_fn("=", 1, 2, EGA_set, "set(var, value)");
-    EGA_add_fn("define", 1, 2, EGA_define, "define(var, expr)");
-    EGA_add_fn(":=", 1, 2, EGA_define, "define(var, expr)");
+    EGA_add_fn("set", 1, 2, EGA_set, "set(var[, value])");
+    EGA_add_fn("=", 1, 2, EGA_set, "set(var[, value])");
+    EGA_add_fn("define", 1, 2, EGA_define, "define(var[, expr])");
+    EGA_add_fn(":=", 1, 2, EGA_define, "define(var[, expr])");
 
     // control structure
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
