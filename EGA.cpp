@@ -189,7 +189,19 @@ bool TokenStream::do_lexical(const char *input)
             for (;;)
             {
                 if (*pch == '"')
-                    break;
+                {
+                    if (pch[1] == '"')
+                    {
+                        str += *pch;
+                        ++pch;
+                        ++pch;
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
                 str += *pch;
                 ++pch;
             }
