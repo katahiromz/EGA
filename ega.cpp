@@ -2144,6 +2144,20 @@ bool EGA_file_input(const char *filename)
     if (FILE *fp = fopen(filename, "r"))
     {
         char buf[512];
+
+        if (fgets(buf, sizeof(buf), fp))
+        {
+            if (memcmp(buf, "\xEF\xBB\xBF", 3) == 0)
+            {
+                // UTF-8 BOM
+                str += &buf[3];
+            }
+            else
+            {
+                str += buf;
+            }
+        }
+
         while (fgets(buf, sizeof(buf), fp))
         {
             str += buf;
