@@ -705,7 +705,7 @@ arg_t EGA_greater(const args_t& args)
     return NULL;
 }
 
-arg_t EGA_le(const args_t& args)
+arg_t EGA_less_equal(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
@@ -719,7 +719,7 @@ arg_t EGA_le(const args_t& args)
     return NULL;
 }
 
-arg_t EGA_ge(const args_t& args)
+arg_t EGA_greater_equal(const args_t& args)
 {
     EVAL_DEBUG();
     if (args.size() != 2)
@@ -1110,12 +1110,12 @@ bool EGA_init(void)
     EGA_add_fn("compare", 2, 2, EGA_compare);
     EGA_add_fn("less", 2, 2, EGA_less);
     EGA_add_fn("<", 2, 2, EGA_less);
-    EGA_add_fn("le", 2, 2, EGA_le);
-    EGA_add_fn("<=", 2, 2, EGA_le);
+    EGA_add_fn("less_equal", 2, 2, EGA_less_equal);
+    EGA_add_fn("<=", 2, 2, EGA_less_equal);
     EGA_add_fn("greater", 2, 2, EGA_greater);
     EGA_add_fn(">", 2, 2, EGA_greater);
-    EGA_add_fn("ge", 2, 2, EGA_ge);
-    EGA_add_fn(">=", 2, 2, EGA_ge);
+    EGA_add_fn("greater_equal", 2, 2, EGA_greater_equal);
+    EGA_add_fn(">=", 2, 2, EGA_greater_equal);
     EGA_add_fn("print", 0, 16, EGA_print);
     EGA_add_fn("println", 0, 16, EGA_println);
     EGA_add_fn("?", 0, 16, EGA_println);
