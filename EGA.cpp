@@ -1158,6 +1158,37 @@ arg_t EGA_for(const args_t& args)
     return arg;
 }
 
+arg_t EGA_foreach(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args[0]->get_type() != AST_VAR)
+        throw EGA_type_mismatch();
+
+    arg_t arg;
+    if (auto var = std::static_pointer_cast<AstVar>(args[0]))
+    {
+        if (auto array = EGA_array(args[1]))
+        {
+            for (size_t i = 0; i < array->size(); ++i)
+            {
+                EGA_set_var(var->get_name(), (*array)[i]);
+
+                try
+                {
+                    arg = EGA_eval(args[2]);
+                }
+                catch (EGA_break_exception&)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    return arg;
+}
+
 arg_t EGA_while(const args_t& args)
 {
     EVAL_DEBUG();
@@ -1536,6 +1567,7 @@ bool EGA_init(void)
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
     EGA_add_fn("?:", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
     EGA_add_fn("for", 4, 4, EGA_for, "for(var, min, max, expr)");
+    EGA_add_fn("foreach", 3, 3, EGA_foreach, "foreach(var, array, expr)");
     EGA_add_fn("while", 2, 2, EGA_while, "while(cond, expr)");
     EGA_add_fn("do", 0, 256, EGA_do, "do(expr, ...)");
     EGA_add_fn("exit", 0, 1, EGA_exit, "exit([value])");
