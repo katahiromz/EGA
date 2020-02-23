@@ -769,7 +769,7 @@ arg_t EGA_print(const args_t& args)
     {
         if (auto ast = do_eval_ast(args[i]))
         {
-            printf("%s\n", ast->dump().c_str());
+            printf("%s", ast->dump().c_str());
         }
     }
     return NULL;
