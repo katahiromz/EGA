@@ -13,10 +13,14 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # using Clang
     set(CMAKE_C_FLAGS "-static")
     set(CMAKE_CXX_FLAGS "-static")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using GCC
     set(CMAKE_C_FLAGS "-static")
     set(CMAKE_CXX_FLAGS "-static")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 elseif (MSVC)
     # replace "/MD" with "/MT" (building without runtime DLLs)
     set(CompilerFlags
