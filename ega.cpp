@@ -748,7 +748,7 @@ bool EGA_eval_text_ex(const char *text)
     return true;
 }
 
-int EGA_int(arg_t ast)
+static int EGA_get_int(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_INT)
@@ -756,7 +756,7 @@ int EGA_int(arg_t ast)
     return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
-std::shared_ptr<AstArray> EGA_array(arg_t ast)
+static std::shared_ptr<AstArray> EGA_get_array(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)
@@ -764,7 +764,7 @@ std::shared_ptr<AstArray> EGA_array(arg_t ast)
     return std::static_pointer_cast<AstArray>(ast);
 }
 
-std::string EGA_str(arg_t ast)
+static std::string EGA_get_str(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_STR)
@@ -804,7 +804,7 @@ EGA_compare_0(arg_t a1, arg_t a2)
                 {
                     return NULL;
                 }
-                if (EGA_int(ai) != 0)
+                if (EGA_get_int(ai) != 0)
                 {
                     return ai;
                 }
@@ -821,8 +821,8 @@ EGA_compare_0(arg_t a1, arg_t a2)
         }
     case AST_INT:
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             if (i1 < i2)
                 return make_arg<AstInt>(-1);
             if (i1 > i2)
@@ -831,8 +831,8 @@ EGA_compare_0(arg_t a1, arg_t a2)
         }
     case AST_STR:
         {
-            std::string str1 = EGA_str(ast1);
-            std::string str2 = EGA_str(ast2);
+            std::string str1 = EGA_get_str(ast1);
+            std::string str2 = EGA_get_str(ast2);
             if (str1 < str2)
                 return make_arg<AstInt>(-1);
             if (str1 > str2)
@@ -979,7 +979,7 @@ arg_t EGA_FN EGA_input(const args_t& args)
     {
         if (auto ast = EGA_eval_arg(args[0], true))
         {
-            std::string str = EGA_str(ast);
+            std::string str = EGA_get_str(ast);
             EGA_do_print("%s? ", str.c_str());
         }
     }
@@ -1005,13 +1005,13 @@ arg_t EGA_FN EGA_len(const args_t& args)
         {
         case AST_STR:
             {
-                int len = int(EGA_str(ast1).size());
+                int len = int(EGA_get_str(ast1).size());
                 return make_arg<AstInt>(len);
             }
 
         case AST_ARRAY:
             {
-                int len = int(EGA_array(ast1)->size());
+                int len = int(EGA_get_array(ast1)->size());
                 return make_arg<AstInt>(len);
             }
 
@@ -1032,11 +1032,11 @@ arg_t EGA_FN EGA_cat(const args_t& args)
         {
         case AST_STR:
             {
-                std::string str = EGA_str(ast1);
+                std::string str = EGA_get_str(ast1);
                 for (size_t i = 1; i < args.size(); ++i)
                 {
                     ast1 = args[i]->eval();
-                    str += EGA_str(ast1);
+                    str += EGA_get_str(ast1);
                 }
                 return make_arg<AstStr>(str);
             }
@@ -1074,8 +1074,8 @@ arg_t EGA_FN EGA_plus(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 + i2);
         }
     }
@@ -1090,7 +1090,7 @@ arg_t EGA_FN EGA_minus(const args_t& args)
     {
         if (auto ast1 = EGA_eval_arg(args[0], true))
         {
-            int i1 = EGA_int(ast1);
+            int i1 = EGA_get_int(ast1);
             return make_arg<AstInt>(-i1);
         }
         return NULL;
@@ -1102,8 +1102,8 @@ arg_t EGA_FN EGA_minus(const args_t& args)
         {
             if (auto ast2 = EGA_eval_arg(args[1], true))
             {
-                int i1 = EGA_int(ast1);
-                int i2 = EGA_int(ast2);
+                int i1 = EGA_get_int(ast1);
+                int i2 = EGA_get_int(ast2);
                 return make_arg<AstInt>(i1 - i2);
             }
         }
@@ -1120,8 +1120,8 @@ arg_t EGA_FN EGA_mul(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 * i2);
         }
     }
@@ -1137,8 +1137,8 @@ arg_t EGA_FN EGA_div(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 / i2);
         }
     }
@@ -1154,8 +1154,8 @@ arg_t EGA_FN EGA_mod(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 % i2);
         }
     }
@@ -1169,7 +1169,7 @@ arg_t EGA_FN EGA_if(const args_t& args)
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        int i1 = EGA_int(ast1);
+        int i1 = EGA_get_int(ast1);
         if (i1)
         {
             if (auto ast2 = EGA_eval_arg(args[1]))
@@ -1253,8 +1253,8 @@ arg_t EGA_FN EGA_for(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[2], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
 
             for (int i = i1; i <= i2; ++i)
             {
@@ -1289,7 +1289,7 @@ arg_t EGA_FN EGA_foreach(const args_t& args)
     {
         if (auto ast = EGA_eval_arg(args[1], true))
         {
-            if (auto array = EGA_array(ast))
+            if (auto array = EGA_get_array(ast))
             {
                 for (size_t i = 0; i < array->size(); ++i)
                 {
@@ -1321,7 +1321,7 @@ arg_t EGA_FN EGA_while(const args_t& args)
         auto ast1 = EGA_eval_arg(args[0], true);
         if (ast1)
         {
-            int i1 = EGA_int(ast1);
+            int i1 = EGA_get_int(ast1);
             if (!i1)
                 break;
         }
@@ -1385,9 +1385,9 @@ arg_t EGA_FN EGA_at(const args_t& args)
             switch (ast1->get_type())
             {
             case AST_ARRAY:
-                if (auto array = EGA_array(ast1))
+                if (auto array = EGA_get_array(ast1))
                 {
-                    size_t index = EGA_int(ast2);
+                    size_t index = EGA_get_int(ast2);
                     if (index < array->size())
                     {
                         auto base = (*array)[index]->eval();
@@ -1397,8 +1397,8 @@ arg_t EGA_FN EGA_at(const args_t& args)
                 break;
             case AST_STR:
                 {
-                    std::string str = EGA_str(ast1);
-                    size_t index = EGA_int(ast2);
+                    std::string str = EGA_get_str(ast1);
+                    size_t index = EGA_get_int(ast2);
                     if (index < str.size())
                     {
                         return make_arg<AstInt>(str[index]);
@@ -1420,7 +1420,7 @@ arg_t EGA_FN EGA_not(const args_t& args)
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        int i = EGA_int(ast1);
+        int i = EGA_get_int(ast1);
         return make_arg<AstInt>(!i);
     }
 
@@ -1435,8 +1435,8 @@ arg_t EGA_FN EGA_or(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 || i2);
         }
     }
@@ -1452,8 +1452,8 @@ arg_t EGA_FN EGA_and(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 && i2);
         }
     }
@@ -1467,7 +1467,7 @@ arg_t EGA_FN EGA_compl(const args_t& args)
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        int i = EGA_int(ast1);
+        int i = EGA_get_int(ast1);
         return make_arg<AstInt>(~i);
     }
 
@@ -1482,8 +1482,8 @@ arg_t EGA_FN EGA_bitor(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 | i2);
         }
     }
@@ -1499,8 +1499,8 @@ arg_t EGA_FN EGA_bitand(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 & i2);
         }
     }
@@ -1516,8 +1516,8 @@ arg_t EGA_FN EGA_xor(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_int(ast1);
-            int i2 = EGA_int(ast2);
+            int i1 = EGA_get_int(ast1);
+            int i2 = EGA_get_int(ast2);
             return make_arg<AstInt>(i1 ^ i2);
         }
     }
@@ -1533,12 +1533,12 @@ arg_t EGA_FN EGA_left(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            size_t i2 = EGA_int(ast2);
+            size_t i2 = EGA_get_int(ast2);
             switch (ast1->get_type())
             {
             case AST_STR:
                 {
-                    std::string str = EGA_str(ast1);
+                    std::string str = EGA_get_str(ast1);
                     if (i2 <= str.size())
                     {
                         std::string str2 = str.substr(0, i2);
@@ -1551,7 +1551,7 @@ arg_t EGA_FN EGA_left(const args_t& args)
             case AST_ARRAY:
                 {
                     auto array1 = make_arg<AstArray>(AST_ARRAY);
-                    auto array2 = EGA_array(ast1);
+                    auto array2 = EGA_get_array(ast1);
                     if (i2 <= array2->size())
                     {
                         for (size_t i = 0; i < i2; ++i)
@@ -1581,12 +1581,12 @@ arg_t EGA_FN EGA_right(const args_t& args)
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            size_t i2 = EGA_int(ast2);
+            size_t i2 = EGA_get_int(ast2);
             switch (ast1->get_type())
             {
             case AST_STR:
                 {
-                    std::string str = EGA_str(ast1);
+                    std::string str = EGA_get_str(ast1);
                     if (i2 <= str.size())
                     {
                         std::string str2 = str.substr(str.size() - i2, i2);
@@ -1599,7 +1599,7 @@ arg_t EGA_FN EGA_right(const args_t& args)
             case AST_ARRAY:
                 {
                     auto array1 = make_arg<AstArray>(AST_ARRAY);
-                    auto array2 = EGA_array(ast1);
+                    auto array2 = EGA_get_array(ast1);
                     if (i2 <= array2->size())
                     {
                         size_t k1 = array2->size() - i2;
@@ -1633,13 +1633,13 @@ arg_t EGA_FN EGA_mid(const args_t& args)
         {
             if (auto ast3 = EGA_eval_arg(args[2], true))
             {
-                size_t i2 = EGA_int(ast2);
-                size_t i3 = EGA_int(ast3);
+                size_t i2 = EGA_get_int(ast2);
+                size_t i3 = EGA_get_int(ast3);
                 switch (ast1->get_type())
                 {
                 case AST_STR:
                     {
-                        std::string str = EGA_str(ast1);
+                        std::string str = EGA_get_str(ast1);
                         if (i2 <= str.size() && i2 + i3 <= str.size())
                         {
                             std::string str2 = str.substr(i2, i3);
@@ -1652,7 +1652,7 @@ arg_t EGA_FN EGA_mid(const args_t& args)
                 case AST_ARRAY:
                     {
                         auto array1 = make_arg<AstArray>(AST_ARRAY);
-                        auto array2 = EGA_array(ast1);
+                        auto array2 = EGA_get_array(ast1);
                         if (i2 <= array2->size() && i2 + i3 <= array2->size())
                         {
                             size_t k1 = array2->size() - i2;
@@ -1690,6 +1690,65 @@ arg_t EGA_FN EGA_typeid(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_FN EGA_int(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (auto ast1 = EGA_eval_arg(args[0], true))
+    {
+        switch (ast1->get_type())
+        {
+        case AST_INT:
+            {
+                int i = EGA_get_int(ast1);
+                return make_arg<AstInt>(i);
+            }
+        case AST_STR:
+            {
+                std::string str = EGA_get_str(ast1);
+                int i = std::atoi(str.c_str());
+                return make_arg<AstInt>(i);
+            }
+        case AST_ARRAY:
+            {
+                auto array = EGA_get_array(ast1);
+                int i = int(array->size());
+                return make_arg<AstInt>(i);
+            }
+        default:
+            throw EGA_type_mismatch();
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_FN EGA_str(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (auto ast1 = EGA_eval_arg(args[0], true))
+    {
+        std::string str = ast1->dump(false);
+        return make_arg<AstStr>(str);
+    }
+
+    return NULL;
+}
+
+arg_t EGA_FN EGA_array(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    auto array = make_arg<AstArray>(AST_ARRAY);
+    for (auto arg : args)
+    {
+        array->add(arg->eval());
+    }
+
+    return array;
+}
+
 bool EGA_init(void)
 {
     EGA_set_input_fn(EGA_default_input);
@@ -1701,8 +1760,11 @@ bool EGA_init(void)
     EGA_add_fn("define", 1, 2, EGA_define, "define(var[, expr])");
     EGA_add_fn(":=", 1, 2, EGA_define, "define(var[, expr])");
 
-    // typeid
+    // type
     EGA_add_fn("typeid", 1, 1, EGA_typeid, "typeid(value)");
+    EGA_add_fn("int", 1, 1, EGA_int, "int(value)");
+    EGA_add_fn("str", 1, 1, EGA_str, "str(value)");
+    EGA_add_fn("array", 0, 256, EGA_array, "array(value1[, ...])");
 
     // control structure
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
