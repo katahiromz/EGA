@@ -1168,19 +1168,22 @@ arg_t EGA_foreach(const args_t& args)
     arg_t arg;
     if (auto var = std::static_pointer_cast<AstVar>(args[0]))
     {
-        if (auto array = EGA_array(args[1]))
+        if (auto ast = EGA_eval(args[1]))
         {
-            for (size_t i = 0; i < array->size(); ++i)
+            if (auto array = EGA_array(ast))
             {
-                EGA_set_var(var->get_name(), (*array)[i]);
+                for (size_t i = 0; i < array->size(); ++i)
+                {
+                    EGA_set_var(var->get_name(), (*array)[i]);
 
-                try
-                {
-                    arg = EGA_eval(args[2]);
-                }
-                catch (EGA_break_exception&)
-                {
-                    break;
+                    try
+                    {
+                        arg = EGA_eval(args[2]);
+                    }
+                    catch (EGA_break_exception&)
+                    {
+                        break;
+                    }
                 }
             }
         }
