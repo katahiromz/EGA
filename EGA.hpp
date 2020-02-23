@@ -62,10 +62,10 @@ void EGA_set_var(const std::string& name, arg_t ast);
 
 typedef std::runtime_error EGA_exception;
 
-class EGA_parse_error : public EGA_exception
+class EGA_syntax_error : public EGA_exception
 {
 public:
-    EGA_parse_error() : EGA_exception("parse error")
+    EGA_syntax_error() : EGA_exception("syntax error")
     {
     }
 };

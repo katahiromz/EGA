@@ -152,16 +152,16 @@ bool TokenStream::do_lexical(const char *input)
         if (is_ident_fchar(*pch))
         {
             str += *pch;
-            ++pch;
             for (;;)
             {
+                ++pch;
                 if (!is_ident_char(*pch))
                     break;
                 str += *pch;
-                ++pch;
             }
 
             add(TOK_IDENT, lineno, str);
+            --pch;
             --pch;
             continue;
         }
@@ -210,7 +210,7 @@ bool TokenStream::do_lexical(const char *input)
         if (*pch == 0x7F) // EOF
             break;
 
-        printf("ERROR: invalid character '%c'\n", *pch);
+        printf("ERROR: invalid character '%c' (%u)\n", *pch, (*pch & 0xFF));
         m_error = -1;
         return false;
     }
@@ -545,33 +545,30 @@ arg_t EGA_eval(const arg_t& ast)
 {
     EVAL_DEBUG();
     if (!ast)
-        throw EGA_parse_error();
+        throw EGA_syntax_error();
     auto ret = ast->eval();
     if (!ret)
-        throw EGA_parse_error();
+        throw EGA_syntax_error();
     return ret;
 }
 
 int do_eval_text(const char *text)
 {
     TokenStream stream;
-    if (stream.do_lexical(text))
+    if (!stream.do_lexical(text))
+        throw EGA_syntax_error();
+
+    auto ast = stream.do_parse();
+    if (!ast)
+        throw EGA_syntax_error();
+
+    auto evaled = EGA_eval(ast);
+    if (evaled)
     {
-        if (auto ast = stream.do_parse())
-        {
-            //ast->print();
-            auto evaled = EGA_eval(ast);
-            if (evaled)
-            {
-                evaled->print();
-            }
-            return 0;
-        }
-        printf("do_parse failed\n");
-        return -2;
+        evaled->print();
     }
-    printf("do_lexical failed\n");
-    return -1;
+
+    return 0;
 }
 
 int EGA_int(arg_t ast)
@@ -599,9 +596,12 @@ std::string EGA_str(arg_t ast)
 }
 
 std::shared_ptr<AstInt>
-EGA_compare_0(arg_t ast1, arg_t ast2)
+EGA_compare_0(arg_t a1, arg_t a2)
 {
     EVAL_DEBUG();
+
+    auto ast1 = EGA_eval(a1);
+    auto ast2 = EGA_eval(a2);
 
     if (ast1->get_type() < ast2->get_type())
     {
