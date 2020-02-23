@@ -1580,20 +1580,39 @@ EGA_uninit(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
+void
+show_help(void)
+{
+    printf("EGA has the following functions:\n");
+    for (auto pair : s_fn_map)
+    {
+        printf("  %s\n", pair.second->name.c_str());
+    }
+}
+
 int
 do_interpret_mode(void)
 {
     char buf[512];
 
-    printf("Type quit to quit.\n");
+    printf("Type 'exit' to exit. Type 'help' to see help.\n");
     printf("\nEGA> ");
     std::fflush(stdout);
 
     while (fgets(buf, sizeof(buf), stdin))
     {
         mstr_trim(buf, " \t\r\n\f\v");
-        if (strcmp(buf, "quit") == 0)
+        if (strcmp(buf, "exit") == 0)
             break;
+
+        if (strcmp(buf, "help") == 0)
+        {
+            show_help();
+
+            printf("\nEGA> ");
+            std::fflush(stdout);
+            continue;
+        }
 
         do_eval_text_ex(buf);
         printf("\nEGA> ");
