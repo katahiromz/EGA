@@ -676,7 +676,7 @@ void EGA_eval_text(const char *text)
     }
 }
 
-void EGA_eval_text_ex(const char *text)
+bool EGA_eval_text_ex(const char *text)
 {
     try
     {
@@ -691,11 +691,13 @@ void EGA_eval_text_ex(const char *text)
                 evaled->print();
             }
         }
+        return false;
     }
     catch (EGA_exception& e)
     {
         EGA_do_print("ERROR: %s\n", e.what());
     }
+    return true;
 }
 
 int EGA_int(arg_t ast)
@@ -1767,7 +1769,8 @@ int EGA_interactive(bool echo)
             continue;
         }
 
-        EGA_eval_text_ex(buf);
+        if (!EGA_eval_text_ex(buf))
+            break;
     }
 
     return 0;

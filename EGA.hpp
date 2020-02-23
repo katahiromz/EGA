@@ -617,7 +617,7 @@ bool EGA_init(void);
 void EGA_uninit(void);
 
 void EGA_set_var(const std::string& name, arg_t ast);
-void EGA_eval_text_ex(const char *text);
+bool EGA_eval_text_ex(const char *text);
 
 int EGA_interactive(bool echo = false);
 bool EGA_file_input(const char *filename);
