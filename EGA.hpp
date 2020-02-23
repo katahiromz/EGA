@@ -53,19 +53,22 @@ struct EGA_FUNCTION
     size_t min_args;
     size_t max_args;
     EGA_PROC proc;
+    std::string help;
 
-    EGA_FUNCTION(std::string n, size_t m1, size_t m2, EGA_PROC p)
+    EGA_FUNCTION(std::string n, size_t m1, size_t m2, EGA_PROC p, std::string h)
         : name(n)
         , min_args(m1)
         , max_args(m2)
         , proc(p)
+        , help(h)
     {
     }
 };
 typedef std::shared_ptr<EGA_FUNCTION> fn_t;
 
 fn_t EGA_get_fn(const std::string& name);
-bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc);
+bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc,
+                const std::string& help);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args);
 arg_t EGA_eval_program(const args_t& args, bool do_break);
 arg_t EGA_eval_var(const std::string& name);

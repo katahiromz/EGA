@@ -543,9 +543,10 @@ fn_t EGA_get_fn(const std::string& name)
 }
 
 bool
-EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc)
+EGA_add_fn(const std::string& name, size_t min_args, size_t max_args,
+           EGA_PROC proc, const std::string& help)
 {
-    auto fn = std::make_shared<EGA_FUNCTION>(name, min_args, max_args, proc);
+    auto fn = std::make_shared<EGA_FUNCTION>(name, min_args, max_args, proc, help);
     s_fn_map[name] = fn;
     return true;
 }
@@ -1071,7 +1072,10 @@ arg_t EGA_if(const args_t& args)
 
 void EGA_set_var(const std::string& name, arg_t arg)
 {
-    s_var_map[name] = arg;
+    if (arg)
+        s_var_map[name] = arg;
+    else
+        s_var_map.erase(name);
 }
 
 arg_t EGA_set(const args_t& args)
@@ -1082,9 +1086,18 @@ arg_t EGA_set(const args_t& args)
         throw EGA_type_mismatch();
 
     std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
-    auto value = args[1]->eval();
-    EGA_set_var(name, value);
-    return value;
+
+    if (args.size() == 2)
+    {
+        auto value = args[1]->eval();
+        EGA_set_var(name, value);
+        return value;
+    }
+    else
+    {
+        EGA_set_var(name, NULL);
+        return NULL;
+    }
 }
 
 arg_t EGA_define(const args_t& args)
@@ -1095,8 +1108,18 @@ arg_t EGA_define(const args_t& args)
         throw EGA_type_mismatch();
 
     std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
-    EGA_set_var(name, args[1]->clone());
-    return args[1];
+
+    if (args.size() == 2)
+    {
+        auto expr = args[1]->clone();
+        EGA_set_var(name, expr);
+        return expr;
+    }
+    else
+    {
+        EGA_set_var(name, NULL);
+        return NULL;
+    }
 }
 
 arg_t EGA_for(const args_t& args)
@@ -1492,80 +1515,80 @@ arg_t EGA_mid(const args_t& args)
 bool EGA_init(void)
 {
     // assignment
-    EGA_add_fn("set", 2, 2, EGA_set);
-    EGA_add_fn("=", 2, 2, EGA_set);
-    EGA_add_fn("define", 2, 2, EGA_define);
-    EGA_add_fn(":=", 2, 2, EGA_define);
+    EGA_add_fn("set", 1, 2, EGA_set, "set(var, value)");
+    EGA_add_fn("=", 1, 2, EGA_set, "set(var, value)");
+    EGA_add_fn("define", 1, 2, EGA_define, "define(var, expr)");
+    EGA_add_fn(":=", 1, 2, EGA_define, "define(var, expr)");
 
     // control structure
-    EGA_add_fn("if", 2, 3, EGA_if);
-    EGA_add_fn("?:", 2, 3, EGA_if);
-    EGA_add_fn("for", 4, 4, EGA_for);
-    EGA_add_fn("while", 2, 2, EGA_while);
-    EGA_add_fn("do", 0, 256, EGA_do);
-    EGA_add_fn("exit", 0, 1, EGA_exit);
-    EGA_add_fn("break", 0, 0, EGA_break);
+    EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
+    EGA_add_fn("?:", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
+    EGA_add_fn("for", 4, 4, EGA_for, "for(var, min, max, expr)");
+    EGA_add_fn("while", 2, 2, EGA_while, "while(cond, expr)");
+    EGA_add_fn("do", 0, 256, EGA_do, "do(expr, ...)");
+    EGA_add_fn("exit", 0, 1, EGA_exit, "exit([value])");
+    EGA_add_fn("break", 0, 0, EGA_break, "break()");
 
     // comparison
-    EGA_add_fn("equal", 2, 2, EGA_equal);
-    EGA_add_fn("==", 2, 2, EGA_equal);
-    EGA_add_fn("not_equal", 2, 2, EGA_not_equal);
-    EGA_add_fn("!=", 2, 2, EGA_not_equal);
-    EGA_add_fn("compare", 2, 2, EGA_compare);
-    EGA_add_fn("less", 2, 2, EGA_less);
-    EGA_add_fn("<", 2, 2, EGA_less);
-    EGA_add_fn("less_equal", 2, 2, EGA_less_equal);
-    EGA_add_fn("<=", 2, 2, EGA_less_equal);
-    EGA_add_fn("greater", 2, 2, EGA_greater);
-    EGA_add_fn(">", 2, 2, EGA_greater);
-    EGA_add_fn("greater_equal", 2, 2, EGA_greater_equal);
-    EGA_add_fn(">=", 2, 2, EGA_greater_equal);
+    EGA_add_fn("equal", 2, 2, EGA_equal, "equal(value1, value2)");
+    EGA_add_fn("==", 2, 2, EGA_equal, "equal(value1, value2)");
+    EGA_add_fn("not_equal", 2, 2, EGA_not_equal, "not_equal(value1, value2)");
+    EGA_add_fn("!=", 2, 2, EGA_not_equal, "not_equal(value1, value2)");
+    EGA_add_fn("compare", 2, 2, EGA_compare, "compare(value1, value2)");
+    EGA_add_fn("less", 2, 2, EGA_less, "less(value1, value2)");
+    EGA_add_fn("<", 2, 2, EGA_less, "less(value1, value2)");
+    EGA_add_fn("less_equal", 2, 2, EGA_less_equal, "less_equal(value1, value2)");
+    EGA_add_fn("<=", 2, 2, EGA_less_equal, "less_equal(value1, value2)");
+    EGA_add_fn("greater", 2, 2, EGA_greater, "greater(value1, value2)");
+    EGA_add_fn(">", 2, 2, EGA_greater, "greater(value1, value2)");
+    EGA_add_fn("greater_equal", 2, 2, EGA_greater_equal, "greater_equal(value1, value2)");
+    EGA_add_fn(">=", 2, 2, EGA_greater_equal, "greater_equal(value1, value2)");
 
     // print
-    EGA_add_fn("print", 0, 256, EGA_print);
-    EGA_add_fn("println", 0, 256, EGA_println);
-    EGA_add_fn("dump", 0, 256, EGA_dump);
-    EGA_add_fn("dumpln", 0, 256, EGA_dumpln);
-    EGA_add_fn("?", 0, 256, EGA_dumpln);
+    EGA_add_fn("print", 0, 256, EGA_print, "print(value, ...)");
+    EGA_add_fn("println", 0, 256, EGA_println, "println(value, ...)");
+    EGA_add_fn("dump", 0, 256, EGA_dump, "dump(value, ...)");
+    EGA_add_fn("dumpln", 0, 256, EGA_dumpln, "dumpln(value, ...)");
+    EGA_add_fn("?", 0, 256, EGA_dumpln, "dumpln(value, ...)");
 
     // arithmetic
-    EGA_add_fn("plus", 2, 2, EGA_plus);
-    EGA_add_fn("+", 2, 2, EGA_plus);
-    EGA_add_fn("minus", 1, 2, EGA_minus);
-    EGA_add_fn("-", 1, 2, EGA_minus);
-    EGA_add_fn("mul", 2, 2, EGA_mul);
-    EGA_add_fn("*", 2, 2, EGA_mul);
-    EGA_add_fn("div", 2, 2, EGA_div);
-    EGA_add_fn("/", 2, 2, EGA_div);
-    EGA_add_fn("mod", 2, 2, EGA_mod);
-    EGA_add_fn("%", 2, 2, EGA_mod);
+    EGA_add_fn("plus", 2, 2, EGA_plus, "plus(int1, int2)");
+    EGA_add_fn("+", 2, 2, EGA_plus, "plus(int1, int2)");
+    EGA_add_fn("minus", 1, 2, EGA_minus, "minus(int1[, int2])");
+    EGA_add_fn("-", 1, 2, EGA_minus, "minus(int1[, int2])");
+    EGA_add_fn("mul", 2, 2, EGA_mul, "mul(int1, int2)");
+    EGA_add_fn("*", 2, 2, EGA_mul, "mul(int1, int2)");
+    EGA_add_fn("div", 2, 2, EGA_div, "div(int1, int2)");
+    EGA_add_fn("/", 2, 2, EGA_div, "div(int1, int2)");
+    EGA_add_fn("mod", 2, 2, EGA_mod, "mod(int1, int2)");
+    EGA_add_fn("%", 2, 2, EGA_mod, "mod(int1, int2)");
 
     // logical
-    EGA_add_fn("not", 1, 1, EGA_not);
-    EGA_add_fn("!", 1, 1, EGA_not);
-    EGA_add_fn("or", 2, 2, EGA_or);
-    EGA_add_fn("||", 2, 2, EGA_or);
-    EGA_add_fn("and", 2, 2, EGA_and);
-    EGA_add_fn("&&", 2, 2, EGA_and);
+    EGA_add_fn("not", 1, 1, EGA_not, "not(value)");
+    EGA_add_fn("!", 1, 1, EGA_not, "not(value)");
+    EGA_add_fn("or", 2, 2, EGA_or, "or(value1, value2)");
+    EGA_add_fn("||", 2, 2, EGA_or, "or(value1, value2)");
+    EGA_add_fn("and", 2, 2, EGA_and, "and(value1, value2)");
+    EGA_add_fn("&&", 2, 2, EGA_and, "and(value1, value2)");
 
     // bit operation
-    EGA_add_fn("compl", 1, 1, EGA_compl);
-    EGA_add_fn("~", 1, 1, EGA_compl);
-    EGA_add_fn("bitor", 2, 2, EGA_bitor);
-    EGA_add_fn("|", 2, 2, EGA_bitor);
-    EGA_add_fn("bitand", 2, 2, EGA_bitand);
-    EGA_add_fn("&", 2, 2, EGA_bitand);
-    EGA_add_fn("xor", 2, 2, EGA_xor);
-    EGA_add_fn("^", 2, 2, EGA_xor);
+    EGA_add_fn("compl", 1, 1, EGA_compl, "compl(value)");
+    EGA_add_fn("~", 1, 1, EGA_compl, "compl(value)");
+    EGA_add_fn("bitor", 2, 2, EGA_bitor, "bitor(value1, value2)");
+    EGA_add_fn("|", 2, 2, EGA_bitor, "bitor(value1, value2)");
+    EGA_add_fn("bitand", 2, 2, EGA_bitand, "bitand(value1, value2)");
+    EGA_add_fn("&", 2, 2, EGA_bitand, "bitand(value1, value2)");
+    EGA_add_fn("xor", 2, 2, EGA_xor, "xor(value1, value2)");
+    EGA_add_fn("^", 2, 2, EGA_xor, "xor(value1, value2)");
 
     // array/string manipulation
-    EGA_add_fn("len", 1, 1, EGA_len);
-    EGA_add_fn("cat", 1, 256, EGA_cat);
-    EGA_add_fn("[]", 2, 2, EGA_at);
-    EGA_add_fn("at", 2, 2, EGA_at);
-    EGA_add_fn("left", 2, 2, EGA_left);
-    EGA_add_fn("right", 2, 2, EGA_right);
-    EGA_add_fn("mid", 3, 3, EGA_mid);
+    EGA_add_fn("len", 1, 1, EGA_len, "len(array_or_string)");
+    EGA_add_fn("cat", 1, 256, EGA_cat, "len(array_or_string_1, array_or_string_2, ...)");
+    EGA_add_fn("[]", 2, 2, EGA_at, "at(array_or_string, index)");
+    EGA_add_fn("at", 2, 2, EGA_at, "at(array_or_string, index)");
+    EGA_add_fn("left", 2, 2, EGA_left, "left(array_or_string, count)");
+    EGA_add_fn("right", 2, 2, EGA_right, "right(array_or_string, count)");
+    EGA_add_fn("mid", 3, 3, EGA_mid, "mid(array_or_string, index, count)");
 
     return true;
 }
@@ -1590,6 +1613,30 @@ show_help(void)
     }
 }
 
+void
+show_help(const std::string& name)
+{
+    auto it = s_fn_map.find(name);
+    if (it == s_fn_map.end() || !it->second)
+    {
+        printf("ERROR: No such function: '%s'\n", name.c_str());
+        return;
+    }
+
+    printf("EGA function '%s':\n", name.c_str());
+
+    if (it->second->min_args == it->second->max_args)
+    {
+        printf("  argument number: %d\n", int(it->second->min_args));
+    }
+    else
+    {
+        printf("  argument number: %d..%d\n", int(it->second->min_args), int(it->second->max_args));
+    }
+
+    printf("  usage: %s\n", it->second->help.c_str());
+}
+
 int
 do_interpret_mode(void)
 {
@@ -1608,6 +1655,18 @@ do_interpret_mode(void)
         if (strcmp(buf, "help") == 0)
         {
             show_help();
+
+            printf("\nEGA> ");
+            std::fflush(stdout);
+            continue;
+        }
+
+        if (memcmp(buf, "help", 4) == 0 &&
+            std::isspace(buf[4]))
+        {
+            std::string name = &buf[5];
+            mstr_trim(name, " \t\r\n\f\v");
+            show_help(name);
 
             printf("\nEGA> ");
             std::fflush(stdout);
