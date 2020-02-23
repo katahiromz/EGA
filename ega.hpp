@@ -10,7 +10,6 @@
 #include <vector>
 #include <memory>
 #include <cstdlib>
-#include <cctype>
 #include <cassert>
 #include "mstr.hpp"
 

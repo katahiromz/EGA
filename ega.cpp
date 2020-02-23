@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
+#include <cctype>
 
 typedef std::unordered_map<std::string, fn_t> fn_map_t;
 typedef std::unordered_map<std::string, arg_t> var_map_t;
