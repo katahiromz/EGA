@@ -1644,6 +1644,19 @@ arg_t EGA_FN EGA_mid(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_FN EGA_typeid(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (auto ast1 = EGA_eval_arg(args[0], true))
+    {
+        int type = int(ast1->get_type());
+        return make_arg<AstInt>(type);
+    }
+
+    return NULL;
+}
+
 bool EGA_init(void)
 {
     EGA_set_input_fn(EGA_default_input);
@@ -1654,6 +1667,9 @@ bool EGA_init(void)
     EGA_add_fn("=", 1, 2, EGA_set, "set(var[, value])");
     EGA_add_fn("define", 1, 2, EGA_define, "define(var[, expr])");
     EGA_add_fn(":=", 1, 2, EGA_define, "define(var[, expr])");
+
+    // typeid
+    EGA_add_fn("typeid", 1, 1, EGA_typeid, "typeid(value)");
 
     // control structure
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");
