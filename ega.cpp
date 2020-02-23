@@ -71,6 +71,21 @@ inline bool is_ident_char(char ch)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// inputing
+
+bool EGA_default_input(char *buf, size_t buflen)
+{
+    return fgets(buf, buflen, stdin) != NULL;
+}
+
+static EGA_INPUT_FN s_input_fn = EGA_default_input;
+
+void EGA_set_input_fn(EGA_INPUT_FN fn)
+{
+    s_input_fn = fn;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Dumping
 
 void EGA_default_print(const char *fmt, va_list va)
@@ -108,6 +123,32 @@ void TokenStream::print() const
 void AstBase::print() const
 {
     EGA_do_print("%s\n", dump(true).c_str());
+}
+
+std::string AstContainer::dump(bool q) const
+{
+    std::string ret = "{ ";
+    if (size() > 0)
+    {
+        ret += m_children[0]->dump(q);
+        for (size_t i = 1; i < size(); ++i)
+        {
+            ret += ", ";
+            ret += m_children[i]->dump(q);
+        }
+    }
+    ret += " }";
+    return ret;
+}
+
+arg_t AstContainer::clone() const
+{
+    auto ret = make_arg<AstContainer>(m_type, m_str);
+    for (size_t i = 0; i < size(); ++i)
+    {
+        ret->add(m_children[i]->clone());
+    }
+    return ret;
 }
 
 std::string EGA_dump_token_type(TokenType type)
@@ -1605,6 +1646,9 @@ arg_t EGA_FN EGA_mid(const args_t& args)
 
 bool EGA_init(void)
 {
+    EGA_set_input_fn(EGA_default_input);
+    EGA_set_print_fn(EGA_default_print);
+
     // assignment
     EGA_add_fn("set", 1, 2, EGA_set, "set(var[, value])");
     EGA_add_fn("=", 1, 2, EGA_set, "set(var[, value])");
@@ -1744,7 +1788,7 @@ int EGA_interactive(bool echo)
         EGA_do_print("\nEGA> ");
         std::fflush(stdout);
 
-        if (!fgets(buf, sizeof(buf), stdin))
+        if (!(*s_input_fn)(buf, sizeof(buf)))
             break;
 
         mstr_trim(buf, " \t\r\n\f\v;");

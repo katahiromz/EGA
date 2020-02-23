@@ -80,6 +80,13 @@ void EGA_set_print_fn(EGA_PRINT_FN fn);
 void EGA_default_print(const char *fmt, va_list va);
 
 //////////////////////////////////////////////////////////////////////////////
+// inputing
+
+typedef bool (*EGA_INPUT_FN)(char *buf, size_t buflen);
+void EGA_set_input_fn(EGA_INPUT_FN fn);
+bool EGA_default_input(char *buf, size_t buflen);
+
+//////////////////////////////////////////////////////////////////////////////
 // exceptions
 
 #include <stdexcept>
@@ -572,31 +579,9 @@ public:
         return m_str;
     }
 
-    virtual std::string dump(bool q) const
-    {
-        std::string ret = "{ ";
-        if (size() > 0)
-        {
-            ret += m_children[0]->dump(q);
-            for (size_t i = 1; i < size(); ++i)
-            {
-                ret += ", ";
-                ret += m_children[i]->dump(q);
-            }
-        }
-        ret += " }";
-        return ret;
-    }
+    virtual std::string dump(bool q) const;
 
-    virtual arg_t clone() const
-    {
-        auto ret = make_arg<AstContainer>(m_type, m_str);
-        for (size_t i = 0; i < size(); ++i)
-        {
-            ret->add(m_children[i]->clone());
-        }
-        return ret;
-    }
+    virtual arg_t clone() const;
 
     virtual arg_t eval() const;
 
