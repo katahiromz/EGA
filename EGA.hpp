@@ -115,6 +115,15 @@ public:
     }
 };
 
+class EGA_index_out_of_range : public EGA_exception
+{
+public:
+    EGA_index_out_of_range()
+        : EGA_exception("index out of range")
+    {
+    }
+};
+
 class EGA_exit_exception : public EGA_exception
 {
 public:

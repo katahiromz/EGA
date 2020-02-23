@@ -1391,6 +1391,8 @@ arg_t EGA_left(const args_t& args)
                         std::string str2 = str.substr(0, i2);
                         return make_arg<AstStr>(str2);
                     }
+                    else
+                        throw EGA_index_out_of_range();
                 }
                 break;
             case AST_ARRAY:
@@ -1405,6 +1407,8 @@ arg_t EGA_left(const args_t& args)
                         }
                         return array1;
                     }
+                    else
+                        throw EGA_index_out_of_range();
                 }
                 break;
             default:
@@ -1435,6 +1439,8 @@ arg_t EGA_right(const args_t& args)
                         std::string str2 = str.substr(str.size() - i2, i2);
                         return make_arg<AstStr>(str2);
                     }
+                    else
+                        throw EGA_index_out_of_range();
                 }
                 break;
             case AST_ARRAY:
@@ -1451,6 +1457,8 @@ arg_t EGA_right(const args_t& args)
                         }
                         return array1;
                     }
+                    else
+                        throw EGA_index_out_of_range();
                 }
                 break;
             default:
@@ -1484,6 +1492,8 @@ arg_t EGA_mid(const args_t& args)
                             std::string str2 = str.substr(i2, i3);
                             return make_arg<AstStr>(str2);
                         }
+                        else
+                            throw EGA_index_out_of_range();
                     }
                     break;
                 case AST_ARRAY:
@@ -1500,6 +1510,8 @@ arg_t EGA_mid(const args_t& args)
                             }
                             return array1;
                         }
+                        else
+                            throw EGA_index_out_of_range();
                     }
                     break;
                 default:
