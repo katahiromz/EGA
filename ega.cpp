@@ -115,6 +115,7 @@ void EGA_do_print(const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
     s_print_fn(fmt, va);
+    fflush(stdout);
     va_end(va);
 }
 
