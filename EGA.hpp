@@ -24,10 +24,25 @@ class AstContainer;
 typedef std::shared_ptr<AstBase> arg_t;
 typedef std::vector<arg_t> args_t;
 
-template <class T, class... Args>
-std::shared_ptr<T> make_arg(Args&&... args)
+template <class T>
+std::shared_ptr<T> make_arg()
 {
-    return std::make_shared<T>(args...);
+    return std::make_shared<T>();
+}
+template <class T, typename T1>
+std::shared_ptr<T> make_arg(const T1& t1)
+{
+    return std::make_shared<T>(t1);
+}
+template <class T, typename T1, typename T2>
+std::shared_ptr<T> make_arg(const T1& t1, const T2& t2)
+{
+    return std::make_shared<T>(t1, t2);
+}
+template <class T, typename T1, typename T2, typename T3>
+std::shared_ptr<T> make_arg(const T1& t1, const T2& t2, const T3& t3)
+{
+    return std::make_shared<T>(t1, t2, t3);
 }
 
 typedef arg_t (*EGA_PROC)(const args_t& args);

@@ -295,6 +295,8 @@ arg_t TokenStream::visit_expression()
         {
             auto var = make_arg<AstVar>(name);
             go_next();
+            if (token()->get_str() == "(")
+                throw EGA_syntax_error();
             return var;
         }
 
