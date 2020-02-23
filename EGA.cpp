@@ -1101,8 +1101,141 @@ arg_t EGA_at(const args_t& args)
     return NULL;
 }
 
+arg_t EGA_not(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 1)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        int i = EGA_int(ast1);
+        return make_arg<AstInt>(!i);
+    }
+
+    return NULL;
+}
+
+arg_t EGA_logical_or(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            return make_arg<AstInt>(i1 || i2);
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_logical_and(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            return make_arg<AstInt>(i1 && i2);
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_compl(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 1)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        int i = EGA_int(ast1);
+        return make_arg<AstInt>(~i);
+    }
+
+    return NULL;
+}
+
+arg_t EGA_bitor(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            return make_arg<AstInt>(i1 | i2);
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_bitand(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            return make_arg<AstInt>(i1 & i2);
+        }
+    }
+
+    return NULL;
+}
+
+arg_t EGA_xor(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    if (args.size() != 2)
+        return NULL;
+
+    if (auto ast1 = do_eval_ast(args[0]))
+    {
+        if (auto ast2 = do_eval_ast(args[1]))
+        {
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            return make_arg<AstInt>(i1 ^ i2);
+        }
+    }
+
+    return NULL;
+}
+
 bool EGA_init(void)
 {
+    // comparison
     EGA_add_fn("equal", 2, 2, EGA_equal);
     EGA_add_fn("==", 2, 2, EGA_equal);
     EGA_add_fn("not_equal", 2, 2, EGA_not_equal);
@@ -1116,11 +1249,13 @@ bool EGA_init(void)
     EGA_add_fn(">", 2, 2, EGA_greater);
     EGA_add_fn("greater_equal", 2, 2, EGA_greater_equal);
     EGA_add_fn(">=", 2, 2, EGA_greater_equal);
+
+    // print
     EGA_add_fn("print", 0, 16, EGA_print);
     EGA_add_fn("println", 0, 16, EGA_println);
     EGA_add_fn("?", 0, 16, EGA_println);
-    EGA_add_fn("len", 1, 1, EGA_len);
-    EGA_add_fn("cat", 0, 15, EGA_cat);
+
+    // arithmetic
     EGA_add_fn("plus", 2, 2, EGA_plus);
     EGA_add_fn("+", 2, 2, EGA_plus);
     EGA_add_fn("minus", 1, 2, EGA_minus);
@@ -1131,6 +1266,29 @@ bool EGA_init(void)
     EGA_add_fn("/", 2, 2, EGA_div);
     EGA_add_fn("mod", 2, 2, EGA_mod);
     EGA_add_fn("%", 2, 2, EGA_mod);
+
+    // logical
+    EGA_add_fn("not", 2, 2, EGA_not);
+    EGA_add_fn("!", 2, 2, EGA_not);
+    EGA_add_fn("or", 2, 2, EGA_logical_or);
+    EGA_add_fn("||", 2, 2, EGA_logical_or);
+    EGA_add_fn("and", 2, 2, EGA_logical_and);
+    EGA_add_fn("&&", 2, 2, EGA_logical_and);
+
+    // bit operation
+    EGA_add_fn("compl", 2, 2, EGA_compl);
+    EGA_add_fn("~", 2, 2, EGA_compl);
+    EGA_add_fn("bitor", 2, 2, EGA_bitor);
+    EGA_add_fn("|", 2, 2, EGA_bitor);
+    EGA_add_fn("bitand", 2, 2, EGA_bitand);
+    EGA_add_fn("&", 2, 2, EGA_bitand);
+    EGA_add_fn("xor", 2, 2, EGA_xor);
+    EGA_add_fn("^", 2, 2, EGA_xor);
+
+    // array/string manipulation
+    EGA_add_fn("len", 1, 1, EGA_len);
+    EGA_add_fn("cat", 0, 15, EGA_cat);
+
     EGA_add_fn("if", 2, 3, EGA_if);
     EGA_add_fn("?:", 2, 3, EGA_if);
     EGA_add_fn("set", 2, 2, EGA_set);
