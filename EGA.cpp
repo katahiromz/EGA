@@ -527,6 +527,8 @@ EGA_eval_fn(const std::string& name, const args_t& args)
         {
             if (fn->min_args <= args.size() && args.size() <= fn->max_args)
                 return (*(fn->proc))(args);
+            else
+                throw EGA_argument_number_exception();
         }
     }
     else
@@ -543,8 +545,11 @@ arg_t EGA_eval(const arg_t& ast)
 {
     EVAL_DEBUG();
     if (!ast)
-        throw new EGA_exception;
-    return ast->eval();
+        throw EGA_parse_error();
+    auto ret = ast->eval();
+    if (!ret)
+        throw EGA_parse_error();
+    return ret;
 }
 
 int do_eval_text(const char *text)
@@ -573,7 +578,7 @@ int EGA_int(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_INT)
-        throw new EGA_exception;
+        throw EGA_type_mismatch();
     return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
@@ -581,7 +586,7 @@ std::shared_ptr<AstArray> EGA_array(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)
-        throw new EGA_exception;
+        throw EGA_type_mismatch();
     return std::static_pointer_cast<AstArray>(ast);
 }
 
@@ -589,7 +594,7 @@ std::string EGA_str(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_STR)
-        throw new EGA_exception;
+        throw EGA_type_mismatch();
     return std::static_pointer_cast<AstStr>(ast)->get_str();
 }
 
@@ -658,7 +663,7 @@ EGA_compare_0(arg_t ast1, arg_t ast2)
             return make_arg<AstInt>(0);
         }
     default:
-        break;
+        throw EGA_type_mismatch();
     }
 
     return NULL;
@@ -667,8 +672,6 @@ EGA_compare_0(arg_t ast1, arg_t ast2)
 arg_t EGA_compare(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
@@ -680,9 +683,6 @@ arg_t EGA_compare(const args_t& args)
 arg_t EGA_less(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() < 0);
@@ -694,9 +694,6 @@ arg_t EGA_less(const args_t& args)
 arg_t EGA_greater(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() > 0);
@@ -708,9 +705,6 @@ arg_t EGA_greater(const args_t& args)
 arg_t EGA_less_equal(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() <= 0);
@@ -722,9 +716,6 @@ arg_t EGA_less_equal(const args_t& args)
 arg_t EGA_greater_equal(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() >= 0);
@@ -736,9 +727,6 @@ arg_t EGA_greater_equal(const args_t& args)
 arg_t EGA_equal(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() == 0);
@@ -750,9 +738,6 @@ arg_t EGA_equal(const args_t& args)
 arg_t EGA_not_equal(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ai = EGA_compare_0(args[0], args[1]))
     {
         ai->get_int() = (ai->get_int() != 0);
@@ -787,9 +772,6 @@ arg_t EGA_println(const args_t& args)
 arg_t EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() != 1)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         switch (ast1->get_type())
@@ -814,8 +796,6 @@ arg_t EGA_len(const args_t& args)
 arg_t EGA_cat(const args_t& args)
 {
     EVAL_DEBUG();
-    if (args.size() < 1)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -850,7 +830,7 @@ arg_t EGA_cat(const args_t& args)
             break;
 
         default:
-            break;
+            throw EGA_type_mismatch();
         }
     }
 
@@ -861,16 +841,13 @@ arg_t EGA_plus(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() == 2)
+    if (auto ast1 = EGA_eval(args[0]))
     {
-        if (auto ast1 = EGA_eval(args[0]))
+        if (auto ast2 = EGA_eval(args[1]))
         {
-            if (auto ast2 = EGA_eval(args[1]))
-            {
-                int i1 = EGA_int(ast1);
-                int i2 = EGA_int(ast2);
-                return make_arg<AstInt>(i1 + i2);
-            }
+            int i1 = EGA_int(ast1);
+            int i2 = EGA_int(ast2);
+            return make_arg<AstInt>(i1 + i2);
         }
     }
     return NULL;
@@ -902,15 +879,13 @@ arg_t EGA_minus(const args_t& args)
             }
         }
     }
-    return NULL;
+
+    throw EGA_argument_number_exception();
 }
 
 arg_t EGA_mul(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -929,9 +904,6 @@ arg_t EGA_div(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         if (auto ast2 = EGA_eval(args[1]))
@@ -949,9 +921,6 @@ arg_t EGA_mod(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         if (auto ast2 = EGA_eval(args[1]))
@@ -968,9 +937,6 @@ arg_t EGA_mod(const args_t& args)
 arg_t EGA_if(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2 && args.size() != 3)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1003,8 +969,8 @@ arg_t EGA_set(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2 || args[0]->get_type() != AST_VAR)
-        return NULL;
+    if (args[0]->get_type() != AST_VAR)
+        throw EGA_type_mismatch();
 
     std::string name = std::static_pointer_cast<AstVar>(args[0])->get_name();
     auto value = args[1]->eval();
@@ -1016,11 +982,8 @@ arg_t EGA_for(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 4)
-        return NULL;
-
     if (args[0]->get_type() != AST_VAR)
-        return NULL;
+        throw EGA_type_mismatch();
 
     if (auto ast1 = EGA_eval(args[1]))
     {
@@ -1046,9 +1009,6 @@ arg_t EGA_while(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
-        return NULL;
-
     while (true)
     {
         auto ast1 = EGA_eval(args[0]);
@@ -1068,9 +1028,6 @@ arg_t EGA_while(const args_t& args)
 arg_t EGA_at(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1112,9 +1069,6 @@ arg_t EGA_not(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 1)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         int i = EGA_int(ast1);
@@ -1127,9 +1081,6 @@ arg_t EGA_not(const args_t& args)
 arg_t EGA_or(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1148,9 +1099,6 @@ arg_t EGA_and(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         if (auto ast2 = EGA_eval(args[1]))
@@ -1168,9 +1116,6 @@ arg_t EGA_compl(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 1)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         int i = EGA_int(ast1);
@@ -1183,9 +1128,6 @@ arg_t EGA_compl(const args_t& args)
 arg_t EGA_bitor(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1204,9 +1146,6 @@ arg_t EGA_bitand(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         if (auto ast2 = EGA_eval(args[1]))
@@ -1224,9 +1163,6 @@ arg_t EGA_xor(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (args.size() != 2)
-        return NULL;
-
     if (auto ast1 = EGA_eval(args[0]))
     {
         if (auto ast2 = EGA_eval(args[1]))
@@ -1243,9 +1179,6 @@ arg_t EGA_xor(const args_t& args)
 arg_t EGA_left(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1279,7 +1212,7 @@ arg_t EGA_left(const args_t& args)
                 }
                 break;
             default:
-                break;
+                throw EGA_type_mismatch();
             }
         }
     }
@@ -1290,9 +1223,6 @@ arg_t EGA_left(const args_t& args)
 arg_t EGA_right(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 2)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1328,7 +1258,7 @@ arg_t EGA_right(const args_t& args)
                 }
                 break;
             default:
-                break;
+                throw EGA_type_mismatch();
             }
         }
     }
@@ -1339,9 +1269,6 @@ arg_t EGA_right(const args_t& args)
 arg_t EGA_mid(const args_t& args)
 {
     EVAL_DEBUG();
-
-    if (args.size() != 3)
-        return NULL;
 
     if (auto ast1 = EGA_eval(args[0]))
     {
@@ -1380,7 +1307,7 @@ arg_t EGA_mid(const args_t& args)
                     }
                     break;
                 default:
-                    break;
+                    throw EGA_type_mismatch();
                 }
             }
         }
@@ -1435,16 +1362,16 @@ bool EGA_init(void)
     EGA_add_fn("%", 2, 2, EGA_mod);
 
     // logical
-    EGA_add_fn("not", 2, 2, EGA_not);
-    EGA_add_fn("!", 2, 2, EGA_not);
+    EGA_add_fn("not", 1, 1, EGA_not);
+    EGA_add_fn("!", 1, 1, EGA_not);
     EGA_add_fn("or", 2, 2, EGA_or);
     EGA_add_fn("||", 2, 2, EGA_or);
     EGA_add_fn("and", 2, 2, EGA_and);
     EGA_add_fn("&&", 2, 2, EGA_and);
 
     // bit operation
-    EGA_add_fn("compl", 2, 2, EGA_compl);
-    EGA_add_fn("~", 2, 2, EGA_compl);
+    EGA_add_fn("compl", 1, 1, EGA_compl);
+    EGA_add_fn("~", 1, 1, EGA_compl);
     EGA_add_fn("bitor", 2, 2, EGA_bitor);
     EGA_add_fn("|", 2, 2, EGA_bitor);
     EGA_add_fn("bitand", 2, 2, EGA_bitand);
@@ -1454,7 +1381,7 @@ bool EGA_init(void)
 
     // array/string manipulation
     EGA_add_fn("len", 1, 1, EGA_len);
-    EGA_add_fn("cat", 0, 15, EGA_cat);
+    EGA_add_fn("cat", 1, 256, EGA_cat);
     EGA_add_fn("[]", 2, 2, EGA_at);
     EGA_add_fn("at", 2, 2, EGA_at);
     EGA_add_fn("left", 2, 2, EGA_left);

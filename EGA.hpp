@@ -49,14 +49,59 @@ struct EGA_FUNCTION
 };
 typedef std::shared_ptr<EGA_FUNCTION> fn_t;
 
-struct EGA_exception { };
-struct EGA_arg_number_exception : EGA_exception { };
-
 fn_t EGA_get_fn(const std::string& name);
 bool EGA_add_fn(const std::string& name, size_t min_args, size_t max_args, EGA_PROC proc);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args);
 arg_t EGA_eval_var(const std::string& name);
 void EGA_set_var(const std::string& name, arg_t ast);
+
+//////////////////////////////////////////////////////////////////////////////
+// exceptions
+
+#include <stdexcept>
+
+typedef std::runtime_error EGA_exception;
+
+class EGA_parse_error : public EGA_exception
+{
+public:
+    EGA_parse_error() : EGA_exception("parse error")
+    {
+    }
+};
+
+class EGA_type_mismatch : public EGA_exception
+{
+public:
+    EGA_type_mismatch() : EGA_exception("type mismatch")
+    {
+    }
+};
+
+class EGA_argument_number_exception : public EGA_exception
+{
+public:
+    EGA_argument_number_exception()
+        : EGA_exception("argument number mismatch")
+    {
+    }
+};
+
+class EGA_break_exception : public EGA_exception
+{
+public:
+    EGA_break_exception() : EGA_exception("break exception")
+    {
+    }
+};
+
+class EGA_end_exception : public EGA_exception
+{
+public:
+    EGA_end_exception() : EGA_exception("end exception")
+    {
+    }
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // TokenType
