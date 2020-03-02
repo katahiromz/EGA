@@ -1397,35 +1397,93 @@ arg_t EGA_FN EGA_at(const args_t& args)
 {
     EVAL_DEBUG();
 
+    if (args.size() != 2 && args.size() != 3)
+        throw EGA_argument_number_exception(args[0]->get_lineno());
+
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            switch (ast1->get_type())
+            if (args.size() == 2)
             {
-            case AST_ARRAY:
-                if (auto array = EGA_get_array(ast1))
+                switch (ast1->get_type())
                 {
-                    size_t index = EGA_get_int(ast2);
-                    if (index < array->size())
+                case AST_ARRAY:
+                    if (auto array = EGA_get_array(ast1))
                     {
-                        auto base = (*array)[index]->eval();
-                        return base;
+                        size_t index = EGA_get_int(ast2);
+                        if (index < array->size())
+                        {
+                            auto base = (*array)[index]->eval();
+                            return base;
+                        }
+                        else
+                        {
+                            throw EGA_index_out_of_range(args[0]->get_lineno());
+                        }
+                    }
+                    break;
+                case AST_STR:
+                    {
+                        std::string str = EGA_get_str(ast1);
+                        size_t index = EGA_get_int(ast2);
+                        if (index < str.size())
+                        {
+                            return make_arg<AstInt>(str[index]);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+            else if (args.size() == 3)
+            {
+                if (args[0]->get_type() != AST_VAR)
+                    throw EGA_type_mismatch(args[0]->get_lineno());
+
+                auto var = std::static_pointer_cast<AstVar>(args[0]);
+
+                if (auto ast3 = EGA_eval_arg(args[2], true))
+                {
+                    switch (ast1->get_type())
+                    {
+                    case AST_ARRAY:
+                        if (auto array = EGA_get_array(ast1))
+                        {
+                            size_t index = EGA_get_int(ast2);
+                            if (index < array->size())
+                            {
+                                array->children()[index] = ast3;
+                                EGA_set_var(var->get_name(), array);
+                                return array;
+                            }
+                            else
+                            {
+                                throw EGA_index_out_of_range(args[0]->get_lineno());
+                            }
+                        }
+                        break;
+                    case AST_STR:
+                        {
+                            std::string str = EGA_get_str(args[0]);
+                            size_t index = EGA_get_int(ast2);
+                            if (index < str.size())
+                            {
+                                str[index] = EGA_get_int(ast3);
+                                EGA_set_var(var->get_name(), make_arg<AstStr>(str));
+                                return args[0];
+                            }
+                            else
+                            {
+                                throw EGA_index_out_of_range(args[0]->get_lineno());
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                     }
                 }
-                break;
-            case AST_STR:
-                {
-                    std::string str = EGA_get_str(ast1);
-                    size_t index = EGA_get_int(ast2);
-                    if (index < str.size())
-                    {
-                        return make_arg<AstInt>(str[index]);
-                    }
-                }
-                break;
-            default:
-                break;
             }
         }
     }
@@ -2054,8 +2112,8 @@ bool EGA_init(void)
     // array/string manipulation
     EGA_add_fn("len", 1, 1, EGA_len, "len(ary_or_str)");
     EGA_add_fn("cat", 1, 256, EGA_cat, "cat(ary_or_str_1, ary_or_str_2, ...)");
-    EGA_add_fn("[]", 2, 2, EGA_at, "at(ary_or_str, index)");
-    EGA_add_fn("at", 2, 2, EGA_at, "at(ary_or_str, index)");
+    EGA_add_fn("[]", 2, 3, EGA_at, "at(ary_or_str, index[, value])");
+    EGA_add_fn("at", 2, 3, EGA_at, "at(ary_or_str, index[, value])");
     EGA_add_fn("left", 2, 2, EGA_left, "left(ary_or_str, count)");
     EGA_add_fn("right", 2, 2, EGA_right, "right(ary_or_str, count)");
     EGA_add_fn("mid", 3, 4, EGA_mid, "mid(ary_or_str, index, count[, value])");
