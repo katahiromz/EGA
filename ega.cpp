@@ -258,6 +258,13 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
         if (*pch == '\n')
             ++lineno;
 
+        if (*pch == '@')
+        {
+            while (*pch && *pch != '\n')
+                ++pch;
+            continue;
+        }
+
         if (std::isspace(*pch))
         {
             continue;
@@ -2192,7 +2199,10 @@ int EGA_interactive(bool echo)
 
     s_interactive = true;
 
-    EGA_do_print("Type 'exit' to exit. Type 'help' to see help.\n");
+    EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    EGA_do_print("@ EGA Version %d by katahiromz                   @\n", EGA_HPP_);
+    EGA_do_print("@ Type 'exit' to exit. Type 'help' to see help. @\n");
+    EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 
     for (;;)
     {
