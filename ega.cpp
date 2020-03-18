@@ -4,12 +4,16 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "ega.hpp"
+#include "mstr.hpp"
 #include <unordered_map>
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
 #include <cctype>
+
+namespace EGA
+{
 
 typedef std::unordered_map<std::string, fn_t> fn_map_t;
 typedef std::unordered_map<std::string, arg_t> var_map_t;
@@ -27,6 +31,16 @@ arg_t EGA_eval_program(const args_t& args);
 arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check);
 arg_t EGA_eval_arg(arg_t ast, bool do_check);
 arg_t EGA_eval_arg(arg_t ast);
+
+std::string AstInt::dump(bool q) const
+{
+    return mstr_to_string(m_value);
+}
+
+std::string AstStr::dump(bool q) const
+{
+    return (q ? mstr_quote(m_str) : m_str);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -2254,8 +2268,18 @@ bool EGA_file_input(const char *filename)
     return false;
 }
 
+} // namespace EGA
+
+using namespace EGA;
+
 #ifndef EGA_LIB
+#if defined(UNICODE) && defined(_WIN32)
+#include <windows.h>
+extern "C"
+int __cdecl wmain(int argc, wchar_t **wargv)
+#else
 int main(int argc, char **argv)
+#endif
 {
     mstr_unittest();
 
@@ -2266,7 +2290,13 @@ int main(int argc, char **argv)
     }
     else
     {
+#if defined(UNICODE) && defined(_WIN32)
+        char file[MAX_PATH];
+        WideCharToMultiByte(CP_ACP, 0, wargv[1], -1, file, MAX_PATH, NULL, NULL);
+        std::string arg = file;
+#else
         std::string arg = argv[1];
+#endif
         if (arg == "--help")
         {
             printf("Usage: EGA [options] [input-file]\n");
@@ -2283,7 +2313,11 @@ int main(int argc, char **argv)
         }
 
         EGA_init();
+#if defined(UNICODE) && defined(_WIN32)
+        EGA_file_input(file);
+#else
         EGA_file_input(argv[1]);
+#endif
     }
 
     EGA_uninit();

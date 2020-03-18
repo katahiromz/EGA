@@ -3,7 +3,7 @@
 // This file is public domain software.
 
 #ifndef EGA_HPP_
-#define EGA_HPP_    3 // Version 3
+#define EGA_HPP_    4 // Version 4
 
 #pragma once
 
@@ -11,7 +11,8 @@
 #include <memory>
 #include <cstdlib>
 #include <cassert>
-#include "mstr.hpp"
+
+namespace EGA {
 
 class AstBase;
 class AstInt;
@@ -464,10 +465,7 @@ public:
         return m_value;
     }
 
-    virtual std::string dump(bool q) const
-    {
-        return mstr_to_string(m_value);
-    }
+    virtual std::string dump(bool q) const;
 
     virtual arg_t clone() const
     {
@@ -500,10 +498,7 @@ public:
         return m_str;
     }
 
-    virtual std::string dump(bool q) const
-    {
-        return (q ? mstr_quote(m_str) : m_str);
-    }
+    virtual std::string dump(bool q) const;
 
     virtual arg_t clone() const
     {
@@ -632,5 +627,7 @@ bool EGA_eval_text_ex(const char *text);
 
 int EGA_interactive(bool echo = false);
 bool EGA_file_input(const char *filename);
+
+} // namespace EGA
 
 #endif  // ndef EGA_HPP_
