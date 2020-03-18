@@ -2283,7 +2283,7 @@ bool EGA_file_input(const char *filename)
 using namespace EGA;
 
 #ifndef EGA_LIB
-#if defined(UNICODE) && defined(_WIN32)
+#ifdef _WIN32
 #include <windows.h>
 extern "C"
 int __cdecl wmain(int argc, wchar_t **wargv)
@@ -2300,7 +2300,7 @@ int main(int argc, char **argv)
     }
     else
     {
-#if defined(UNICODE) && defined(_WIN32)
+#ifdef _WIN32
         char file[MAX_PATH];
         WideCharToMultiByte(CP_ACP, 0, wargv[1], -1, file, MAX_PATH, NULL, NULL);
         std::string arg = file;
@@ -2323,7 +2323,7 @@ int main(int argc, char **argv)
         }
 
         EGA_init();
-#if defined(UNICODE) && defined(_WIN32)
+#ifdef _WIN32
         EGA_file_input(file);
 #else
         EGA_file_input(argv[1]);
@@ -2336,4 +2336,14 @@ int main(int argc, char **argv)
     assert(AstBase::s_alive_count == 0);
     return 0;
 }
+#ifdef _WIN32
+int main(int argc, char **argv)
+{
+    int argc_;
+    LPWSTR *wargv_ = CommandLineToArgvW(GetCommandLineW(), &argc_);
+    int ret = wmain(argc_, wargv_);
+    LocalFree(wargv_);
+    return ret;
+}
+#endif
 #endif  // ndef EGA_LIB
