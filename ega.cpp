@@ -2205,7 +2205,7 @@ int EGA_interactive(bool echo)
         mstr_trim(buf, " \t\r\n\f\v;");
 
         if (echo)
-            EGA_do_print("%s;", buf);
+            EGA_do_print("%s;\n", buf);
 
         if (strcmp(buf, "exit") == 0)
             break;
