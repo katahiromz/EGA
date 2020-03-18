@@ -262,6 +262,7 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
         {
             while (*pch && *pch != '\n')
                 ++pch;
+            --pch;
             continue;
         }
 
