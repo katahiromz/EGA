@@ -1985,13 +1985,13 @@ arg_t EGA_FN EGA_typeid(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval_arg(args[0], true))
+    if (auto ast1 = EGA_eval_arg(args[0], false))
     {
         int type = int(ast1->get_type());
         return make_arg<AstInt>(type);
     }
 
-    return NULL;
+    return make_arg<AstInt>(-1);
 }
 
 arg_t EGA_FN EGA_int(const args_t& args)

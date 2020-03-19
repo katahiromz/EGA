@@ -715,6 +715,7 @@ EGA function 'typeid':
 
 Returns the type ID of the value.
 
+If the value is NULL, then returns `-1`.
 If the value is an integer, then returns zero.
 If the value is a string, then returns `1`.
 If the value is an array, then returns `2`.
@@ -750,7 +751,7 @@ Same as `^`.
 
 ## RisohEditor EGA extension
 
-RisohEditor EGA has the following function as EGA extension:
+RisohEditor EGA has the following functions as EGA extension:
 
 - `RES_search`
 - `RES_delete`
