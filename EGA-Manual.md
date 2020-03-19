@@ -924,7 +924,7 @@ Always returns `1`.
 1. Import `libega`.
 2. Include `ega.hpp`.
 3. Call the following EGA C++ functions: `EGA_init`, `EGA_set_input_fn` and `EGA_set_print_fn`.
-4. Add your EGA functions by `EGA_add_fn` C++ functions.
+4. Add your EGA functions by `EGA_add_fn` C++ function.
 
 ## Special thanks
 
