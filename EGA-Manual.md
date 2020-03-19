@@ -75,7 +75,7 @@ The detailed descriptions of the EGA functions will be described later.
 
 ## Comments
 
-An EGA comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
+An comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
 The comments are ignored in EGA execution.
 
 ## Values
@@ -140,7 +140,7 @@ The `break` special function can break the loop.
 ## Normal functions vs. special functions
 
 In a call of the normal function, the parameters will be evaluated in the order of parameters.
-The special functions can change the order of expression evaluations.
+The special functions can change the order of expression evaluations and can ignore some parameters.
 
 ## Input and output
 
@@ -175,6 +175,8 @@ This EGA program will outputs 0-to-10. Output:
 10
 ```
 
+The `break` special function cut the `for` loop.
+
 ### Sample `fact.ega`
 
 ```txt
@@ -205,6 +207,17 @@ n = 11: fact == 39916800
 n = 12: fact == 479001600
 ```
 
+The `define` special function defines a macro variable. This program is same as:
+
+```txt
+for(k, 1, 12, (
+        set(n, k),
+        do(set(prod, 1), for(i, 2, n, set(prod, *(prod, i)))),
+        println("n = ", n, ": fact == ", prod)
+    )
+)
+```
+
 ### Sample `input.ega`
 
 ```txt
@@ -225,6 +238,9 @@ Type a string? This is a test.
 ###################
 ```
 
+The `input` function prompts user input.
+The `cat` function concatnates strings.
+
 ### Sample `plus.ega`
 
 ```txt
@@ -243,6 +259,8 @@ B=? 5
 ```
 
 ## The EGA Functions
+
+The following sections are a list of the EGA functions.
 
 ### EGA '`and`' Function
 
@@ -900,3 +918,14 @@ EGA function 'RES_unload_resh':
 
 `RES_unload_resh` unloads the "`resource.h`" file.
 Always returns `1`.
+
+## How can I extend EGA?
+
+1. Import `libega`.
+2. Include `ega.hpp`.
+3. Call the following EGA C++ functions: `EGA_init`, `EGA_set_input_fn` and `EGA_set_print_fn`.
+4. Add your EGA functions by `EGA_add_fn` C++ functions.
+
+# Special thanks
+
+- `md2pdf`: https://md2pdf.netlify.com/
