@@ -2052,7 +2052,6 @@ arg_t EGA_FN EGA_array(const args_t& args)
 
 bool EGA_init(void)
 {
-    s_interactive = true;
     EGA_set_input_fn(EGA_default_input);
     EGA_set_print_fn(EGA_default_print);
 
@@ -2194,7 +2193,7 @@ void EGA_show_help(const std::string& name)
     EGA_do_print("  usage: %s\n", it->second->help.c_str());
 }
 
-int EGA_interactive(bool echo)
+int EGA_interactive(const char *filename, bool echo)
 {
     char buf[512];
 
@@ -2202,8 +2201,18 @@ int EGA_interactive(bool echo)
 
     EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     EGA_do_print("@ EGA Version %d by katahiromz                   @\n", EGA_HPP_);
-    EGA_do_print("@ Type 'exit' to exit. Type 'help' to see help. @\n");
+    if (!filename)
+        EGA_do_print("@ Type 'exit' to exit. Type 'help' to see help. @\n");
     EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+
+    if (filename)
+    {
+        EGA_do_print("Executing '%s'...\n", filename);
+        s_interactive = false;
+        EGA_file_input(filename);
+        s_interactive = true;
+        EGA_do_print("Done.\n");
+    }
 
     for (;;)
     {
@@ -2245,8 +2254,6 @@ int EGA_interactive(bool echo)
 
 bool EGA_file_input(const char *filename)
 {
-    s_interactive = false;
-
     std::string str;
     if (FILE *fp = fopen(filename, "r"))
     {
