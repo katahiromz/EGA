@@ -97,7 +97,20 @@ The EGA array is a list of the EGA values it contains, separated by commas (`,`)
 for(i, 1, 10000, (println(i), if(>=(i, 10), break())));
 ```
 
-This EGA program will outputs 0 .. 10.
+This EGA program will outputs 0-to-10. Output:
+
+```txt
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
 
 ### Sample `fact.ega`
 
@@ -112,7 +125,22 @@ for(k, 1, 12, (
 )
 ```
 
-This EGA program will outputs the factorial numbers of 1-to-12.
+This EGA program will outputs the factorial numbers of 1-to-12. Output:
+
+```txt
+n = 1: fact == 1
+n = 2: fact == 2
+n = 3: fact == 6
+n = 4: fact == 24
+n = 5: fact == 120
+n = 6: fact == 720
+n = 7: fact == 5040
+n = 8: fact == 40320
+n = 9: fact == 362880
+n = 10: fact == 3628800
+n = 11: fact == 39916800
+n = 12: fact == 479001600
+```
 
 ### Sample `input.ega`
 
@@ -125,7 +153,14 @@ for(i, 1, +(len(s), 4), print("#"));
 println();
 ```
 
-This program wraps the input string by `#`.
+This program wraps the input string by `#`. Output:
+
+```txt
+Type a string? This is a test.
+###################
+# This is a test. #
+###################
+```
 
 ### Sample `plus.ega`
 
@@ -136,7 +171,13 @@ set(C, +(int(A), int(B)));
 println(C);
 ```
 
-This program calculates the sum of input `A` and `B`.
+This program calculates the sum of input `A` and `B`. Output:
+
+```txt
+A=? 3
+B=? 5
+8
+```
 
 ## The EGA Functions
 

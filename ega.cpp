@@ -1033,7 +1033,7 @@ arg_t EGA_FN EGA_input(const args_t& args)
         mstr_trim(buf, " \t\r\n\f\v;");
 
         if (s_echo_input)
-            EGA_do_print("%s;\n", buf);
+            EGA_do_print("%s\n", buf);
 
         return make_arg<AstStr>(buf);
     }
