@@ -82,7 +82,40 @@ An EGA integer literal is a sequence of digit(s) (`0`, ..., `9`).
 An EGA string literal is a string wrapped by double quotations (`" "`).
 If the string contains a double quotation, it will be doubled in the string literal.
 
-The EGA array is a list of the EGA values it contains, separated by commas (`,`), and wrapped by braces (`{` and `}`).
+The EGA array literal is a list of the EGA values it contains, separated by commas (`,`), and wrapped by braces (`{` and `}`).
+
+## Variables
+
+You can set a value into a variable by using `set` function.
+For example, `set(A, 123);` will create a variable named `A` whose value is `123`.
+
+## Integers
+
+Expression `+(1, 2)` is the sum of two integers `1` and `2`.
+Expression `*(3, 4)` is the multiplication of two integers `3` and `4`.
+
+You can compare two integers by function `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
+
+## Strings
+
+Expression `"This is a string."` is a string literal of length 17.
+
+Expression `"This is a ""string""."` is a string literal of length 19.
+
+You can compare two strings by function `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
+
+See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `str` functions.
+
+## Arrays
+
+Expression `{1, 2, "string"}` is an array literal of length 3.
+
+Expression `set(ary, {1, 2, "string"});` can store the array to the `ary` variable.
+
+To get the 2nd element of `ary`, use `at(ary, 1);`.
+To set 999 to the 2nd element of `ary`, use `at(ary, 1, 999);`.
+
+See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `array` functions.
 
 ## Samples
 
