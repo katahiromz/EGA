@@ -382,7 +382,7 @@ EGA function 'left':
   usage: left(ary_or_str, count)
 ```
 
-Returns an array or a string of `count` items from the left side of an array or a string.
+Returns an array or a string of `count` items at the left side of an array or a string.
 
 ### EGA '`len`' Function
 
@@ -579,7 +579,7 @@ EGA function 'right':
   usage: right(ary_or_str, count)
 ```
 
-Returns an array or a string of `count` items from the right side of an array or a string.
+Returns an array or a string of `count` items at the right side of an array or a string.
 
 ### EGA '`set`' Function
 
