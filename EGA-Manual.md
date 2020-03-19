@@ -6,7 +6,8 @@ Copyright (C) 2020 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
-EGA is a small programming language of a simple grammar, written in C++.
+EGA is a small programming language of a simple grammar, written in C++11.
+It is very tiny (< 500 KiB). You can extend its functions easily.
 
 The source code of EGA will be found at https://github.com/katahiromz/EGA .
 
@@ -74,7 +75,7 @@ The detailed descriptions of the EGA functions will be described later.
 
 ## Comments
 
-An EGA comment of EGA begins with atmark (`@`) and ends with newline.
+An EGA comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
 The comments are ignored in EGA execution.
 
 ## Values
