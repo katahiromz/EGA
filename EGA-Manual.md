@@ -186,7 +186,7 @@ EGA function 'compl':
   usage: compl(value)
 ```
 
-Executes bitwise NOT. Returns an integer.
+Calculates bitwise NOT. Returns an integer.
 
 Same as `~`.
 
