@@ -112,8 +112,8 @@ Expression `{1, 2, "string"}` is an array literal of length 3.
 
 Expression `set(ary, {1, 2, "string"});` can store the array to the `ary` variable.
 
-To get the 2nd element of `ary`, use `at(ary, 1);`.
-To set 999 to the 2nd element of `ary`, use `at(ary, 1, 999);`.
+To get the 2nd element of `ary`, use `at(ary, 1)`.
+To set `999` to the 2nd element of `ary`, use `at(ary, 1, 999)`.
 
 See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `array` functions.
 
