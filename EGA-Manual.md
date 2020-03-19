@@ -75,9 +75,9 @@ EGA>
 
 The EGA values are integers, strings, and arrays.
 
-An EGA integer literal is a sequence of `0`, `1`, ..., or `9`.
+An EGA integer literal is a sequence of digit(s) (`0`, ..., `9`).
 
-An EGA string literal is a string wrapped by double quotations.
+An EGA string literal is a string wrapped by double quotations (`" "`).
 If the string contains a double quotation, it will be doubled in the string literal.
 
 The EGA array is a list of the EGA values it contains, separated by commas (`,`), and wrapped by braces (`{` and `}`).
@@ -199,6 +199,7 @@ EGA function 'define':
 ```
 
 Defines an EGA macro variable. `var` is a variable.
+Unlike the `set` function, the `expr` argument will be not evaluated.
 If `expr` is omitted, `var` will be reset.
 Returns `expr`.
 
