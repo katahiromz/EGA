@@ -21,6 +21,7 @@ typedef std::unordered_map<std::string, arg_t> var_map_t;
 static fn_map_t s_fn_map;
 static var_map_t s_var_map;
 static bool s_interactive = false;
+static bool s_echo_input = false;
 
 #define EGA_FN
 
@@ -1032,6 +1033,10 @@ arg_t EGA_FN EGA_input(const args_t& args)
     if (EGA_do_input(buf, sizeof(buf)))
     {
         mstr_trim(buf, " \t\r\n\f\v;");
+
+        if (s_echo_input)
+            EGA_do_print("%s;\n", buf);
+
         return make_arg<AstStr>(buf);
     }
     return NULL;
@@ -2198,6 +2203,7 @@ int EGA_interactive(const char *filename, bool echo)
     char buf[512];
 
     s_interactive = true;
+    s_echo_input = echo;
 
     EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     EGA_do_print("@ EGA Version %d by katahiromz                   @\n", EGA_HPP_);
@@ -2224,7 +2230,7 @@ int EGA_interactive(const char *filename, bool echo)
 
         mstr_trim(buf, " \t\r\n\f\v;");
 
-        if (echo)
+        if (s_echo_input)
             EGA_do_print("%s;\n", buf);
 
         if (strcmp(buf, "exit") == 0)
