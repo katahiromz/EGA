@@ -644,3 +644,89 @@ EGA function 'xor':
 Calculates bitwise XOR of two integers. Returns an integer.
 
 Same as `^`.
+
+## RisohEditor EGA extension
+
+RisohEditor EGA has the following function as EGA extension:
+
+```txt
+RES_search
+RES_delete
+RES_clone_by_name
+RES_clone_by_lang
+RES_unload_resh
+```
+
+### EGA '`RES_search`' Function
+
+```txt
+EGA function 'RES_search':
+  argument number: 0..3
+  usage: RES_search([type[, name[, lang]]])
+```
+
+`RES_search` returns an array of the resource items.
+
+`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero, then search all resource names.
+`lang` must be an integer that specifies the language ID. If `lang` is `-1`, then search all resource languages.
+
+### EGA '`RES_delete`' Function
+
+```txt
+EGA function 'RES_delete':
+  argument number: 0..3
+  usage: RES_delete([type[, name[, lang]]])
+```
+
+`RES_delete` deletes the resource items.
+
+`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero, then search all resource names.
+`lang` must be an integer that specifies the language ID. If `lang` is `-1`, then search all resource languages.
+
+Returns `1` if deleted. Otherwise returns zero.
+
+### EGA '`RES_clone_by_name`' Function
+
+```txt
+EGA function 'RES_clone_by_name':
+  argument number: 3
+  usage: RES_clone_by_name(type, src_name, dest_name)
+```
+
+`RES_clone_by_name` clones the resource data as another resource name.
+
+`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
+`src_name` must be an integer or a string of a resource name. If `src_name` is zero, then search all resource names.
+`dest_name` must be an integer or a string of a new resource name.
+
+Returns `1` if cloned. Otherwise returns zero.
+
+### EGA '`RES_clone_by_lang`' Function
+
+```txt
+EGA function 'RES_clone_by_lang':
+  argument number: 4
+  usage: RES_clone_by_name(type, name, src_lang, dest_lang)
+```
+
+`RES_clone_by_name` clones the resource data as another resource language.
+
+`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero, then search all resource names.
+`src_lang` must be an integer that specifies the source language ID. If `lang` is `-1`, then search all resource languages.
+`dest_lang` must be an integer that specifies the destination language ID.
+
+Returns `1` if cloned. Otherwise returns zero.
+
+### EGA '`RES_unload_resh`' Function
+
+```txt
+EGA function 'RES_unload_resh':
+  argument number: 0
+  usage: RES_unload_resh()
+```
+
+`RES_unload_resh` unloads the "`resource.h`" file.
+Always returns `1`.
