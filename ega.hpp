@@ -132,7 +132,7 @@ class EGA_undefined_variable : public EGA_exception
 {
 public:
     EGA_undefined_variable(const std::string& name, int lineno)
-        : EGA_exception("undefined variable: '" + std::string(name) + "'", lineno)
+        : EGA_exception((std::string("undefined variable: '") += name) += "'", lineno)
     {
     }
 };
