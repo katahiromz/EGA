@@ -295,9 +295,16 @@ EGA function 'for':
 ```
 
 Does loop from `min` and `max`.
+
 The `expr` argument will be evaluated repeatedly.
 The `min` and `max` values must be integers.
 The `var` is the name of a loop variable.
+
+1. At first, `min` will be stored into the `var` variable.
+2. Then, `expr` will be evaluated.
+3. `var` will be incremented upto `max`.
+4. If `var` is less than `max`, then back to 2.
+
 You can break the loop by `break` function.
 
 ### EGA '`foreach`' Function
@@ -309,8 +316,8 @@ EGA function 'foreach':
 ```
 
 Does loop using an array.
-The `ary` is the array. The item in the array will be evaluated repeatedly.
-The `var` is the name of a loop variable.
+`ary` is an array.
+The item in the `ary` array will be evaluated and stored into variable `var` repeatedly.
 You can break the loop by `break` function.
 
 ### EGA '`greater`' Function
@@ -333,7 +340,7 @@ EGA function 'greater_equal':
   usage: greater_equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was greater than `value2` or equal. Returns zero otherwise.
+Compares two values. Returns 1 if `value1` was greater than `value2` or equal. Otherwise returns zero.
 
 Same as `>=`.
 
@@ -414,7 +421,7 @@ EGA function 'less':
   usage: less_equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was less than `value2` or equal. Returns zero otherwise.
+Compares two values. Returns 1 if `value1` was less than `value2` or equal. Otherwise returns zero.
 
 Same as `<=`.
 
@@ -492,7 +499,7 @@ EGA function 'not_equal':
   usage: not_equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was different from `value2`. Returns zero otherwise.
+Compares two values. Returns 1 if `value1` was different from `value2`. Otherwise returns zero.
 Same as `!=`.
 
 ### EGA '`or`' Function
@@ -631,6 +638,10 @@ EGA function 'while':
 Does loop while the specified condition is non-zero.
 The `expr` argument will be evaluated repeatedly.
 The `cond` is the condition.
+
+1. At first `cond` will be evaluated. If it was zero, then loop will be ended.
+2. `expr` will be evaluated. Back to 1.
+
 You can break the loop by `break` function.
 
 ### EGA '`xor`' Function
