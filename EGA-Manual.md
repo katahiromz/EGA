@@ -1,4 +1,8 @@
-# Programming Language EGA Reference Manual
+# The Programming Language EGA Reference Manual
+
+Written by Katayama Hirofumi MZ.
+
+Copyright (C) 2020 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
@@ -71,6 +75,9 @@ EGA function 'print':
 EGA> 
 ```
 
+An EGA comment of EGA begins with atmark (`@`) and ends with newline.
+The comments are ignored.
+
 ## The EGA values
 
 The EGA values are integers, strings, and arrays.
@@ -81,6 +88,55 @@ An EGA string literal is a string wrapped by double quotations (`" "`).
 If the string contains a double quotation, it will be doubled in the string literal.
 
 The EGA array is a list of the EGA values it contains, separated by commas (`,`), and wrapped by braces (`{` and `}`).
+
+## Samples
+
+### Sample `break.ega`
+
+```txt
+for(i, 1, 10000, (println(i), if(>=(i, 10), break())));
+```
+
+This EGA program will outputs 0 .. 10.
+
+### Sample `fact.ega`
+
+```txt
+define(fact, do(set(prod, 1), for(i, 2, n, set(prod, *(prod, i)))));
+
+for(k, 1, 12, (
+        set(n, k),
+        fact,
+        println("n = ", n, ": fact == ", prod)
+    )
+)
+```
+
+This EGA program will outputs the factorial numbers of 1-to-12.
+
+### Sample `input.ega`
+
+```txt
+set(s, input("Type a string"));
+for(i, 1, +(len(s), 4), print("#"));
+println();
+println(cat("# ", s, " #"));
+for(i, 1, +(len(s), 4), print("#"));
+println();
+```
+
+This program wraps the input string by `#`.
+
+### Sample `plus.ega`
+
+```txt
+set(A, input("A="));
+set(B, input("B="));
+set(C, +(int(A), int(B)));
+println(C);
+```
+
+This program calculates the sum of input `A` and `B`.
 
 ## The EGA Functions
 
