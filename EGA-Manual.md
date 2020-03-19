@@ -34,8 +34,8 @@ To quit EGA, enter "`exit`".
 
 ## Introduction to EGA
 
-The syntax of the EGA is similar to a C function call.
-However, in EGA, every operator is a function.
+The syntax of the EGA is similar to one or more C function call(s).
+But, in EGA, every operator is a function.
 
 Enter "`help`" to see all the EGA functions:
 
@@ -82,7 +82,7 @@ If the string contains a double quotation, it will be doubled in the string lite
 
 The EGA array is a list of the EGA values it contains, separated by commas (`,`), and wrapped by braces (`{` and `}`).
 
-## EGA Functions
+## The EGA Functions
 
 ### EGA '`and`' Function
 
@@ -156,7 +156,7 @@ Same as `|`.
   usage: break()
 ```
 
-Goes out of a EGA loop.
+Goes out of an EGA loop.
 
 ### EGA '`cat`' Function
 
@@ -649,13 +649,11 @@ Same as `^`.
 
 RisohEditor EGA has the following function as EGA extension:
 
-```txt
-RES_search
-RES_delete
-RES_clone_by_name
-RES_clone_by_lang
-RES_unload_resh
-```
+- `RES_search`
+- `RES_delete`
+- `RES_clone_by_name`
+- `RES_clone_by_lang`
+- `RES_unload_resh`
 
 ### EGA '`RES_search`' Function
 
