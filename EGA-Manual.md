@@ -146,8 +146,7 @@ The special functions can change the order of expression evaluations.
 The `input` function prompts the user for a string and waits for input.
 If input is done, the function returns a string.
 
-The `print` and `println` functions shows text of the specified values to the user.
-The `dump` and `dumpln` functions shows text of the specified values to the user.
+The `print`, `println`, `dump` and `dumpln` functions shows text of the specified values to the user.
 
 Unlike `print` and `println`, the `dump` and `dumpln` functions add quotes to the string values.
 `println` and `dumpln` add a newline at the end of the output text.
