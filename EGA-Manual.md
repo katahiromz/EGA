@@ -551,7 +551,7 @@ EGA function 'remove':
   usage: remove(ary_or_str, target)
 ```
 
-Returns a sequence whose parts are removed.
+Returns an array or a string, whose parts are removed.
 
 If `ary_or_str` is an array, the items with the same value as `target` are removed.
 If `ary_or_str` is a string, the substrings `target` are removed.
