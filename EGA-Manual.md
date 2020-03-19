@@ -75,7 +75,7 @@ The detailed descriptions of the EGA functions will be described later.
 
 ## Comments
 
-An comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
+The comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
 The comments are ignored in EGA execution.
 
 ## Values
