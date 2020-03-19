@@ -8,6 +8,8 @@ Copyright (C) 2020 Katayama Hirofumi MZ.
 
 EGA is a small programming language of a simple grammar.
 
+The source code of EGA will be found at https://github.com/katahiromz/EGA .
+
 ## How to use
 
 Please start up EGA. The following text will be displayed:
@@ -70,10 +72,12 @@ EGA>
 
 The detailed descriptions of the EGA functions will be described later.
 
-An EGA comment of EGA begins with atmark (`@`) and ends with newline.
-The comments are ignored.
+## Comments
 
-## The EGA values
+An EGA comment of EGA begins with atmark (`@`) and ends with newline.
+The comments are ignored in EGA execution.
+
+## Values
 
 The EGA values are integers, strings, and arrays.
 
@@ -86,9 +90,10 @@ The EGA array literal is a list of the EGA values it contains, separated by comm
 
 ## Variables
 
-You can set a value into a variable by using `set` function.
+You can set a value into a variable by using the `set` special function.
 For example, `set(A, 123);` will create a variable named `A` whose value is `123`.
-See also `define` function.
+
+The `define` special function can store the unevaluated expression into a variable.
 
 ## Integers
 
@@ -117,6 +122,24 @@ To get the 2nd element of `ary`, use `at(ary, 1)`.
 To set `999` to the 2nd element of `ary`, use `at(ary, 1, 999)`.
 
 See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `array` functions.
+
+## Booleans
+
+In EGA, the boolean value is an integer value. Zero means false. Non-zero means true.
+
+## Conditional execution
+
+The special function `if` can switch the execution by condition.
+
+## Loops
+
+The special functions `for`, `foreach` and `while` can make an execution loop.
+The `break` function can break the loop.
+
+## Normal functions vs. special functions
+
+In a call of the normal function, the parameters will be evaluated in the order of parameters.
+The special functions can change the order of expression evaluations.
 
 ## Samples
 
@@ -355,7 +378,7 @@ EGA function 'do':
 Does loop while `expr` is non-zero.
 The arguments will be evaluated in order.
 Returns the last argument.
-You can break the loop by `break` function.
+You can break the execution by `break` function.
 
 ### EGA '`dump`' Function
 
