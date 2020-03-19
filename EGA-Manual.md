@@ -68,7 +68,7 @@ EGA function 'print':
 EGA> 
 ```
 
-The detailed descriptions of the function will be described later.
+The detailed descriptions of the EGA functions will be described later.
 
 An EGA comment of EGA begins with atmark (`@`) and ends with newline.
 The comments are ignored.
