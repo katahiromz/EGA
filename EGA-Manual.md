@@ -676,9 +676,9 @@ EGA function 'RES_search':
 
 `RES_search` returns an array of the resource items.
 
-`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero, then search all resource names.
-`lang` must be an integer that specifies the language ID. If `lang` is `-1`, then search all resource languages.
+`type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
+`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
 
 ### EGA '`RES_delete`' Function
 
@@ -690,9 +690,9 @@ EGA function 'RES_delete':
 
 `RES_delete` deletes the resource items.
 
-`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero, then search all resource names.
-`lang` must be an integer that specifies the language ID. If `lang` is `-1`, then search all resource languages.
+`type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
+`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
 
 Returns `1` if deleted. Otherwise returns zero.
 
