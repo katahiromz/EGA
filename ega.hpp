@@ -49,6 +49,8 @@ std::shared_ptr<T> make_arg(const T1& t1, const T2& t2, const T3& t3)
 //////////////////////////////////////////////////////////////////////////////
 // functions
 
+#define EGA_FN
+
 typedef arg_t (*EGA_PROC)(const args_t& args);
 
 struct EGA_FUNCTION
@@ -627,6 +629,9 @@ bool EGA_eval_text_ex(const char *text);
 
 int EGA_interactive(const char *filename = NULL, bool echo = false);
 bool EGA_file_input(const char *filename);
+arg_t EGA_eval_arg(arg_t ast, bool do_check);
+int EGA_get_int(arg_t ast);
+std::string EGA_get_str(arg_t ast);
 
 } // namespace EGA
 

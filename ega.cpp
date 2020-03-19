@@ -23,8 +23,6 @@ static var_map_t s_var_map;
 static bool s_interactive = false;
 static bool s_echo_input = false;
 
-#define EGA_FN
-
 fn_t EGA_get_fn(const std::string& name);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args, int lineno);
 arg_t EGA_eval_var(const std::string& name, int lineno);
@@ -790,7 +788,7 @@ bool EGA_eval_text_ex(const char *text)
     return true;
 }
 
-static int EGA_get_int(arg_t ast)
+int EGA_get_int(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_INT)
@@ -806,7 +804,7 @@ static std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
     return std::static_pointer_cast<AstContainer>(ast);
 }
 
-static std::string EGA_get_str(arg_t ast)
+std::string EGA_get_str(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_STR)
