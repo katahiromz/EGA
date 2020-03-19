@@ -6,7 +6,7 @@ Copyright (C) 2020 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
-EGA is a small programming language of a simple grammar.
+EGA is a small programming language of a simple grammar, written in C++.
 
 The source code of EGA will be found at https://github.com/katahiromz/EGA .
 
@@ -79,7 +79,7 @@ The comments are ignored in EGA execution.
 
 ## Values
 
-The EGA values are integers, strings, and arrays.
+The EGA values are integers, strings, and/or arrays.
 
 An EGA integer literal is a sequence of digit(s) (`0`, ..., `9`).
 
@@ -134,12 +134,23 @@ The special function `if` can switch the execution by condition.
 ## Loops
 
 The special functions `for`, `foreach` and `while` can make an execution loop.
-The `break` function can break the loop.
+The `break` special function can break the loop.
 
 ## Normal functions vs. special functions
 
 In a call of the normal function, the parameters will be evaluated in the order of parameters.
 The special functions can change the order of expression evaluations.
+
+## Input and output
+
+The `input` function prompts the user for a string and waits for input.
+If input is done, the function returns a string.
+
+The `print` and `println` functions shows text of the specified values to the user.
+The `dump` and `dumpln` functions shows text of the specified values to the user.
+
+Unlike `print` and `println`, the `dump` and `dumpln` functions add quotes to the string values.
+`println` and `dumpln` add a newline at the end of the output text.
 
 ## Samples
 
