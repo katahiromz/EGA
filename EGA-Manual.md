@@ -6,11 +6,11 @@ Copyright (C) 2020 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
-EGA is a programming language of a simple grammar.
+EGA is a small programming language of a simple grammar.
 
 ## How to use
 
-Start up EGA. The following text will be displayed:
+Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -21,7 +21,7 @@ Start up EGA. The following text will be displayed:
 EGA> 
 ```
 
-Enter EGA statement (for example, `print(+(1, 2));`) and press `Enter` key. `3` will be shown.
+Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. `3` will be shown.
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -34,21 +34,14 @@ EGA> print(+(1, 2));
 EGA>
 ```
 
-To quit EGA, enter "`exit`".
+To quit EGA, please enter "`exit`".
 
-## Introduction to EGA
-
-The syntax of the EGA is similar to one or more C function call(s).
-But, in EGA, every operator is a function.
+The syntax of the EGA is similar to one or more function call(s) of C language.
+But, every operator in EGA is a function.
 
 Enter "`help`" to see all the EGA functions:
 
 ```txt
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 4 by katahiromz                   @
-@ Type 'exit' to exit. Type 'help' to see help. @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 EGA> help;
 EGA has the following functions:
   !
@@ -64,7 +57,7 @@ EGA has the following functions:
 EGA> 
 ```
 
-To see usage of `print` function, enter "`help print`".
+To see brief usage of `print` function, enter "`help print`".
 
 ```txt
 EGA> help print;
@@ -74,6 +67,8 @@ EGA function 'print':
 
 EGA> 
 ```
+
+The detailed descriptions of the function will be described later.
 
 An EGA comment of EGA begins with atmark (`@`) and ends with newline.
 The comments are ignored.
