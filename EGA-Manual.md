@@ -88,13 +88,14 @@ The EGA array literal is a list of the EGA values it contains, separated by comm
 
 You can set a value into a variable by using `set` function.
 For example, `set(A, 123);` will create a variable named `A` whose value is `123`.
+See also `define` function.
 
 ## Integers
 
 Expression `+(1, 2)` is the sum of two integers `1` and `2`.
 Expression `*(3, 4)` is the multiplication of two integers `3` and `4`.
 
-You can compare two integers by function `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
+You can compare two integers by `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
 
 ## Strings
 
@@ -102,7 +103,7 @@ Expression `"This is a string."` is a string literal of length 17.
 
 Expression `"This is a ""string""."` is a string literal of length 19.
 
-You can compare two strings by function `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
+You can compare two strings by `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
 
 See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `str` functions.
 
