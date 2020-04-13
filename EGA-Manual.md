@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual
+# The Programming Language EGA Reference Manual Version 2
 
 Written by Katayama Hirofumi MZ.
 
@@ -417,7 +417,7 @@ EGA function 'dump':
   usage: dump(value, ...)
 ```
 
-Outputs the values with quotations if necessary.
+Outputs the values with quotations and commas if necessary.
 No return.
 
 ### EGA '`dumpln`' Function

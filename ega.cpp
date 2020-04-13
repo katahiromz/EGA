@@ -993,6 +993,8 @@ arg_t EGA_FN EGA_dump(const args_t& args)
     {
         if (auto ast = EGA_eval_arg(args[i]))
         {
+            if (i != 0)
+                EGA_do_print(", ");
             EGA_do_print("%s", ast->dump(true).c_str());
         }
     }
