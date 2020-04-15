@@ -984,14 +984,14 @@ arg_t EGA_FN EGA_u16fromu8(const args_t& args)
         std::string utf8 = EGA_get_str(ast);
 #ifdef _WIN32
         std::wstring utf16;
-        if (UTF_u8_to_L(utf8, utf16))
+        if (UTF_u8_to_L<'?'>(utf8, utf16))
         {
             ret.assign((const char *)utf16.c_str(),
                        (const char *)utf16.c_str() + utf16.size() * sizeof(wchar_t));
         }
 #else
         std::u16string utf16;
-        if (UTF_u8_to_u(utf8, utf16))
+        if (UTF_u8_to_u<'?'>(utf8, utf16))
         {
             ret.assign((const char *)utf16.c_str(),
                        (const char *)utf16.c_str() + utf16.size() * sizeof(char16_t));
@@ -1012,11 +1012,11 @@ arg_t EGA_FN EGA_u8fromu16(const args_t& args)
 #ifdef _WIN32
         std::wstring utf16((const wchar_t *)u16.c_str(),
                            (const wchar_t *)u16.c_str() + (u16.size() / sizeof(wchar_t)));
-        UTF_L_to_u8(utf16, utf8);
+        UTF_L_to_u8<'?'>(utf16, utf8);
 #else
         std::u16string utf16((const char16_t *)u16.c_str(),
                              (const char16_t *)u16.c_str() + (u16.size() / sizeof(char16_t)));
-        UTF_u_to_u8(utf16, utf8);
+        UTF_u_to_u8<'?'>(utf16, utf8);
 #endif
     }
     return make_arg<AstStr>(utf8);
