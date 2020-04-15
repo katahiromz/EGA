@@ -77,7 +77,7 @@ std::string mstr_quote2(const std::string& str)
             ret += ", ";
         }
 
-        if (mzcrt_isgraph(ch))
+        if (mzcrt_isgraph(ch) && ch != '"')
         {
             ret += '\"';
             ret += ch;
