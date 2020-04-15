@@ -55,20 +55,27 @@ bool mstr_is_binary(const std::string& str)
     for (auto ch : str)
     {
         if (!mzcrt_isprint(ch))
-            return false;
+            return true;
     }
-    return true;
+    return false;
 }
 
-inline std::string
-mstr_quote2(const std::string& str)
+std::string mstr_quote2(const std::string& str)
 {
     if (!mstr_is_binary(str))
         return mstr_quote(str);
 
     std::string ret = "binary(";
-    for (auto ch : str)
+    bool first = true;
+    for (size_t i = 0; i < str.size(); ++i)
     {
+        char ch = str[i];
+
+        if (!first)
+        {
+            ret += ", ";
+        }
+
         if (mzcrt_isprint(ch))
         {
             ret += '\"';
@@ -79,8 +86,10 @@ mstr_quote2(const std::string& str)
         {
             ret += mstr_to_string(ch);
         }
+
+        first = false;
     }
-    ret += "\"";
+    ret += ")";
     return ret;
 }
 
@@ -941,7 +950,7 @@ arg_t EGA_FN EGA_binary(const args_t& args)
     std::string str;
     for (auto arg : args)
     {
-        if (auto ast = EGA_eval_arg(args[0], true))
+        if (auto ast = EGA_eval_arg(arg, true))
         {
             switch (ast->get_type())
             {
