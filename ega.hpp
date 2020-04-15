@@ -504,7 +504,7 @@ public:
 
     virtual arg_t clone() const
     {
-        return make_arg<AstStr>(m_str.c_str());
+        return make_arg<AstStr>(m_str);
     }
 
     virtual arg_t eval() const
