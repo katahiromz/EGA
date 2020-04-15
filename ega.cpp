@@ -35,9 +35,58 @@ std::string AstInt::dump(bool q) const
     return mstr_to_string(m_value);
 }
 
+inline int mzcrt_isprint(char c)
+{
+    return 0x20 <= (unsigned char)c && (unsigned char)c <= 0x7E;
+}
+
+inline int mzcrt_isspace(char c)
+{
+    return strchr(" \t\n\r\f\v", c) != NULL;
+}
+
+inline int mzcrt_isgraph(char c)
+{
+    return !mzcrt_isspace(c) && mzcrt_isprint(c);
+}
+
+bool mstr_is_binary(const std::string& str)
+{
+    for (auto ch : str)
+    {
+        if (!mzcrt_isprint(ch))
+            return false;
+    }
+    return true;
+}
+
+inline std::string
+mstr_quote2(const std::string& str)
+{
+    if (!mstr_is_binary(str))
+        return mstr_quote(str);
+
+    std::string ret = "binary(";
+    for (auto ch : str)
+    {
+        if (mzcrt_isprint(ch))
+        {
+            ret += '\"';
+            ret += ch;
+            ret += '\"';
+        }
+        else
+        {
+            ret += mstr_to_string(ch);
+        }
+    }
+    ret += "\"";
+    return ret;
+}
+
 std::string AstStr::dump(bool q) const
 {
-    return (q ? mstr_quote(m_str) : m_str);
+    return (q ? mstr_quote2(m_str) : m_str);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -883,6 +932,32 @@ EGA_compare_0(arg_t a1, arg_t a2)
     }
 
     return NULL;
+}
+
+arg_t EGA_FN EGA_binary(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    std::string str;
+    for (auto arg : args)
+    {
+        if (auto ast = EGA_eval_arg(args[0], true))
+        {
+            switch (ast->get_type())
+            {
+            case AST_INT:
+                str += (char)EGA_get_int(ast);
+                break;
+            case AST_STR:
+                str += EGA_get_str(ast)[0];
+                break;
+            default:
+                throw EGA_type_mismatch(ast->get_lineno());
+            }
+        }
+    }
+
+    return make_arg<AstStr>(str);
 }
 
 arg_t EGA_FN EGA_compare(const args_t& args)
@@ -2070,6 +2145,7 @@ bool EGA_init(void)
     EGA_add_fn("int", 1, 1, EGA_int, "int(value)");
     EGA_add_fn("str", 1, 1, EGA_str, "str(value)");
     EGA_add_fn("array", 0, 256, EGA_array, "array(value1[, ...])");
+    EGA_add_fn("binary", 0, 32767, EGA_binary, "binary(byte1[, ...])");
 
     // control structure
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");

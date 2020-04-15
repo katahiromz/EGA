@@ -113,6 +113,10 @@ You can compare two strings by `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
 
 See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `str` functions.
 
+## Binarys
+
+In EGA, a binary is a string. See `binary` function.
+
 ## Arrays
 
 Expression `{1, 2, "string"}` is an array literal of length 3.
@@ -303,6 +307,18 @@ If the value is specified, the function sets the value at the position of the sp
 Returns the value.
 
 Same as `[]`.
+
+### EGA '`binary`' Function
+
+```txt
+EGA function 'binary':
+  argument number: 0..32767
+  usage: binary(byte1[, ...])
+```
+
+Creates a binary string of the specified bytes.
+Each parameter is an integer or a string that represents a byte.
+Returns a binary string.
 
 ### EGA '`bitand`' Function
 
