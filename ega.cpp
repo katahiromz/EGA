@@ -1003,6 +1003,21 @@ arg_t EGA_FN EGA_u8fromu16(const args_t& args)
     return make_arg<AstStr>(utf8);
 }
 
+arg_t EGA_FN EGA_hex(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    std::string ret;
+    if (auto ast = EGA_eval_arg(args[0], true))
+    {
+        int value = EGA_get_int(ast);
+        char buf[32];
+        std::sprintf(buf, "%X", value);
+        ret = buf;
+    }
+    return make_arg<AstStr>(ret);
+}
+
 arg_t EGA_FN EGA_compare(const args_t& args)
 {
     EVAL_DEBUG();
@@ -2183,12 +2198,13 @@ bool EGA_init(void)
     EGA_add_fn("define", 1, 2, EGA_define, "define(var[, expr])");
     EGA_add_fn(":=", 1, 2, EGA_define, "define(var[, expr])");
 
-    // type
+    // type and conversion
     EGA_add_fn("typeid", 1, 1, EGA_typeid, "typeid(value)");
     EGA_add_fn("int", 1, 1, EGA_int, "int(value)");
     EGA_add_fn("str", 1, 1, EGA_str, "str(value)");
     EGA_add_fn("array", 0, 256, EGA_array, "array(value1[, ...])");
     EGA_add_fn("binary", 0, 32767, EGA_binary, "binary(byte1[, ...])");
+    EGA_add_fn("hex", 1, 1, EGA_hex, "hex(value)");
 
     // control structure
     EGA_add_fn("if", 2, 3, EGA_if, "if(cond, true_case[, false_case])");

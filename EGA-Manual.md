@@ -538,6 +538,17 @@ Compares two values. Returns 1 if `value1` was greater than `value2` or equal. O
 
 Same as `>=`.
 
+### EGA '`hex`' Function
+
+```txt
+EGA function 'hex':
+  argument number: 1
+  usage: hex(value)
+```
+
+Converts an integer value to a hexidemical string.
+Returns a string.
+
 ### EGA '`if`' Function
 
 ```txt
