@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual Version 2
+# The Programming Language EGA Version 6 Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -889,57 +889,13 @@ Same as `^`.
 
 RisohEditor EGA has the following functions as EGA extension:
 
-- `RES_search`
-- `RES_delete`
-- `RES_clone_by_name`
 - `RES_clone_by_lang`
+- `RES_clone_by_name`
+- `RES_delete`
+- `RES_get_binary`
+- `RES_search`
+- `RES_select`
 - `RES_unload_resh`
-
-### EGA '`RES_search`' Function
-
-```txt
-EGA function 'RES_search':
-  argument number: 0..3
-  usage: RES_search([type[, name[, lang]]])
-```
-
-`RES_search` returns an array of the resource items.
-
-`type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
-`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
-
-### EGA '`RES_delete`' Function
-
-```txt
-EGA function 'RES_delete':
-  argument number: 0..3
-  usage: RES_delete([type[, name[, lang]]])
-```
-
-`RES_delete` deletes the resource items.
-
-`type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
-`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
-
-Returns `1` if deleted. Otherwise returns zero.
-
-### EGA '`RES_clone_by_name`' Function
-
-```txt
-EGA function 'RES_clone_by_name':
-  argument number: 3
-  usage: RES_clone_by_name(type, src_name, dest_name)
-```
-
-`RES_clone_by_name` clones the resource data as another resource name.
-
-`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
-`src_name` must be an integer or a string of a resource name. If `src_name` is zero, then search all resource names.
-`dest_name` must be an integer or a string of a new resource name.
-
-Returns `1` if cloned. Otherwise returns zero.
 
 ### EGA '`RES_clone_by_lang`' Function
 
@@ -957,6 +913,75 @@ EGA function 'RES_clone_by_lang':
 `dest_lang` must be an integer that specifies the destination language ID.
 
 Returns `1` if cloned. Otherwise returns zero.
+
+### EGA '`RES_clone_by_name`' Function
+
+```txt
+EGA function 'RES_clone_by_name':
+  argument number: 3
+  usage: RES_clone_by_name(type, src_name, dest_name)
+```
+
+`RES_clone_by_name` clones the resource data as another resource name.
+
+`type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
+`src_name` must be an integer or a string of a resource name. If `src_name` is zero, then search all resource names.
+`dest_name` must be an integer or a string of a new resource name.
+
+Returns `1` if cloned. Otherwise returns zero.
+
+### EGA '`RES_delete`' Function
+
+```txt
+EGA function 'RES_delete':
+  argument number: 0..3
+  usage: RES_delete([type[, name[, lang]]])
+```
+
+`RES_delete` deletes the resource items.
+
+`type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
+`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
+
+Returns `1` if deleted. Otherwise returns zero.
+
+### EGA '`RES_get_binary`' Function
+
+```txt
+EGA function 'RES_get_binary':
+  argument number: 0..3
+  usage: RES_get_binary([type[, name[, lang]]])
+```
+
+`RES_get_binary` gets the binary data of the specified resource data.
+Returns the binary string.
+
+### EGA '`RES_search`' Function
+
+```txt
+EGA function 'RES_search':
+  argument number: 0..3
+  usage: RES_search([type[, name[, lang]]])
+```
+
+`RES_search` returns an array of the resource items.
+
+`type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
+`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
+`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
+
+### EGA '`RES_select`' Function
+
+```txt
+EGA function 'RES_select':
+  argument number: 0..3
+  usage: RES_select([type[, name[, lang]]])
+```
+
+`RES_select` selects an item on the RisohEditor treeview.
+Returns `1` if successful, zero if failed.
+
 
 ### EGA '`RES_unload_resh`' Function
 
