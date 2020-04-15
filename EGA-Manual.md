@@ -822,6 +822,29 @@ If the value is an integer, then returns zero.
 If the value is a string, then returns `1`.
 If the value is an array, then returns `2`.
 
+### EGA '`u8fromu16`' Function
+
+```txt
+EGA function 'u8fromu16':
+  argument number: 1
+  usage: u8fromu16(utf16str)
+```
+
+Converts a UTF-16 string to a UTF-8 string.
+
+NOTE: The EGA standard string is UTF-8.
+You can convert a UTF-8 string into a UTF-16 binary string by this function.
+
+### EGA '`u16fromu8`' Function
+
+```txt
+EGA function 'u16fromu8':
+  argument number: 1
+  usage: u16fromu8(utf8str)
+```
+
+Converts a UTF-8 string to a UTF-16 string.
+
 ### EGA '`while`' Function
 
 ```txt

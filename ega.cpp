@@ -4,6 +4,7 @@
 
 #include "ega.hpp"
 #include "mstr.hpp"
+#include "UTF/utf.hpp"
 #include <unordered_map>
 #include <algorithm>
 #include <cstdio>
@@ -69,14 +70,14 @@ std::string mstr_quote2(const std::string& str)
     bool first = true;
     for (size_t i = 0; i < str.size(); ++i)
     {
-        char ch = str[i];
+        unsigned char ch = str[i];
 
         if (!first)
         {
             ret += ", ";
         }
 
-        if (mzcrt_isprint(ch))
+        if (mzcrt_isgraph(ch))
         {
             ret += '\"';
             ret += ch;
@@ -967,6 +968,39 @@ arg_t EGA_FN EGA_binary(const args_t& args)
     }
 
     return make_arg<AstStr>(str);
+}
+
+arg_t EGA_FN EGA_u16fromu8(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    std::string ret;
+    if (auto ast = EGA_eval_arg(args[0], true))
+    {
+        std::string utf8 = EGA_get_str(ast);
+        std::u16string utf16;
+        if (UTF_u8_to_u(utf8, utf16))
+        {
+            ret.assign((const char *)utf16.c_str(),
+                       (const char *)utf16.c_str() + utf16.size() * sizeof(char16_t));
+        }
+    }
+    return make_arg<AstStr>(ret);
+}
+
+arg_t EGA_FN EGA_u8fromu16(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    std::string utf8;
+    if (auto ast = EGA_eval_arg(args[0], true))
+    {
+        std::string u16 = EGA_get_str(ast);
+        std::u16string utf16((const char16_t *)u16.c_str(),
+                             (const char16_t *)u16.c_str() + (u16.size() / sizeof(char16_t)));
+        UTF_u_to_u8(utf16, utf8);
+    }
+    return make_arg<AstStr>(utf8);
 }
 
 arg_t EGA_FN EGA_compare(const args_t& args)
@@ -2230,6 +2264,8 @@ bool EGA_init(void)
     EGA_add_fn("find", 2, 2, EGA_find, "find(ary_or_str, target)");
     EGA_add_fn("replace", 3, 3, EGA_replace, "replace(ary_or_str, from, to)");
     EGA_add_fn("remove", 2, 2, EGA_remove, "remove(ary_or_str, target)");
+    EGA_add_fn("u8fromu16", 1, 1, EGA_u8fromu16, "u8fromu16(utf16str)");
+    EGA_add_fn("u16fromu8", 1, 1, EGA_u16fromu8, "u16fromu8(utf8str)");
 
     return true;
 }
