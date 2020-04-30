@@ -773,7 +773,7 @@ EGA_eval_fn(const std::string& name, const args_t& args, int lineno)
             if (fn->min_args <= args.size() && args.size() <= fn->max_args)
                 return (*(fn->proc))(args);
             else
-                throw EGA_argument_number_exception(lineno);
+                throw EGA_arity_exception(lineno);
         }
     }
     else
@@ -1576,7 +1576,7 @@ arg_t EGA_FN EGA_at(const args_t& args)
     EVAL_DEBUG();
 
     if (args.size() != 2 && args.size() != 3)
-        throw EGA_argument_number_exception(args[0]->get_lineno());
+        throw EGA_arity_exception(args[0]->get_lineno());
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
@@ -2343,11 +2343,11 @@ void EGA_show_help(const std::string& name)
 
     if (it->second->min_args == it->second->max_args)
     {
-        EGA_do_print("  argument number: %d\n", int(it->second->min_args));
+        EGA_do_print("  arity: %d\n", int(it->second->min_args));
     }
     else
     {
-        EGA_do_print("  argument number: %d..%d\n", int(it->second->min_args), int(it->second->max_args));
+        EGA_do_print("  arity: %d..%d\n", int(it->second->min_args), int(it->second->max_args));
     }
 
     EGA_do_print("  usage: %s\n", it->second->help.c_str());
