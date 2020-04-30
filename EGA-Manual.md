@@ -65,7 +65,7 @@ To see brief usage of `print` function, enter "`help print`".
 ```txt
 EGA> help print;
 EGA function 'print':
-  argument number: 0..256
+  arity: 0..256
   usage: print(value, ...)
 
 EGA> 
@@ -270,7 +270,7 @@ The following sections are a list of the EGA functions.
 
 ```txt
 EGA function 'and':
-  argument number: 2
+  arity: 2
   usage: and(value1, value2)
 ```
 
@@ -282,7 +282,7 @@ Same as `&&`.
 
 ```txt
 EGA function 'array':
-  argument number: 0..256
+  arity: 0..256
   usage: array(value1[, ...])
 ```
 
@@ -292,7 +292,7 @@ Creates an array from specified parameters. Returns an array.
 
 ```txt
 EGA function 'at':
-  argument number: 2..3
+  arity: 2..3
   usage: at(ary_or_str, index[, value])
 ```
 
@@ -312,7 +312,7 @@ Same as `[]`.
 
 ```txt
 EGA function 'binary':
-  argument number: 0..32767
+  arity: 0..32767
   usage: binary(byte1[, ...])
 ```
 
@@ -324,7 +324,7 @@ Returns a binary string.
 
 ```txt
 EGA function 'bitand':
-  argument number: 2
+  arity: 2
   usage: bitand(value1, value2)
 ```
 
@@ -335,7 +335,7 @@ Same as `&`.
 ### EGA '`bitor`' Function
 
 ```txt
-  argument number: 2
+  arity: 2
   usage: bitor(value1, value2)
 ```
 
@@ -346,7 +346,7 @@ Same as `|`.
 ### EGA '`break`' Function
 
 ```txt
-  argument number: 0
+  arity: 0
   usage: break()
 ```
 
@@ -356,7 +356,7 @@ Goes out of an EGA loop.
 
 ```txt
 EGA function 'cat':
-  argument number: 1..256
+  arity: 1..256
   usage: cat(ary_or_str_1, ary_or_str_2, ...)
 ```
 
@@ -366,7 +366,7 @@ Concatnates the specified arrays and/or strings. Returns an array or a string.
 
 ```txt
 EGA function 'compare':
-  argument number: 2
+  arity: 2
   usage: compare(value1, value2)
 ```
 
@@ -376,7 +376,7 @@ Compares two values. Returns 0 if `value1` and `value2` are equal, -1 if `value1
 
 ```txt
 EGA function 'compl':
-  argument number: 1
+  arity: 1
   usage: compl(value)
 ```
 
@@ -388,7 +388,7 @@ Same as `~`.
 
 ```txt
 EGA function 'define':
-  argument number: 1..2
+  arity: 1..2
   usage: define(var[, expr])
 ```
 
@@ -403,7 +403,7 @@ Same as `:=`.
 
 ```txt
 EGA function 'div':
-  argument number: 2
+  arity: 2
   usage: div(int1, int2)
 ```
 
@@ -416,7 +416,7 @@ Same as `/`.
 
 ```txt
 EGA function 'do':
-  argument number: 0..256
+  arity: 0..256
   usage: do(expr, ...)
 ```
 
@@ -429,7 +429,7 @@ You can break the execution by `break` function.
 
 ```txt
 EGA function 'dump':
-  argument number: 0..256
+  arity: 0..256
   usage: dump(value, ...)
 ```
 
@@ -440,7 +440,7 @@ No return.
 
 ```txt
 EGA function 'dumpln':
-  argument number: 0..256
+  arity: 0..256
   usage: dumpln(value, ...)
 ```
 
@@ -452,7 +452,7 @@ Same as `?`.
 
 ```txt
 EGA function 'equal':
-  argument number: 2
+  arity: 2
   usage: equal(value1, value2)
 ```
 
@@ -463,7 +463,7 @@ Same as `==`.
 ### EGA '`exit`' Function
 
 ```txt
-  argument number: 0..1
+  arity: 0..1
   usage: exit([value])
 ```
 
@@ -473,7 +473,7 @@ Ends the program with a value.
 
 ```txt
 EGA function 'find':
-  argument number: 2
+  arity: 2
   usage: find(ary_or_str, target)
 ```
 
@@ -484,7 +484,7 @@ Returns the zero-based offset of the found target. Returns -1 if not found.
 
 ```txt
 EGA function 'for':
-  argument number: 4
+  arity: 4
   usage: for(var, min, max, expr)
 ```
 
@@ -505,7 +505,7 @@ You can break the loop by `break` function.
 
 ```txt
 EGA function 'foreach':
-  argument number: 3
+  arity: 3
   usage: foreach(var, ary, expr)
 ```
 
@@ -518,7 +518,7 @@ You can break the loop by `break` function.
 
 ```txt
 EGA function 'greater':
-  argument number: 2
+  arity: 2
   usage: greater(value1, value2)
 ```
 
@@ -530,7 +530,7 @@ Same as `>`.
 
 ```txt
 EGA function 'greater_equal':
-  argument number: 2
+  arity: 2
   usage: greater_equal(value1, value2)
 ```
 
@@ -542,7 +542,7 @@ Same as `>=`.
 
 ```txt
 EGA function 'hex':
-  argument number: 1
+  arity: 1
   usage: hex(value)
 ```
 
@@ -553,7 +553,7 @@ Returns a string.
 
 ```txt
 EGA function 'if':
-  argument number: 2..3
+  arity: 2..3
   usage: if(cond, true_case[, false_case])
 ```
 
@@ -567,7 +567,7 @@ Returns the evaluated value of `true_case` or `false_case`.
 
 ```txt
 EGA function 'input':
-  argument number: 0..1
+  arity: 0..1
   usage: input([message])
 ```
 
@@ -579,7 +579,7 @@ Returns the text string.
 
 ```txt
 EGA function 'int':
-  argument number: 1
+  arity: 1
   usage: int(value)
 ```
 
@@ -590,7 +590,7 @@ Returns an integer.
 
 ```txt
 EGA function 'left':
-  argument number: 2
+  arity: 2
   usage: left(ary_or_str, count)
 ```
 
@@ -600,7 +600,7 @@ Returns an array or a string of `count` items at the left side of an array or a 
 
 ```txt
 EGA function 'len':
-  argument number: 1
+  arity: 1
   usage: len(ary_or_str)
 ```
 
@@ -610,7 +610,7 @@ Returns the length of an array or a string.
 
 ```txt
 EGA function 'less':
-  argument number: 2
+  arity: 2
   usage: less(value1, value2)
 ```
 
@@ -622,7 +622,7 @@ Same as `<`.
 
 ```txt
 EGA function 'less':
-  argument number: 2
+  arity: 2
   usage: less_equal(value1, value2)
 ```
 
@@ -634,7 +634,7 @@ Same as `<=`.
 
 ```txt
 EGA function 'mid':
-  argument number: 3..4
+  arity: 3..4
   usage: mid(ary_or_str, index, count[, value])
 ```
 
@@ -648,7 +648,7 @@ If `value` is specified, the range will be replaced with a value of `value`.
 
 ```txt
 EGA function 'minus':
-  argument number: 1..2
+  arity: 1..2
   usage: minus(int1[, int2])
 ```
 
@@ -662,7 +662,7 @@ Same as `-`.
 
 ```txt
 EGA function 'mod':
-  argument number: 2
+  arity: 2
   usage: mod(int1, int2)
 ```
 
@@ -675,7 +675,7 @@ Same as `%`.
 
 ```txt
 EGA function 'mul':
-  argument number: 2
+  arity: 2
   usage: mul(int1, int2)
 ```
 
@@ -688,7 +688,7 @@ Same as `*`.
 
 ```txt
 EGA function 'not':
-  argument number: 1
+  arity: 1
   usage: not(value)
 ```
 
@@ -700,7 +700,7 @@ Same as `!`.
 
 ```txt
 EGA function 'not_equal':
-  argument number: 2
+  arity: 2
   usage: not_equal(value1, value2)
 ```
 
@@ -711,7 +711,7 @@ Same as `!=`.
 
 ```txt
 EGA function 'or':
-  argument number: 2
+  arity: 2
   usage: or(value1, value2)
 ```
 
@@ -724,7 +724,7 @@ Same as `||`.
 
 ```txt
 EGA function 'plus':
-  argument number: 2
+  arity: 2
   usage: plus(int1, int2)
 ```
 
@@ -737,7 +737,7 @@ Same as `+`.
 
 ```txt
 EGA function 'print':
-  argument number: 0..256
+  arity: 0..256
   usage: print(value, ...)
 ```
 
@@ -748,7 +748,7 @@ No return.
 
 ```txt
 EGA function 'println':
-  argument number: 0..256
+  arity: 0..256
   usage: println(value, ...)
 ```
 
@@ -759,7 +759,7 @@ No return.
 
 ```txt
 EGA function 'remove':
-  argument number: 2
+  arity: 2
   usage: remove(ary_or_str, target)
 ```
 
@@ -774,7 +774,7 @@ This function doesn't change `ary_or_str`.
 
 ```txt
 EGA function 'replace':
-  argument number: 3
+  arity: 3
   usage: replace(ary_or_str, from, to)
 ```
 
@@ -787,7 +787,7 @@ This function doesn't change `ary_or_str`.
 
 ```txt
 EGA function 'right':
-  argument number: 2
+  arity: 2
   usage: right(ary_or_str, count)
 ```
 
@@ -797,7 +797,7 @@ Returns an array or a string of `count` items at the right side of an array or a
 
 ```txt
 EGA function 'set':
-  argument number: 1..2
+  arity: 1..2
   usage: set(var[, value])
 ```
 
@@ -811,7 +811,7 @@ Same as `=`.
 
 ```txt
 EGA function 'str':
-  argument number: 1
+  arity: 1
   usage: str(value)
 ```
 
@@ -822,7 +822,7 @@ Returns a string.
 
 ```txt
 EGA function 'typeid':
-  argument number: 1
+  arity: 1
   usage: typeid(value)
 ```
 
@@ -837,7 +837,7 @@ If the value is an array, then returns `2`.
 
 ```txt
 EGA function 'u8fromu16':
-  argument number: 1
+  arity: 1
   usage: u8fromu16(utf16str)
 ```
 
@@ -850,7 +850,7 @@ You can convert a UTF-8 string into a UTF-16 binary string by this function.
 
 ```txt
 EGA function 'u16fromu8':
-  argument number: 1
+  arity: 1
   usage: u16fromu8(utf8str)
 ```
 
@@ -860,7 +860,7 @@ Converts a UTF-8 string to a UTF-16 string.
 
 ```txt
 EGA function 'while':
-  argument number: 2
+  arity: 2
   usage: while(cond, expr)
 ```
 
@@ -877,7 +877,7 @@ You can break the loop by `break` function.
 
 ```txt
 EGA function 'xor':
-  argument number: 2
+  arity: 2
   usage: xor(value1, value2)
 ```
 
@@ -901,7 +901,7 @@ RisohEditor EGA has the following functions as EGA extension:
 
 ```txt
 EGA function 'RES_clone_by_lang':
-  argument number: 4
+  arity: 4
   usage: RES_clone_by_name(type, name, src_lang, dest_lang)
 ```
 
@@ -918,7 +918,7 @@ Returns `1` if cloned. Otherwise returns zero.
 
 ```txt
 EGA function 'RES_clone_by_name':
-  argument number: 3
+  arity: 3
   usage: RES_clone_by_name(type, src_name, dest_name)
 ```
 
@@ -934,7 +934,7 @@ Returns `1` if cloned. Otherwise returns zero.
 
 ```txt
 EGA function 'RES_delete':
-  argument number: 0..3
+  arity: 0..3
   usage: RES_delete([type[, name[, lang]]])
 ```
 
@@ -950,7 +950,7 @@ Returns `1` if deleted. Otherwise returns zero.
 
 ```txt
 EGA function 'RES_get_binary':
-  argument number: 0..3
+  arity: 0..3
   usage: RES_get_binary([type[, name[, lang]]])
 ```
 
@@ -961,7 +961,7 @@ Returns the binary string.
 
 ```txt
 EGA function 'RES_search':
-  argument number: 0..3
+  arity: 0..3
   usage: RES_search([type[, name[, lang]]])
 ```
 
@@ -975,7 +975,7 @@ EGA function 'RES_search':
 
 ```txt
 EGA function 'RES_select':
-  argument number: 0..3
+  arity: 0..3
   usage: RES_select([type[, name[, lang]]])
 ```
 
@@ -987,7 +987,7 @@ Returns `1` if successful, zero if failed.
 
 ```txt
 EGA function 'RES_unload_resh':
-  argument number: 0
+  arity: 0
   usage: RES_unload_resh()
 ```
 
