@@ -139,11 +139,11 @@ public:
     }
 };
 
-class EGA_argument_number_exception : public EGA_exception
+class EGA_arity_exception : public EGA_exception
 {
 public:
-    EGA_argument_number_exception(int lineno)
-        : EGA_exception("argument number mismatch", lineno)
+    EGA_arity_exception(int lineno)
+        : EGA_exception("arity mismatch", lineno)
     {
     }
 };
