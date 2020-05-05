@@ -1,4 +1,4 @@
-# The programming language EGA by katahiromz
+# The programming language EGA
 
 EGA is a tiny programming language for general purpose.
 
