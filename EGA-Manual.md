@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 4 by katahiromz                   @
+@ EGA Version 6 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 4 by katahiromz                   @
+@ EGA Version 6 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -153,8 +153,8 @@ If input is done, the function returns a string.
 
 The `print`, `println`, `dump` and `dumpln` functions shows text of the specified values to the user.
 
-Unlike `print` and `println`, the `dump` and `dumpln` functions add quotes to the string values.
-`println` and `dumpln` add a newline at the end of the output text.
+Unlike `print` and `println`, the `dump` and `dumpln` functions add quotes and commas to 
+the string values. `println` and `dumpln` add a newline at the end of the output text.
 
 ## Samples
 
