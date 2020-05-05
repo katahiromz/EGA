@@ -266,7 +266,7 @@ B=? 5
 
 The following sections are a list of the EGA functions.
 
-### EGA '`and`' Function
+### EGA `and` Function
 
 ```txt
 EGA function 'and':
@@ -278,7 +278,7 @@ Calculates logical AND of two integers. Returns an integer.
 
 Same as `&&`.
 
-### EGA '`array`' Function
+### EGA `array` Function
 
 ```txt
 EGA function 'array':
@@ -288,7 +288,7 @@ EGA function 'array':
 
 Creates an array from specified parameters. Returns an array.
 
-### EGA '`at`' Function
+### EGA `at` Function
 
 ```txt
 EGA function 'at':
@@ -308,7 +308,7 @@ Returns the value.
 
 Same as `[]`.
 
-### EGA '`binary`' Function
+### EGA `binary` Function
 
 ```txt
 EGA function 'binary':
@@ -320,7 +320,7 @@ Creates a binary string of the specified bytes.
 Each parameter is an integer or a string that represents a byte.
 Returns a binary string.
 
-### EGA '`bitand`' Function
+### EGA `bitand` Function
 
 ```txt
 EGA function 'bitand':
@@ -332,9 +332,10 @@ Calculates bitwise AND of two integers. Returns an integer.
 
 Same as `&`.
 
-### EGA '`bitor`' Function
+### EGA `bitor` Function
 
 ```txt
+EGA function 'bitor':
   arity: 2
   usage: bitor(value1, value2)
 ```
@@ -343,16 +344,17 @@ Calculates bitwise OR of two integers. Returns an integer.
 
 Same as `|`.
 
-### EGA '`break`' Function
+### EGA `break` Function
 
 ```txt
+EGA function 'break':
   arity: 0
   usage: break()
 ```
 
 Goes out of an EGA loop.
 
-### EGA '`cat`' Function
+### EGA `cat` Function
 
 ```txt
 EGA function 'cat':
@@ -362,7 +364,7 @@ EGA function 'cat':
 
 Concatnates the specified arrays and/or strings. Returns an array or a string.
 
-### EGA '`compare`' Function
+### EGA `compare` Function
 
 ```txt
 EGA function 'compare':
@@ -372,7 +374,7 @@ EGA function 'compare':
 
 Compares two values. Returns 0 if `value1` and `value2` are equal, -1 if `value1` was less, or 1 if `value1` was greater.
 
-### EGA '`compl`' Function
+### EGA `compl` Function
 
 ```txt
 EGA function 'compl':
@@ -384,7 +386,7 @@ Calculates bitwise NOT. Returns an integer.
 
 Same as `~`.
 
-### EGA '`define`' Function
+### EGA `define` Function
 
 ```txt
 EGA function 'define':
@@ -399,7 +401,7 @@ Returns `expr`.
 
 Same as `:=`.
 
-### EGA '`div`' Function
+### EGA `div` Function
 
 ```txt
 EGA function 'div':
@@ -412,7 +414,7 @@ Returns an integer.
 
 Same as `/`.
 
-### EGA '`do`' Function
+### EGA `do` Function
 
 ```txt
 EGA function 'do':
@@ -425,7 +427,7 @@ The arguments will be evaluated in order.
 Returns the last argument.
 You can break the execution by `break` function.
 
-### EGA '`dump`' Function
+### EGA `dump` Function
 
 ```txt
 EGA function 'dump':
@@ -436,7 +438,7 @@ EGA function 'dump':
 Outputs the values with quotations and commas if necessary.
 No return value.
 
-### EGA '`dumpln`' Function
+### EGA `dumpln` Function
 
 ```txt
 EGA function 'dumpln':
@@ -448,7 +450,7 @@ Same as `dump` except `dumpln` adds a newline.
 
 Same as `?`.
 
-### EGA '`equal`' Function
+### EGA `equal` Function
 
 ```txt
 EGA function 'equal':
@@ -460,16 +462,17 @@ Compares two values. Returns 1 if two values are equal. zero if not equal.
 
 Same as `==`.
 
-### EGA '`exit`' Function
+### EGA `exit` Function
 
 ```txt
+EGA function 'exit':
   arity: 0..1
   usage: exit([value])
 ```
 
 Ends the program with a value.
 
-### EGA '`find`' Function
+### EGA `find` Function
 
 ```txt
 EGA function 'find':
@@ -480,7 +483,7 @@ EGA function 'find':
 Finds a target value from an array or a string.
 Returns the zero-based offset of the found target. Returns -1 if not found.
 
-### EGA '`for`' Function
+### EGA `for` Function
 
 ```txt
 EGA function 'for':
@@ -501,7 +504,7 @@ The `var` is the name of a loop variable.
 
 You can break the loop by `break` function.
 
-### EGA '`foreach`' Function
+### EGA `foreach` Function
 
 ```txt
 EGA function 'foreach':
@@ -514,7 +517,7 @@ Does loop using an array.
 The item in the `ary` array will be evaluated and stored into variable `var` repeatedly.
 You can break the loop by `break` function.
 
-### EGA '`greater`' Function
+### EGA `greater` Function
 
 ```txt
 EGA function 'greater':
@@ -526,7 +529,7 @@ Compares two values. Returns 1 if `value1` was greater than `value2`. zero if no
 
 Same as `>`.
 
-### EGA '`greater_equal`' Function
+### EGA `greater_equal` Function
 
 ```txt
 EGA function 'greater_equal':
@@ -538,7 +541,7 @@ Compares two values. Returns 1 if `value1` was greater than `value2` or equal. O
 
 Same as `>=`.
 
-### EGA '`hex`' Function
+### EGA `hex` Function
 
 ```txt
 EGA function 'hex':
@@ -549,7 +552,7 @@ EGA function 'hex':
 Converts an integer value to a hexidemical string.
 Returns a string.
 
-### EGA '`if`' Function
+### EGA `if` Function
 
 ```txt
 EGA function 'if':
@@ -563,7 +566,7 @@ If the integer value `cond` was non-zero, then `true_case` will be evaluated.
 If `cond` was zero, then `false_case` will be evaluated if any.
 Returns the evaluated value of `true_case` or `false_case`.
 
-### EGA '`input`' Function
+### EGA `input` Function
 
 ```txt
 EGA function 'input':
@@ -575,7 +578,7 @@ Gets a text string as input from EGA console.
 `message` will be shown if any.
 Returns the text string.
 
-### EGA '`int`' Function
+### EGA `int` Function
 
 ```txt
 EGA function 'int':
@@ -586,7 +589,7 @@ EGA function 'int':
 Converts a value to an integer value.
 Returns an integer.
 
-### EGA '`left`' Function
+### EGA `left` Function
 
 ```txt
 EGA function 'left':
@@ -596,7 +599,7 @@ EGA function 'left':
 
 Returns an array or a string of `count` items at the left side of an array or a string.
 
-### EGA '`len`' Function
+### EGA `len` Function
 
 ```txt
 EGA function 'len':
@@ -606,7 +609,7 @@ EGA function 'len':
 
 Returns the length of an array or a string.
 
-### EGA '`less`' Function
+### EGA `less` Function
 
 ```txt
 EGA function 'less':
@@ -618,7 +621,7 @@ Compares two values. Returns 1 if `value1` was less than `value2`. zero if not l
 
 Same as `<`.
 
-### EGA '`less_equal`' Function
+### EGA `less_equal` Function
 
 ```txt
 EGA function 'less':
@@ -630,7 +633,7 @@ Compares two values. Returns 1 if `value1` was less than `value2` or equal. Othe
 
 Same as `<=`.
 
-### EGA '`mid`' Function
+### EGA `mid` Function
 
 ```txt
 EGA function 'mid':
@@ -644,7 +647,7 @@ The range starts from offset `index`.
 The length of the range is `count`.
 If `value` is specified, the range will be replaced with a value of `value`.
 
-### EGA '`minus`' Function
+### EGA `minus` Function
 
 ```txt
 EGA function 'minus':
@@ -658,7 +661,7 @@ Returns an integer.
 
 Same as `-`.
 
-### EGA '`mod`' Function
+### EGA `mod` Function
 
 ```txt
 EGA function 'mod':
@@ -671,7 +674,7 @@ Calculates the remainder of division of two integers.
 Returns an integer.
 Same as `%`.
 
-### EGA '`mul`' Function
+### EGA `mul` Function
 
 ```txt
 EGA function 'mul':
@@ -684,7 +687,7 @@ Returns an integer.
 
 Same as `*`.
 
-### EGA '`not`' Function
+### EGA `not` Function
 
 ```txt
 EGA function 'not':
@@ -696,7 +699,7 @@ Calculates logical NOT of the value.
 Returns an integer.
 Same as `!`.
 
-### EGA '`not_equal`' Function
+### EGA `not_equal` Function
 
 ```txt
 EGA function 'not_equal':
@@ -707,7 +710,7 @@ EGA function 'not_equal':
 Compares two values. Returns 1 if `value1` was different from `value2`. Otherwise returns zero.
 Same as `!=`.
 
-### EGA '`or`' Function
+### EGA `or` Function
 
 ```txt
 EGA function 'or':
@@ -720,7 +723,7 @@ Returns an integer.
 
 Same as `||`.
 
-### EGA '`plus`' Function
+### EGA `plus` Function
 
 ```txt
 EGA function 'plus':
@@ -733,7 +736,7 @@ Returns an integer.
 
 Same as `+`.
 
-### EGA '`print`' Function
+### EGA `print` Function
 
 ```txt
 EGA function 'print':
@@ -744,7 +747,7 @@ EGA function 'print':
 Outputs the values without quotation.
 No return value.
 
-### EGA '`println`' Function
+### EGA `println` Function
 
 ```txt
 EGA function 'println':
@@ -755,7 +758,7 @@ EGA function 'println':
 Outputs the values without quotation with a newline.
 No return value.
 
-### EGA '`remove`' Function
+### EGA `remove` Function
 
 ```txt
 EGA function 'remove':
@@ -770,7 +773,7 @@ If `ary_or_str` is a string, the substrings `target` are removed.
 Returns the array or the string of the results.
 This function doesn't change `ary_or_str`.
 
-### EGA '`replace`' Function
+### EGA `replace` Function
 
 ```txt
 EGA function 'replace':
@@ -783,7 +786,7 @@ If `ary_or_str` is a string, the substrings `from` are replaced with the `to` st
 Returns the array or the string of the results.
 This function doesn't change `ary_or_str`.
 
-### EGA '`right`' Function
+### EGA `right` Function
 
 ```txt
 EGA function 'right':
@@ -793,7 +796,7 @@ EGA function 'right':
 
 Returns an array or a string of `count` items at the right side of an array or a string.
 
-### EGA '`set`' Function
+### EGA `set` Function
 
 ```txt
 EGA function 'set':
@@ -807,7 +810,7 @@ Returns the value.
 
 Same as `=`.
 
-### EGA '`str`' Function
+### EGA `str` Function
 
 ```txt
 EGA function 'str':
@@ -818,7 +821,7 @@ EGA function 'str':
 Converts the value to a string.
 Returns a string.
 
-### EGA '`typeid`' Function
+### EGA `typeid` Function
 
 ```txt
 EGA function 'typeid':
@@ -833,7 +836,7 @@ If the value is an integer, then returns zero.
 If the value is a string, then returns `1`.
 If the value is an array, then returns `2`.
 
-### EGA '`u8fromu16`' Function
+### EGA `u8fromu16` Function
 
 ```txt
 EGA function 'u8fromu16':
@@ -846,7 +849,7 @@ Converts a UTF-16 string to a UTF-8 string.
 NOTE: The EGA standard string is UTF-8.
 You can convert a UTF-8 string into a UTF-16 binary string by this function.
 
-### EGA '`u16fromu8`' Function
+### EGA `u16fromu8` Function
 
 ```txt
 EGA function 'u16fromu8':
@@ -856,7 +859,7 @@ EGA function 'u16fromu8':
 
 Converts a UTF-8 string to a UTF-16 string.
 
-### EGA '`while`' Function
+### EGA `while` Function
 
 ```txt
 EGA function 'while':
@@ -873,7 +876,7 @@ The `cond` is the condition.
 
 You can break the loop by `break` function.
 
-### EGA '`xor`' Function
+### EGA `xor` Function
 
 ```txt
 EGA function 'xor':
@@ -897,7 +900,7 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_select`
 - `RES_unload_resh`
 
-### EGA '`RES_clone_by_lang`' Function
+### EGA `RES_clone_by_lang` Function
 
 ```txt
 EGA function 'RES_clone_by_lang':
@@ -914,7 +917,7 @@ EGA function 'RES_clone_by_lang':
 
 Returns `1` if cloned. Otherwise returns zero.
 
-### EGA '`RES_clone_by_name`' Function
+### EGA `RES_clone_by_name` Function
 
 ```txt
 EGA function 'RES_clone_by_name':
@@ -930,7 +933,7 @@ EGA function 'RES_clone_by_name':
 
 Returns `1` if cloned. Otherwise returns zero.
 
-### EGA '`RES_delete`' Function
+### EGA `RES_delete` Function
 
 ```txt
 EGA function 'RES_delete':
@@ -946,7 +949,7 @@ EGA function 'RES_delete':
 
 Returns `1` if deleted. Otherwise returns zero.
 
-### EGA '`RES_get_binary`' Function
+### EGA `RES_get_binary` Function
 
 ```txt
 EGA function 'RES_get_binary':
@@ -957,7 +960,7 @@ EGA function 'RES_get_binary':
 `RES_get_binary` gets the binary data of the specified resource data.
 Returns the binary string.
 
-### EGA '`RES_search`' Function
+### EGA `RES_search` Function
 
 ```txt
 EGA function 'RES_search':
@@ -971,7 +974,7 @@ EGA function 'RES_search':
 `name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
 `lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
 
-### EGA '`RES_select`' Function
+### EGA `RES_select` Function
 
 ```txt
 EGA function 'RES_select':
@@ -983,7 +986,7 @@ EGA function 'RES_select':
 Returns `1` if successful, zero if failed.
 
 
-### EGA '`RES_unload_resh`' Function
+### EGA `RES_unload_resh` Function
 
 ```txt
 EGA function 'RES_unload_resh':
