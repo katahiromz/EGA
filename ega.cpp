@@ -2221,7 +2221,7 @@ bool EGA_init(void)
     EGA_add_fn("typeid", 1, 1, EGA_typeid, "typeid(value)");
     EGA_add_fn("int", 1, 1, EGA_int, "int(value)");
     EGA_add_fn("str", 1, 1, EGA_str, "str(value)");
-    EGA_add_fn("array", 0, 256, EGA_array, "array(value1[, ...])");
+    EGA_add_fn("array", 0, 32767, EGA_array, "array(value1[, ...])");
     EGA_add_fn("binary", 0, 32767, EGA_binary, "binary(byte1[, ...])");
     EGA_add_fn("hex", 1, 1, EGA_hex, "hex(value)");
 

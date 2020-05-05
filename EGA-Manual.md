@@ -282,7 +282,7 @@ Same as `&&`.
 
 ```txt
 EGA function 'array':
-  arity: 0..256
+  arity: 0..32767
   usage: array(value1[, ...])
 ```
 
