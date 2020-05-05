@@ -434,7 +434,7 @@ EGA function 'dump':
 ```
 
 Outputs the values with quotations and commas if necessary.
-No return.
+No return value.
 
 ### EGA '`dumpln`' Function
 
@@ -742,7 +742,7 @@ EGA function 'print':
 ```
 
 Outputs the values without quotation.
-No return.
+No return value.
 
 ### EGA '`println`' Function
 
@@ -753,7 +753,7 @@ EGA function 'println':
 ```
 
 Outputs the values without quotation with a newline.
-No return.
+No return value.
 
 ### EGA '`remove`' Function
 
