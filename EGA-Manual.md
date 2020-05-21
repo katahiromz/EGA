@@ -76,7 +76,13 @@ The detailed descriptions of the EGA functions will be described later.
 ## Comments
 
 The comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
-The comments are ignored in EGA execution.
+The comments are ignored in execution of EGA program.
+
+For example:
+
+```txt
+@ This is a comment.
+```
 
 ## Values
 
@@ -85,7 +91,7 @@ The EGA values are integers, strings, and/or arrays.
 An EGA integer literal is a sequence of digit(s) (`0`, ..., `9`).
 
 An EGA string literal is a string wrapped by double quotations (`" "`).
-If the string contains a double quotation, it will be doubled in the string literal.
+If the string value contains a double quotation, it will be doubled in the string literal.
 
 The EGA array literal is a list of the EGA values it contains, separated by commas (`,`), and wrapped by braces (`{` and `}`).
 
@@ -103,6 +109,8 @@ Expression `*(3, 4)` is the multiplication of two integers `3` and `4`.
 
 You can compare two integers by `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
 
+To specify a negative value, use `minus` (`-`) function: `-(123)`.
+
 ## Strings
 
 Expression `"This is a string."` is a string literal of length 17.
@@ -115,7 +123,7 @@ See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `str` functions.
 
 ## Binarys
 
-In EGA, a binary is a string. See `binary` function.
+In EGA, a binary data is a string. See `binary` function.
 
 ## Arrays
 
@@ -132,16 +140,30 @@ See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `array` function
 
 In EGA, the boolean value is an integer value. Zero means false. Non-zero means true.
 
+See `not`, `and`, `or` functions.
+
 ## Conditional execution
 
 The special function `if` can switch the execution by condition.
+
+For example:
+
+```txt
+if(==(+(1, 1), 2), println("1 + 1 == 2"), println("1 + 1 != 2"))
+```
 
 ## Loops
 
 The special functions `for`, `foreach` and `while` can make an execution loop.
 The `break` special function can break the loop.
 
-## Normal functions vs. special functions
+For example:
+
+```txt
+for(i, 1, 10, println(i));
+```
+
+## Normal Functions vs. Special Functions
 
 In a call of the normal function, the parameters will be evaluated in the order of parameters.
 The special functions can change the order of expression evaluations and can ignore some parameters.
