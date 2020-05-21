@@ -1,4 +1,4 @@
-# The Programming Language EGA Version 6 Reference Manual
+# The Programming Language EGA Version 7 Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 6 by katahiromz                   @
+@ EGA Version 7 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 6 by katahiromz                   @
+@ EGA Version 7 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -65,7 +65,7 @@ To see brief usage of `print` function, enter "`help print`".
 ```txt
 EGA> help print;
 EGA function 'print':
-  arity: 0..256
+  arity: 0..32767
   usage: print(value, ...)
 
 EGA> 
@@ -380,7 +380,7 @@ Goes out of an EGA loop.
 
 ```txt
 EGA function 'cat':
-  arity: 1..256
+  arity: 1..32767
   usage: cat(ary_or_str_1, ary_or_str_2, ...)
 ```
 
@@ -440,7 +440,7 @@ Same as `/`.
 
 ```txt
 EGA function 'do':
-  arity: 0..256
+  arity: 0..32767
   usage: do(expr, ...)
 ```
 
@@ -453,7 +453,7 @@ You can break the execution by `break` function.
 
 ```txt
 EGA function 'dump':
-  arity: 0..256
+  arity: 0..32767
   usage: dump(value, ...)
 ```
 
@@ -464,7 +464,7 @@ No return value.
 
 ```txt
 EGA function 'dumpln':
-  arity: 0..256
+  arity: 0..32767
   usage: dumpln(value, ...)
 ```
 
@@ -762,7 +762,7 @@ Same as `+`.
 
 ```txt
 EGA function 'print':
-  arity: 0..256
+  arity: 0..32767
   usage: print(value, ...)
 ```
 
@@ -773,7 +773,7 @@ No return value.
 
 ```txt
 EGA function 'println':
-  arity: 0..256
+  arity: 0..32767
   usage: println(value, ...)
 ```
 

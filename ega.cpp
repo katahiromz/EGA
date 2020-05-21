@@ -2231,7 +2231,7 @@ bool EGA_init(void)
     EGA_add_fn("for", 4, 4, EGA_for, "for(var, min, max, expr)");
     EGA_add_fn("foreach", 3, 3, EGA_foreach, "foreach(var, ary, expr)");
     EGA_add_fn("while", 2, 2, EGA_while, "while(cond, expr)");
-    EGA_add_fn("do", 0, 256, EGA_do, "do(expr, ...)");
+    EGA_add_fn("do", 0, 32767, EGA_do, "do(expr, ...)");
     EGA_add_fn("exit", 0, 1, EGA_exit, "exit([value])");
     EGA_add_fn("break", 0, 0, EGA_break, "break()");
 
@@ -2251,11 +2251,11 @@ bool EGA_init(void)
     EGA_add_fn(">=", 2, 2, EGA_greater_equal, "greater_equal(value1, value2)");
 
     // print/input
-    EGA_add_fn("print", 0, 256, EGA_print, "print(value, ...)");
-    EGA_add_fn("println", 0, 256, EGA_println, "println(value, ...)");
-    EGA_add_fn("dump", 0, 256, EGA_dump, "dump(value, ...)");
-    EGA_add_fn("dumpln", 0, 256, EGA_dumpln, "dumpln(value, ...)");
-    EGA_add_fn("?", 0, 256, EGA_dumpln, "dumpln(value, ...)");
+    EGA_add_fn("print", 0, 32767, EGA_print, "print(value, ...)");
+    EGA_add_fn("println", 0, 32767, EGA_println, "println(value, ...)");
+    EGA_add_fn("dump", 0, 32767, EGA_dump, "dump(value, ...)");
+    EGA_add_fn("dumpln", 0, 32767, EGA_dumpln, "dumpln(value, ...)");
+    EGA_add_fn("?", 0, 32767, EGA_dumpln, "dumpln(value, ...)");
     EGA_add_fn("input", 0, 1, EGA_input, "input([message])");
 
     // arithmetic
@@ -2290,7 +2290,7 @@ bool EGA_init(void)
 
     // array/string manipulation
     EGA_add_fn("len", 1, 1, EGA_len, "len(ary_or_str)");
-    EGA_add_fn("cat", 1, 256, EGA_cat, "cat(ary_or_str_1, ary_or_str_2, ...)");
+    EGA_add_fn("cat", 1, 32767, EGA_cat, "cat(ary_or_str_1, ary_or_str_2, ...)");
     EGA_add_fn("[]", 2, 3, EGA_at, "at(ary_or_str, index[, value])");
     EGA_add_fn("at", 2, 3, EGA_at, "at(ary_or_str, index[, value])");
     EGA_add_fn("left", 2, 2, EGA_left, "left(ary_or_str, count)");
