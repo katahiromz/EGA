@@ -3,14 +3,16 @@
 // This file is public domain software.
 
 #ifndef EGA_HPP_
-#define EGA_HPP_    7 // Version 7
+#define EGA_HPP_    8 // Version 8
 
 #pragma once
 
 #include <vector>
+#include <string>
 #include <memory>
 #include <cstdlib>
 #include <cassert>
+#include <stdexcept>
 
 namespace EGA {
 
@@ -93,8 +95,6 @@ bool EGA_do_input(char *buf, size_t buflen);
 
 //////////////////////////////////////////////////////////////////////////////
 // exceptions
-
-#include <stdexcept>
 
 class EGA_exception : public std::runtime_error
 {

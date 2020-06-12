@@ -1688,11 +1688,15 @@ arg_t EGA_FN EGA_or(const args_t& args)
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
+        if (int i1 = EGA_get_int(ast1))
+            return make_arg<AstInt>(1);
+
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_get_int(ast1);
-            int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 || i2);
+            if (int i2 = EGA_get_int(ast2))
+                return make_arg<AstInt>(1);
+
+            return make_arg<AstInt>(0);
         }
     }
 
@@ -1705,11 +1709,17 @@ arg_t EGA_FN EGA_and(const args_t& args)
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
+        int i1 = EGA_get_int(ast1);
+        if (!i1)
+            return make_arg<AstInt>(0);
+
         if (auto ast2 = EGA_eval_arg(args[1], true))
         {
-            int i1 = EGA_get_int(ast1);
             int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 && i2);
+            if (!i2)
+                return make_arg<AstInt>(0);
+
+            return make_arg<AstInt>(1);
         }
     }
 

@@ -1,4 +1,4 @@
-# The Programming Language EGA Version 7 Reference Manual
+# The Programming Language EGA Version 8 Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 7 by katahiromz                   @
+@ EGA Version 8 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 7 by katahiromz                   @
+@ EGA Version 8 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -72,6 +72,13 @@ EGA>
 ```
 
 The detailed descriptions of the EGA functions will be described later.
+
+## History
+
+Change in Version 8:
+
+- Improved `or` function in evaluation way.
+- Improved `and` function in evaluation way.
 
 ## Comments
 
