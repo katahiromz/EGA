@@ -46,7 +46,7 @@ inline int mzcrt_isprint(char c)
 
 inline int mzcrt_iscntrl(char c)
 {
-    return (unsigned char)c < 0x20 || (unsigned char)c == 0x7F;
+    return (unsigned char)c < 0x20 || (unsigned char)c >= 0x7F;
 }
 
 inline int mzcrt_isspace(char c)
@@ -63,7 +63,7 @@ bool mstr_is_binary(const std::string& str)
 {
     for (auto ch : str)
     {
-        if (mzcrt_iscntrl(ch))
+        if (mzcrt_iscntrl(ch) || ch == '"')
             return true;
     }
     return false;
@@ -104,7 +104,7 @@ std::string mstr_quote2(const std::string& str)
         }
         else
         {
-            buf += ch;
+            buf += (char)ch;
         }
     }
     if (buf.size())
