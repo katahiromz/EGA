@@ -79,6 +79,7 @@ Change in Version 9:
 
 - Improved `binary` function.
 - Added `RES_set_binary` function.
+- Added `RES_constant` function.
 
 Change in Version 8:
 
@@ -928,6 +929,7 @@ RisohEditor EGA has the following functions as EGA extension:
 
 - `RES_clone_by_lang`
 - `RES_clone_by_name`
+- `RES_constant`
 - `RES_delete`
 - `RES_get_binary`
 - `RES_search`
@@ -967,6 +969,18 @@ EGA function 'RES_clone_by_name':
 `dest_name` must be an integer or a string of a new resource name.
 
 Returns `1` if cloned. Otherwise returns zero.
+
+### EGA `RES_constant` Function
+
+```txt
+EGA function 'RES_constant':
+  arity: 1
+  usage: usage: RES_constant(name)
+```
+
+The `RES_constant` function queries the database for the value of a constant.
+
+`name` must be a constant name. Returns the value if successful, otherwise zero.
 
 ### EGA `RES_delete` Function
 
