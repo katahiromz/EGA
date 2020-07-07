@@ -1023,12 +1023,12 @@ Returns `1` if successful, zero if failed.
 ### EGA `RES_set_binary` Function
 
 ```txt
-EGA function 'RES_get_binary':
+EGA function 'RES_set_binary':
   arity: 4
   usage: RES_set_binary(type, name, lang, binary)
 ```
 
-`RES_set_binary` sets the binary data to the specified resource data.
+`RES_set_binary` sets the binary data as the specified resource type, resource name, and language.
 Returns 1 if successful, zero if failed.
 
 ### EGA `RES_unload_resh` Function
