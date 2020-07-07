@@ -3,7 +3,7 @@
 // This file is public domain software.
 
 #ifndef EGA_HPP_
-#define EGA_HPP_    8 // Version 8
+#define EGA_HPP_    9 // Version 9
 
 #pragma once
 

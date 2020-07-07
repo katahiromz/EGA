@@ -44,6 +44,11 @@ inline int mzcrt_isprint(char c)
     return 0x20 <= (unsigned char)c && (unsigned char)c <= 0x7E;
 }
 
+inline int mzcrt_iscntrl(char c)
+{
+    return (unsigned char)c < 0x20 || (unsigned char)c == 0x7F;
+}
+
 inline int mzcrt_isspace(char c)
 {
     return strchr(" \t\n\r\f\v", c) != NULL;
@@ -58,7 +63,7 @@ bool mstr_is_binary(const std::string& str)
 {
     for (auto ch : str)
     {
-        if (!mzcrt_isprint(ch))
+        if (mzcrt_iscntrl(ch))
             return true;
     }
     return false;
@@ -71,27 +76,46 @@ std::string mstr_quote2(const std::string& str)
 
     std::string ret = "binary(";
     bool first = true;
+    std::string buf;
     for (size_t i = 0; i < str.size(); ++i)
     {
         unsigned char ch = str[i];
 
+        if (mzcrt_iscntrl(ch) || ch == '"')
+        {
+            if (!first)
+            {
+                ret += ", ";
+            }
+
+            if (buf.size())
+            {
+                ret += '\"';
+                ret += buf;
+                ret += '\"';
+                buf.clear();
+
+                ret += ", ";
+            }
+
+            ret += mstr_to_string(ch);
+
+            first = false;
+        }
+        else
+        {
+            buf += ch;
+        }
+    }
+    if (buf.size())
+    {
         if (!first)
         {
             ret += ", ";
         }
-
-        if (mzcrt_isgraph(ch) && ch != '"')
-        {
-            ret += '\"';
-            ret += ch;
-            ret += '\"';
-        }
-        else
-        {
-            ret += mstr_to_string(ch);
-        }
-
-        first = false;
+        ret += '\"';
+        ret += buf;
+        ret += '\"';
     }
     ret += ")";
     return ret;
@@ -963,7 +987,7 @@ arg_t EGA_FN EGA_binary(const args_t& args)
                 str += (char)EGA_get_int(ast);
                 break;
             case AST_STR:
-                str += EGA_get_str(ast)[0];
+                str += EGA_get_str(ast);
                 break;
             default:
                 throw EGA_type_mismatch(ast->get_lineno());
@@ -2232,7 +2256,7 @@ bool EGA_init(void)
     EGA_add_fn("int", 1, 1, EGA_int, "int(value)");
     EGA_add_fn("str", 1, 1, EGA_str, "str(value)");
     EGA_add_fn("array", 0, 32767, EGA_array, "array(value1[, ...])");
-    EGA_add_fn("binary", 0, 32767, EGA_binary, "binary(byte1[, ...])");
+    EGA_add_fn("binary", 0, 32767, EGA_binary, "binary(string_or_byte[, ...])");
     EGA_add_fn("hex", 1, 1, EGA_hex, "hex(value)");
 
     // control structure

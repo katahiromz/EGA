@@ -1,4 +1,4 @@
-# The Programming Language EGA Version 8 Reference Manual
+# The Programming Language EGA Version 9 Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 8 by katahiromz                   @
+@ EGA Version 9 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 8 by katahiromz                   @
+@ EGA Version 9 by katahiromz                   @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -74,6 +74,11 @@ EGA>
 The detailed descriptions of the EGA functions will be described later.
 
 ## History
+
+Change in Version 9:
+
+- Improved `binary` function.
+- Added `RES_set_binary` function.
 
 Change in Version 8:
 
@@ -342,11 +347,11 @@ Same as `[]`.
 ```txt
 EGA function 'binary':
   arity: 0..32767
-  usage: binary(byte1[, ...])
+  usage: binary(string_or_byte[, ...])
 ```
 
-Creates a binary string of the specified bytes.
-Each parameter is an integer or a string that represents a byte.
+Creates a binary string of the specified parameters.
+Each parameter is an integer or a string.
 Returns a binary string.
 
 ### EGA `bitand` Function
@@ -927,6 +932,7 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_get_binary`
 - `RES_search`
 - `RES_select`
+- `RES_set_binary`
 - `RES_unload_resh`
 
 ### EGA `RES_clone_by_lang` Function
@@ -1014,6 +1020,16 @@ EGA function 'RES_select':
 `RES_select` selects an item on the RisohEditor treeview.
 Returns `1` if successful, zero if failed.
 
+### EGA `RES_set_binary` Function
+
+```txt
+EGA function 'RES_get_binary':
+  arity: 4
+  usage: RES_set_binary(type, name, lang, binary)
+```
+
+`RES_set_binary` sets the binary data to the specified resource data.
+Returns 1 if successful, zero if failed.
 
 ### EGA `RES_unload_resh` Function
 
