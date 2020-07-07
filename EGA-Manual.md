@@ -79,7 +79,7 @@ Change in Version 9:
 
 - Improved `binary` function.
 - Added `RES_set_binary` function.
-- Added `RES_constant` function.
+- Added `RES_const` function.
 
 Change in Version 8:
 
@@ -929,7 +929,7 @@ RisohEditor EGA has the following functions as EGA extension:
 
 - `RES_clone_by_lang`
 - `RES_clone_by_name`
-- `RES_constant`
+- `RES_const`
 - `RES_delete`
 - `RES_get_binary`
 - `RES_search`
@@ -970,15 +970,15 @@ EGA function 'RES_clone_by_name':
 
 Returns `1` if cloned. Otherwise returns zero.
 
-### EGA `RES_constant` Function
+### EGA `RES_const` Function
 
 ```txt
-EGA function 'RES_constant':
+EGA function 'RES_const':
   arity: 1
-  usage: usage: RES_constant(name)
+  usage: usage: RES_const(name)
 ```
 
-The `RES_constant` function queries the database for the value of a constant.
+The `RES_const` function queries the database for the value of a constant.
 
 `name` must be a constant name. Returns the value if successful, otherwise zero.
 
