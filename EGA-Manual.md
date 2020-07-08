@@ -73,7 +73,7 @@ EGA>
 
 The detailed descriptions of the EGA functions will be described later.
 
-## History
+## What's New
 
 Change in Version 9:
 
