@@ -1034,12 +1034,12 @@ arg_t EGA_FN EGA_u8fromu16(const args_t& args)
     {
         std::string u16 = EGA_get_str(ast);
 #ifdef _WIN32
-        std::wstring utf16((const wchar_t *)u16.c_str(),
-                           (const wchar_t *)u16.c_str() + (u16.size() / sizeof(wchar_t)));
+        const wchar_t *psz = reinterpret_cast<const wchar_t *>(u16.c_str());
+        std::wstring utf16(psz, psz + (u16.size() / sizeof(wchar_t)));
         UTF_L_to_u8<'?'>(utf16, utf8);
 #else
-        std::u16string utf16((const char16_t *)u16.c_str(),
-                             (const char16_t *)u16.c_str() + (u16.size() / sizeof(char16_t)));
+        const char16_t *psz = reinterpret_cast<const char16_t *>(u16.c_str());
+        std::u16string utf16(psz, psz + (u16.size() / sizeof(char16_t)));
         UTF_u_to_u8<'?'>(utf16, utf8);
 #endif
     }
