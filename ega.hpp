@@ -221,7 +221,7 @@ public:
     static int s_alive_count;
     static void alive_count(bool add);
 
-    Token(TokenType type, size_t lineno, const std::string& str)
+    Token(TokenType type, int lineno, const std::string& str)
         : m_type(type)
         , m_lineno(lineno)
         , m_str(str)

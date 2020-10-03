@@ -177,7 +177,7 @@ inline bool is_ident_char(char ch)
 
 bool EGA_default_input(char *buf, size_t buflen)
 {
-    return fgets(buf, buflen, stdin) != NULL;
+    return fgets(buf, int(buflen), stdin) != NULL;
 }
 
 static EGA_INPUT_FN s_input_fn = EGA_default_input;
