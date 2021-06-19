@@ -1,8 +1,8 @@
-# The Programming Language EGA Version 9 Reference Manual
+# The Programming Language EGA Version 10 Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
-Copyright (C) 2020 Katayama Hirofumi MZ.
+Copyright (C) 2020-2021 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
@@ -927,6 +927,8 @@ Same as `^`.
 
 RisohEditor EGA has the following functions as EGA extension:
 
+- `RES_load`
+- `RES_save`
 - `RES_clone_by_lang`
 - `RES_clone_by_name`
 - `RES_const`
@@ -936,6 +938,43 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_select`
 - `RES_set_binary`
 - `RES_unload_resh`
+
+### EGA `RES_load` Function
+
+```txt
+EGA function 'RES_load':
+  arity: 1..2
+  usage: RES_load(filename[, options])
+```
+
+`RES_load` loads the resource file.
+
+`options` is an empty string or `"(no-load-res-h)"`;
+
+### EGA `RES_save` Function
+
+```txt
+EGA function 'RES_load':
+  arity: 1..2
+  usage: RES_save(filename[, options])
+```
+
+`RES_save` saves the resource file.
+
+`options` is an empty string or the combitions of the following strings.
+
+- `"(idc-static)"`
+- `"(compress)"`
+- `"(sep-lang)"`
+- `"(no-res-folder)"`
+- `"(lang-macro)"`
+- `"(less-comments)"`
+- `"(wrap-manifest)"`
+- `"(begin-end)"`
+- `"(utf-16)"`
+- `"(backup)"`
+
+For example: `RES_save("C:\Users\katahiromz\Desktop\a.res", "(sep-lang)(compress)")`;
 
 ### EGA `RES_clone_by_lang` Function
 
