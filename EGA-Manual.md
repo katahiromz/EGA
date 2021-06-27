@@ -1,4 +1,4 @@
-# The Programming Language EGA Version 10 Reference Manual
+# The Programming Language EGA Version 11 Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -973,6 +973,7 @@ EGA function 'RES_load':
 - `"(begin-end)"`
 - `"(utf-16)"`
 - `"(backup)"`
+- `"(ms-msgtbl)"`
 
 For example: `RES_save("C:\Users\katahiromz\Desktop\a.res", "(sep-lang)(compress)")`;
 
