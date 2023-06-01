@@ -1,8 +1,8 @@
-# The Programming Language EGA Version 11 Reference Manual
+# The Programming Language EGA Reference Manual Version 12
 
 Written by Katayama Hirofumi MZ.
 
-Copyright (C) 2020-2021 Katayama Hirofumi MZ.
+Copyright (C) 2020-2023 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 9 by katahiromz                   @
+@ EGA Version 10 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 9 by katahiromz                   @
+@ EGA Version 10 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -74,6 +74,10 @@ EGA>
 The detailed descriptions of the EGA functions will be described later.
 
 ## What's New
+
+Change in Version 10:
+
+- Added `RES_str_get` function.
 
 Change in Version 9:
 
@@ -938,6 +942,7 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_select`
 - `RES_set_binary`
 - `RES_unload_resh`
+- `RES_str_get`
 
 ### EGA `RES_load` Function
 
@@ -1095,6 +1100,19 @@ EGA function 'RES_unload_resh':
 
 `RES_unload_resh` unloads the "`resource.h`" file.
 Always returns `1`.
+
+### EGA `RES_str_get` Function
+
+```txt
+EGA function 'RES_str_get':
+  arity: 1..2
+  usage: RES_str_get(lang[, str_id])
+```
+
+`RES_str_get` reads the resource string table.
+If `str_id` specified, then returns a UTF-8 string.
+If `str_id` not specified, then returns an array of pairs of string ID and text.
+Returns zero if failed.
 
 ## How can I extend EGA?
 

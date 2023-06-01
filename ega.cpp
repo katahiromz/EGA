@@ -2395,7 +2395,7 @@ int EGA_interactive(const char *filename, bool echo)
     s_echo_input = echo;
 
     EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-    EGA_do_print("@ EGA Version %d by katahiromz                   @\n", EGA_HPP_);
+    EGA_do_print("@ EGA Version %d by katahiromz                  @\n", EGA_HPP_);
     if (!filename)
         EGA_do_print("@ Type 'exit' to exit. Type 'help' to see help. @\n");
     EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
