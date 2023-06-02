@@ -1140,4 +1140,4 @@ Returns zero if failed.
 
 ## Special thanks
 
-- `md2pdf`: https://md2pdf.netlify.com/
+- https://www.aconvert.com/pdf/md-to-pdf/
