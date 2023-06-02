@@ -881,7 +881,7 @@ int EGA_get_int(arg_t ast)
     return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
-static std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
+std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)

@@ -632,6 +632,7 @@ bool EGA_file_input(const char *filename);
 arg_t EGA_eval_arg(arg_t ast, bool do_check);
 int EGA_get_int(arg_t ast);
 std::string EGA_get_str(arg_t ast);
+std::shared_ptr<AstContainer> EGA_get_array(arg_t ast);
 
 } // namespace EGA
 

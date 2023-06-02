@@ -78,6 +78,7 @@ The detailed descriptions of the EGA functions will be described later.
 Change in Version 10:
 
 - Added `RES_str_get` function.
+- Added `RES_str_set` function.
 
 Change in Version 9:
 
@@ -943,6 +944,7 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_set_binary`
 - `RES_unload_resh`
 - `RES_str_get`
+- `RES_str_set`
 
 ### EGA `RES_load` Function
 
@@ -1112,6 +1114,21 @@ EGA function 'RES_str_get':
 `RES_str_get` reads the resource string table.
 If `str_id` specified, then returns a UTF-8 string.
 If `str_id` not specified, then returns an array of pairs of string ID and text.
+Returns zero if failed.
+
+### EGA `RES_str_set` Function
+
+```txt
+EGA function 'RES_str_set':
+  arity: 2..3
+  usage: RES_str_set(lang, str_id, str) or RES_str_set(lang, ary)
+```
+
+`RES_str_set` writes the resource string table.
+If `str_id` specified, then write a UTF-8 string to the string table.
+If the string was empty, then the resource string will be cleared.
+If `str_id` not specified, then set an array of pairs of string ID and text to the string table.
+Returns one if successful.
 Returns zero if failed.
 
 ## How can I extend EGA?
