@@ -1114,7 +1114,7 @@ EGA function 'RES_str_get':
 `RES_str_get` reads the resource string table.
 If `str_id` specified, then returns a UTF-8 string.
 If `str_id` not specified, then returns an array of pairs of string ID and text.
-Returns zero if failed.
+If failed, returns an empty string or an empty array.
 
 ### EGA `RES_str_set` Function
 

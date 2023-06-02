@@ -489,7 +489,7 @@ protected:
 class AstStr : public AstBase
 {
 public:
-    AstStr(const std::string& str, int lineno = 0)
+    AstStr(const std::string& str = "", int lineno = 0)
         : AstBase(AST_STR, lineno)
         , m_str(str)
     {
@@ -559,7 +559,7 @@ protected:
 class AstContainer : public AstBase
 {
 public:
-    AstContainer(AstType type, int lineno = 0, const std::string& str = "")
+    AstContainer(AstType type = AST_ARRAY, int lineno = 0, const std::string& str = "")
         : AstBase(type, lineno)
         , m_str(str)
     {
