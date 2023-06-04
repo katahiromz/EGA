@@ -77,8 +77,8 @@ The detailed descriptions of the EGA functions will be described later.
 
 Change in Version 10:
 
-- Added `RES_str_get` function.
-- Added `RES_str_set` function.
+- Added `RES_str_get` and `RES_str_set` functions.
+- Added `RES_get_text` and `RES_set_text` functions.
 
 Change in Version 9:
 
@@ -1128,6 +1128,29 @@ EGA function 'RES_str_set':
 If `str_id` specified, then write a UTF-8 string to the string table.
 If the string was empty, then the resource string will be cleared.
 If `str_id` not specified, then set an array of pairs of string ID and text to the string table.
+Returns one if successful.
+Returns zero if failed.
+
+### EGA `RES_get_text` Function
+
+```txt
+EGA function 'RES_get_text':
+  arity: 3..3
+  usage: RES_get_text(type, name, lang)
+```
+
+`RES_get_text` gets the text of the resource.
+If failed, returns an empty string.
+
+### EGA `RES_set_text` Function
+
+```txt
+EGA function 'RES_set_text':
+  arity: 4..4
+  usage: RES_set_text(type, name, lang, text)
+```
+
+`RES_set_text` sets the text of the resource item and compile the text.
 Returns one if successful.
 Returns zero if failed.
 
