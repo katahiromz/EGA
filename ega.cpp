@@ -177,6 +177,8 @@ inline bool is_ident_char(char ch)
 
 bool EGA_default_input(char *buf, size_t buflen)
 {
+    if (buf == NULL && buflen == 0)
+        return true;
     return fgets(buf, int(buflen), stdin) != NULL;
 }
 
@@ -2442,6 +2444,8 @@ int EGA_interactive(const char *filename, bool echo)
 
         if (!EGA_eval_text_ex(buf))
             break;
+
+        (*s_input_fn)(NULL, 0);
     }
 
     return 0;
@@ -2474,6 +2478,7 @@ bool EGA_file_input(const char *filename)
         fclose(fp);
 
         EGA_eval_text_ex(str.c_str());
+        (*s_input_fn)(NULL, 0);
         return true;
     }
 
