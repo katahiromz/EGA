@@ -1,8 +1,8 @@
-# The Programming Language EGA Reference Manual Version 12
+# The Programming Language EGA Reference Manual Version 13
 
 Written by Katayama Hirofumi MZ.
 
-Copyright (C) 2020-2023 Katayama Hirofumi MZ.
+Copyright (C) 2020-2024 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 10 by katahiromz                  @
+@ EGA Version 11 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 10 by katahiromz                  @
+@ EGA Version 11 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -74,6 +74,11 @@ EGA>
 The detailed descriptions of the EGA functions will be described later.
 
 ## What's New
+
+Change in Version 11:
+
+- Removed EGA `input` function.
+- Modified design of input function.
 
 Change in Version 10:
 
@@ -186,10 +191,7 @@ for(i, 1, 10, println(i));
 In a call of the normal function, the parameters will be evaluated in the order of parameters.
 The special functions can change the order of expression evaluations and can ignore some parameters.
 
-## Input and output
-
-The `input` function prompts the user for a string and waits for input.
-If input is done, the function returns a string.
+## Output
 
 The `print`, `println`, `dump` and `dumpln` functions shows text of the specified values to the user.
 
@@ -282,7 +284,6 @@ Type a string? This is a test.
 ###################
 ```
 
-The `input` function prompts user input.
 The `cat` function concatnates strings.
 
 ### Sample `plus.ega`
@@ -605,18 +606,6 @@ Chooses the execution by the condition.
 If the integer value `cond` was non-zero, then `true_case` will be evaluated.
 If `cond` was zero, then `false_case` will be evaluated if any.
 Returns the evaluated value of `true_case` or `false_case`.
-
-### EGA `input` Function
-
-```txt
-EGA function 'input':
-  arity: 0..1
-  usage: input([message])
-```
-
-Gets a text string as input from EGA console.
-`message` will be shown if any.
-Returns the text string.
 
 ### EGA `int` Function
 
@@ -1160,7 +1149,3 @@ Returns zero if failed.
 2. Include `ega.hpp`.
 3. Call the following EGA C++ functions: `EGA_init`, `EGA_set_input_fn` and `EGA_set_print_fn`.
 4. Add your EGA functions by `EGA_add_fn` C++ function.
-
-## Special thanks
-
-- https://www.aconvert.com/pdf/md-to-pdf/
