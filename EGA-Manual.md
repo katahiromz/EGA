@@ -1,8 +1,8 @@
-# The Programming Language EGA Reference Manual Version 13
+# The Programming Language EGA Reference Manual Version 14
 
 Written by Katayama Hirofumi MZ.
 
-Copyright (C) 2020-2024 Katayama Hirofumi MZ.
+Copyright (C) 2020-2025 Katayama Hirofumi MZ.
 
 ## What is EGA?
 
@@ -968,6 +968,7 @@ EGA function 'RES_load':
 - `"(wrap-manifest)"`
 - `"(begin-end)"`
 - `"(utf-16)"`
+- `"(bom)"`
 - `"(backup)"`
 - `"(ms-msgtbl)"`
 
