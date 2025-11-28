@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual Version 14
+# The Programming Language EGA Reference Manual Version 15
 
 Written by Katayama Hirofumi MZ.
 
@@ -985,7 +985,7 @@ EGA function 'RES_clone_by_lang':
 `RES_clone_by_name` clones the resource data as another resource language.
 
 `type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero, then search all resource names.
+`name` must be an integer or a string of a resource name. If `name` is `"*"`, then search all resource names.
 `src_lang` must be an integer that specifies the source language ID. If `lang` is `-1`, then search all resource languages.
 `dest_lang` must be an integer that specifies the destination language ID.
 
@@ -1002,7 +1002,7 @@ EGA function 'RES_clone_by_name':
 `RES_clone_by_name` clones the resource data as another resource name.
 
 `type` must be an integer or a string of a resource type. If `type` is zero, then search all resource types.
-`src_name` must be an integer or a string of a resource name. If `src_name` is zero, then search all resource names.
+`src_name` must be an integer or a string of a resource name. If `src_name` is `"*"`, then search all resource names.
 `dest_name` must be an integer or a string of a new resource name.
 
 Returns `1` if cloned. Otherwise returns zero.
@@ -1030,7 +1030,7 @@ EGA function 'RES_delete':
 `RES_delete` deletes the resource items.
 
 `type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
+`name` must be an integer or a string of a resource name. If `name` is `"*"` or omitted, then search all resource names.
 `lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
 
 Returns `1` if deleted. Otherwise returns zero.
@@ -1057,7 +1057,7 @@ EGA function 'RES_search':
 `RES_search` returns an array of the resource items.
 
 `type` must be an integer or a string of a resource type. If `type` is zero or omitted, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is zero or omitted, then search all resource names.
+`name` must be an integer or a string of a resource name. If `name` is `"*"` or omitted, then search all resource names.
 `lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
 
 ### EGA `RES_select` Function
