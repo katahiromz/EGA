@@ -1,9 +1,9 @@
 // ega.hpp --- The Programming Language EGA
-// Copyright (C) 2020-2024 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>
+// Copyright (C) 2020-2026 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>
 // This file is public domain software.
 
 #ifndef EGA_HPP_
-#define EGA_HPP_    11 // Version 11
+#define EGA_HPP_    12 // Version 12
 
 #pragma once
 
