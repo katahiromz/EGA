@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual Version 16
+# The Programming Language EGA Reference Manual Version 17
 
 Written by Katayama Hirofumi MZ.
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 11 by katahiromz                  @
+@ EGA Version 13 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 11 by katahiromz                  @
+@ EGA Version 13 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -74,6 +74,10 @@ EGA>
 The detailed descriptions of the EGA functions will be described later.
 
 ## What's New
+
+Change in Version 13:
+
+- Arity changed of function `add`(`+`), `mul`(`*`), `or`(`||`) and `and`(`&&`).
 
 Change in Version 11:
 
@@ -311,11 +315,11 @@ The following sections are a list of the EGA functions.
 
 ```txt
 EGA function 'and':
-  arity: 2
+  arity: 2..32767
   usage: and(value1, value2)
 ```
 
-Calculates logical AND of two integers. Returns an integer.
+Calculates logical AND of two integers or more. Returns an integer.
 
 Same as `&&`.
 
@@ -707,11 +711,11 @@ Same as `%`.
 
 ```txt
 EGA function 'mul':
-  arity: 2
-  usage: mul(int1, int2)
+  arity: 2..32767
+  usage: mul(int1, int2, ...)
 ```
 
-Calculates multiplication of two integers.
+Calculates multiplication of two integers or more.
 Returns an integer.
 
 Same as `*`.
@@ -743,11 +747,11 @@ Same as `!=`.
 
 ```txt
 EGA function 'or':
-  arity: 2
-  usage: or(value1, value2)
+  arity: 2..32767
+  usage: or(value1, value2, ...)
 ```
 
-Calculates logical OR of two values.
+Calculates logical OR of two or more values.
 Returns an integer.
 
 Same as `||`.
@@ -756,11 +760,11 @@ Same as `||`.
 
 ```txt
 EGA function 'plus':
-  arity: 2
-  usage: plus(int1, int2)
+  arity: 1..32767
+  usage: plus(int1, ...)
 ```
 
-Calculates sum of two integer values.
+Calculates sum of two integer values or more.
 Returns an integer.
 
 Same as `+`.

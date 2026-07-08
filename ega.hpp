@@ -3,7 +3,7 @@
 // This file is public domain software.
 
 #ifndef EGA_HPP_
-#define EGA_HPP_    12 // Version 12
+#define EGA_HPP_    13 // Version 13
 
 #pragma once
 
@@ -142,8 +142,8 @@ public:
 class EGA_arity_exception : public EGA_exception
 {
 public:
-    EGA_arity_exception(int lineno)
-        : EGA_exception("arity mismatch", lineno)
+    EGA_arity_exception(const std::string& fname, int lineno)
+        : EGA_exception(std::string("arity mismatch in function '") + fname + "'", lineno)
     {
     }
 };

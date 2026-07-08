@@ -799,7 +799,7 @@ EGA_eval_fn(const std::string& name, const args_t& args, int lineno)
             if (fn->min_args <= args.size() && args.size() <= fn->max_args)
                 return (*(fn->proc))(args);
             else
-                throw EGA_arity_exception(lineno);
+                throw EGA_arity_exception(name, lineno);
         }
     }
     else
@@ -1262,16 +1262,18 @@ arg_t EGA_FN EGA_plus(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval_arg(args[0], true))
+    size_t index = 0;
+    int value = 0;
+    while (index < args.size())
     {
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        if (auto ast1 = EGA_eval_arg(args[index++], true))
         {
             int i1 = EGA_get_int(ast1);
-            int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 + i2);
+            value += i1;
         }
     }
-    return NULL;
+
+    return make_arg<AstInt>(value);
 }
 
 arg_t EGA_FN EGA_minus(const args_t& args)
@@ -1308,17 +1310,18 @@ arg_t EGA_FN EGA_mul(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval_arg(args[0], true))
+    size_t index = 0;
+    int value = 1;
+    while (index < args.size())
     {
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        if (auto ast1 = EGA_eval_arg(args[index++], true))
         {
             int i1 = EGA_get_int(ast1);
-            int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 * i2);
+            value *= i1;
         }
     }
 
-    return NULL;
+    return make_arg<AstInt>(value);
 }
 
 arg_t EGA_FN EGA_div(const args_t& args)
@@ -1571,7 +1574,7 @@ arg_t EGA_FN EGA_at(const args_t& args)
     EVAL_DEBUG();
 
     if (args.size() != 2 && args.size() != 3)
-        throw EGA_arity_exception(args[0]->get_lineno());
+        throw EGA_arity_exception("at", args[0]->get_lineno());
 
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
@@ -1681,44 +1684,35 @@ arg_t EGA_FN EGA_or(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval_arg(args[0], true))
+    size_t index = 0;
+    while (index < args.size())
     {
-        if (int i1 = EGA_get_int(ast1))
-            return make_arg<AstInt>(1);
-
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        if (auto ast1 = EGA_eval_arg(args[index++], true))
         {
-            if (int i2 = EGA_get_int(ast2))
+            if (int i1 = EGA_get_int(ast1))
                 return make_arg<AstInt>(1);
-
-            return make_arg<AstInt>(0);
         }
     }
 
-    return NULL;
+    return make_arg<AstInt>(0);
 }
 
 arg_t EGA_FN EGA_and(const args_t& args)
 {
     EVAL_DEBUG();
 
-    if (auto ast1 = EGA_eval_arg(args[0], true))
+    size_t index = 0;
+    while (index < args.size())
     {
-        int i1 = EGA_get_int(ast1);
-        if (!i1)
-            return make_arg<AstInt>(0);
-
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        if (auto ast1 = EGA_eval_arg(args[index++], true))
         {
-            int i2 = EGA_get_int(ast2);
-            if (!i2)
+            int i1 = EGA_get_int(ast1);
+            if (!i1)
                 return make_arg<AstInt>(0);
-
-            return make_arg<AstInt>(1);
         }
     }
 
-    return NULL;
+    return make_arg<AstInt>(1);
 }
 
 arg_t EGA_FN EGA_compl(const args_t& args)
@@ -2263,12 +2257,12 @@ bool EGA_init(void)
     EGA_add_fn("?", 0, 32767, EGA_dumpln, "dumpln(value, ...)");
 
     // arithmetic
-    EGA_add_fn("plus", 2, 2, EGA_plus, "plus(int1, int2)");
-    EGA_add_fn("+", 2, 2, EGA_plus, "plus(int1, int2)");
+    EGA_add_fn("plus", 1, 32767, EGA_plus, "plus(int1, int2)");
+    EGA_add_fn("+", 1, 32767, EGA_plus, "plus(int1, int2)");
     EGA_add_fn("minus", 1, 2, EGA_minus, "minus(int1[, int2])");
     EGA_add_fn("-", 1, 2, EGA_minus, "minus(int1[, int2])");
-    EGA_add_fn("mul", 2, 2, EGA_mul, "mul(int1, int2)");
-    EGA_add_fn("*", 2, 2, EGA_mul, "mul(int1, int2)");
+    EGA_add_fn("mul", 2, 32767, EGA_mul, "mul(int1, int2)");
+    EGA_add_fn("*", 2, 32767, EGA_mul, "mul(int1, int2)");
     EGA_add_fn("div", 2, 2, EGA_div, "div(int1, int2)");
     EGA_add_fn("/", 2, 2, EGA_div, "div(int1, int2)");
     EGA_add_fn("mod", 2, 2, EGA_mod, "mod(int1, int2)");
@@ -2277,10 +2271,10 @@ bool EGA_init(void)
     // logical
     EGA_add_fn("not", 1, 1, EGA_not, "not(value)");
     EGA_add_fn("!", 1, 1, EGA_not, "not(value)");
-    EGA_add_fn("or", 2, 2, EGA_or, "or(value1, value2)");
-    EGA_add_fn("||", 2, 2, EGA_or, "or(value1, value2)");
-    EGA_add_fn("and", 2, 2, EGA_and, "and(value1, value2)");
-    EGA_add_fn("&&", 2, 2, EGA_and, "and(value1, value2)");
+    EGA_add_fn("or", 2, 32767, EGA_or, "or(value1, value2)");
+    EGA_add_fn("||", 2, 32767, EGA_or, "or(value1, value2)");
+    EGA_add_fn("and", 2, 32767, EGA_and, "and(value1, value2)");
+    EGA_add_fn("&&", 2, 32767, EGA_and, "and(value1, value2)");
 
     // bit operation
     EGA_add_fn("compl", 1, 1, EGA_compl, "compl(value)");
