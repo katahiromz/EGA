@@ -131,13 +131,13 @@ std::string AstStr::dump(bool q) const
 // Is the specified character valid for the first character of the identifier?
 inline bool is_ident_fchar(char ch)
 {
-    return std::isalpha(ch) || std::strchr("_+-[]<>=!~*&|%^?:", ch) != NULL;
+    return std::isalpha(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != NULL;
 }
 
 // Is the specified character valid for the second character of the identifier?
 inline bool is_ident_char(char ch)
 {
-    return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:", ch) != NULL;
+    return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != NULL;
 }
 
 /*static*/ int Token::s_alive_count = 0;
@@ -1334,6 +1334,10 @@ arg_t EGA_FN EGA_div(const args_t& args)
         {
             int i1 = EGA_get_int(ast1);
             int i2 = EGA_get_int(ast2);
+
+            if (i2 == 0)
+                throw EGA_division_by_zero(args[1]->get_lineno());
+
             return make_arg<AstInt>(i1 / i2);
         }
     }
@@ -1351,6 +1355,10 @@ arg_t EGA_FN EGA_mod(const args_t& args)
         {
             int i1 = EGA_get_int(ast1);
             int i2 = EGA_get_int(ast2);
+
+            if (i2 == 0)
+                throw EGA_division_by_zero(args[1]->get_lineno());
+
             return make_arg<AstInt>(i1 % i2);
         }
     }

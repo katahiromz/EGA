@@ -130,6 +130,14 @@ public:
     }
 };
 
+class EGA_division_by_zero : public EGA_exception
+{
+public:
+    EGA_division_by_zero(int lineno) : EGA_exception("division by zero", lineno)
+    {
+    }
+};
+
 class EGA_undefined_variable : public EGA_exception
 {
 public:
