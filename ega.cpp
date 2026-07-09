@@ -23,8 +23,9 @@ typedef std::unordered_map<std::string, arg_t> var_map_t;
 
 static fn_map_t s_fn_map;
 static var_map_t s_var_map;
-static bool s_interactive = false;
-static bool s_echo_input = false;
+static volatile bool s_interactive = false;
+static volatile bool s_echo_input = false;
+static volatile bool s_stopping = false;
 
 fn_t EGA_get_fn(const std::string& name);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args, int lineno);
@@ -718,6 +719,9 @@ arg_t AstVar::eval() const
 
 arg_t AstContainer::eval() const
 {
+	if (EGA_is_stopping())
+        throw EGA_control_break(0);
+
     switch (m_type)
     {
     case AST_ARRAY:
@@ -812,6 +816,8 @@ EGA_eval_fn(const std::string& name, const args_t& args, int lineno)
 arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check)
 {
     EVAL_DEBUG();
+    if (EGA_is_stopping())
+        throw EGA_control_break(0);
     if (!ast)
         throw EGA_syntax_error(0);
     auto ret = ast->eval();
@@ -853,6 +859,10 @@ bool EGA_eval_text_ex(const char *text)
     try
     {
         EGA_eval_text(text);
+    }
+    catch (EGA_control_break& e)
+    {
+        return false;
     }
     catch (EGA_exit_exception& e)
     {
@@ -2215,6 +2225,8 @@ arg_t EGA_FN EGA_array(const args_t& args)
 
 bool EGA_init(void)
 {
+    s_stopping = false;
+
     EGA_set_input_fn(EGA_default_input);
     EGA_set_print_fn(EGA_default_print);
 
@@ -2315,8 +2327,8 @@ void
 EGA_uninit(void)
 {
     s_fn_map.clear();
-
-    s_var_map.clear();
+	s_var_map.clear();
+	s_stopping = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2454,6 +2466,17 @@ bool EGA_file_input(const char *filename)
 
     EGA_do_print("ERROR: cannot open file '%s'\n", filename);
     return false;
+}
+
+bool EGA_stop(void)
+{
+    s_stopping = true;
+	return true;
+}
+
+bool EGA_is_stopping(void)
+{
+    return s_stopping;
 }
 
 } // namespace EGA

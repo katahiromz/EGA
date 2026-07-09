@@ -122,6 +122,14 @@ public:
     }
 };
 
+class EGA_control_break : public EGA_exception
+{
+public:
+    EGA_control_break(int lineno) : EGA_exception("control break", lineno)
+    {
+    }
+};
+
 class EGA_type_mismatch : public EGA_exception
 {
 public:
@@ -637,6 +645,8 @@ bool EGA_eval_text_ex(const char *text);
 
 int EGA_interactive(const char *filename = NULL, bool echo = false);
 bool EGA_file_input(const char *filename);
+bool EGA_stop(void);
+bool EGA_is_stopping(void);
 arg_t EGA_eval_arg(arg_t ast, bool do_check);
 int EGA_get_int(arg_t ast);
 std::string EGA_get_str(arg_t ast);
