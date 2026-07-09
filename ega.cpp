@@ -860,7 +860,7 @@ bool EGA_eval_text_ex(const char *text)
     {
         EGA_eval_text(text);
     }
-    catch (EGA_control_break& e)
+    catch (EGA_control_break&)
     {
         return false;
     }
