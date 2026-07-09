@@ -2383,6 +2383,7 @@ int EGA_interactive(const char *filename, bool echo)
 
     s_interactive = true;
     s_echo_input = echo;
+	s_stopping = false;
 
     EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     EGA_do_print("@ EGA Version %d by katahiromz                  @\n", EGA_HPP_);
@@ -2441,7 +2442,7 @@ int EGA_interactive(const char *filename, bool echo)
 
 bool EGA_file_input(const char *filename)
 {
-    std::string str;
+	std::string str;
     if (FILE *fp = fopen(filename, "r"))
     {
         char buf[512];
