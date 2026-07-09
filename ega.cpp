@@ -1674,8 +1674,9 @@ arg_t EGA_FN EGA_at(const args_t& args)
                             if (index < str.size())
                             {
                                 str[index] = EGA_get_int(ast3);
-                                EGA_set_var(var->get_name(), make_arg<AstStr>(str));
-                                return args[0];
+                                auto ret = make_arg<AstStr>(str);
+                                EGA_set_var(var->get_name(), ret);
+                                return ret;
                             }
                             else
                             {
