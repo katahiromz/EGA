@@ -1632,7 +1632,7 @@ arg_t EGA_FN EGA_at(const args_t& args)
                         size_t index = EGA_get_int(ast2);
                         if (index < str.size())
                         {
-                            return make_arg<AstInt>(str[index]);
+                            return make_arg<AstInt>((unsigned char)str[index]);
                         }
                     }
                     break;
