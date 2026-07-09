@@ -414,7 +414,7 @@ public:
         alive_count(false);
     }
 
-    AstType& get_type()
+    AstType get_type()
     {
         return m_type;
     }
