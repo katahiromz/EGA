@@ -27,25 +27,10 @@ class AstContainer;
 typedef std::shared_ptr<AstBase> arg_t;
 typedef std::vector<arg_t> args_t;
 
-template <class T>
-std::shared_ptr<T> make_arg()
+template<class T, class... Args>
+std::shared_ptr<T> make_arg(Args&&... args)
 {
-    return std::make_shared<T>();
-}
-template <class T, typename T1>
-std::shared_ptr<T> make_arg(const T1& t1)
-{
-    return std::make_shared<T>(t1);
-}
-template <class T, typename T1, typename T2>
-std::shared_ptr<T> make_arg(const T1& t1, const T2& t2)
-{
-    return std::make_shared<T>(t1, t2);
-}
-template <class T, typename T1, typename T2, typename T3>
-std::shared_ptr<T> make_arg(const T1& t1, const T2& t2, const T3& t3)
-{
-    return std::make_shared<T>(t1, t2, t3);
+    return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -255,7 +240,7 @@ public:
         alive_count(false);
     }
 
-    TokenType& get_type()
+    TokenType get_type()
     {
         return m_type;
     }
@@ -285,10 +270,8 @@ protected:
     std::string m_str;
     int m_int;
 
-private:
-    // Token is not copyable.
-    Token(const Token&);
-    Token& operator=(const Token&);
+    Token(const Token&) = delete;
+    Token& operator=(const Token&) = delete;
 };
 typedef std::shared_ptr<Token> token_t;
 typedef std::vector<token_t> tokens_t;
@@ -364,7 +347,7 @@ public:
         return m_tokens[m_index];
     }
 
-    TokenType& token_type()
+    TokenType token_type()
     {
         return token()->get_type();
     }
@@ -483,14 +466,14 @@ public:
         return m_value;
     }
 
-    virtual std::string dump(bool q) const;
+    std::string dump(bool q) const override;
 
-    virtual arg_t clone() const
+    arg_t clone() const override
     {
         return make_arg<AstInt>(m_value);
     }
 
-    virtual arg_t eval() const
+    arg_t eval() const override
     {
         return clone();
     }
@@ -516,14 +499,14 @@ public:
         return m_str;
     }
 
-    virtual std::string dump(bool q) const;
+	std::string dump(bool q) const override;
 
-    virtual arg_t clone() const
+    arg_t clone() const override
     {
         return make_arg<AstStr>(m_str);
     }
 
-    virtual arg_t eval() const
+    arg_t eval() const override
     {
         return clone();
     }
@@ -553,17 +536,17 @@ public:
         return m_name;
     }
 
-    virtual std::string dump(bool q) const
+    std::string dump(bool q) const override
     {
         return m_name;
     }
 
-    virtual arg_t clone() const
+    arg_t clone() const override
     {
         return make_arg<AstVar>(m_name, m_lineno);
     }
 
-    virtual arg_t eval() const;
+    arg_t eval() const override;
 
 protected:
     std::string m_name;
@@ -623,11 +606,11 @@ public:
         return m_str;
     }
 
-    virtual std::string dump(bool q) const;
+    std::string dump(bool q) const override;
 
-    virtual arg_t clone() const;
+    arg_t clone() const override;
 
-    virtual arg_t eval() const;
+    arg_t eval() const override;
 
 protected:
     std::string m_str;
@@ -643,7 +626,7 @@ void EGA_uninit(void);
 void EGA_set_var(const std::string& name, arg_t ast);
 bool EGA_eval_text_ex(const char *text);
 
-int EGA_interactive(const char *filename = NULL, bool echo = false);
+int EGA_interactive(const char *filename = nullptr, bool echo = false);
 bool EGA_file_input(const char *filename);
 bool EGA_stop(void);
 bool EGA_is_stopping(void);

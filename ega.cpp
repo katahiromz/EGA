@@ -52,7 +52,7 @@ inline int mzcrt_iscntrl(unsigned char c)
 
 inline int mzcrt_isspace(unsigned char c)
 {
-    return strchr(" \t\n\r\f\v", c) != NULL;
+    return strchr(" \t\n\r\f\v", c) != nullptr;
 }
 
 inline int mzcrt_isgraph(unsigned char c)
@@ -132,13 +132,13 @@ std::string AstStr::dump(bool q) const
 // Is the specified character valid for the first character of the identifier?
 inline bool is_ident_fchar(unsigned char ch)
 {
-    return std::isalpha(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != NULL;
+    return std::isalpha(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != nullptr;
 }
 
 // Is the specified character valid for the second character of the identifier?
 inline bool is_ident_char(unsigned char ch)
 {
-    return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != NULL;
+    return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != nullptr;
 }
 
 /*static*/ int Token::s_alive_count = 0;
@@ -178,9 +178,9 @@ inline bool is_ident_char(unsigned char ch)
 
 bool EGA_default_input(char *buf, size_t buflen)
 {
-    if (buf == NULL && buflen == 0)
+    if (buf == nullptr && buflen == 0)
         return true;
-    return fgets(buf, int(buflen), stdin) != NULL;
+    return fgets(buf, int(buflen), stdin) != nullptr;
 }
 
 static EGA_INPUT_FN s_input_fn = EGA_default_input;
@@ -488,7 +488,7 @@ arg_t TokenStream::visit_translation_unit()
         }
 
         EGA_do_print("ERROR: unexpected token (2): '%s'\n", token_str().c_str());
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -502,7 +502,7 @@ arg_t TokenStream::visit_expression()
     switch (token_type())
     {
     case TOK_EOF:
-        return NULL;
+        return nullptr;
 
     case TOK_INT:
         return visit_integer_literal();
@@ -557,7 +557,7 @@ arg_t TokenStream::visit_expression()
         break;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t TokenStream::visit_integer_literal()
@@ -565,7 +565,7 @@ arg_t TokenStream::visit_integer_literal()
     PARSE_DEBUG();
 
     if (token_type() != TOK_INT)
-        return NULL;
+        return nullptr;
 
     auto ai = make_arg<AstInt>(token()->get_int(), get_lineno());
     go_next();
@@ -577,7 +577,7 @@ arg_t TokenStream::visit_string_literal()
     PARSE_DEBUG();
 
     if (token_type() != TOK_STR)
-        return NULL;
+        return nullptr;
     auto as = make_arg<AstStr>(token()->get_str(), get_lineno());
     go_next();
     return as;
@@ -588,7 +588,7 @@ arg_t TokenStream::visit_array_literal()
     PARSE_DEBUG();
 
     if (token_type() != TOK_SYMBOL || token_str() != "{")
-        return NULL;
+        return nullptr;
 
     go_next();
 
@@ -609,7 +609,7 @@ arg_t TokenStream::visit_array_literal()
         EGA_do_print("ERROR: unexpected token (3): '%s'\n", token_str().c_str());
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t TokenStream::visit_call(const std::string& name)
@@ -617,7 +617,7 @@ arg_t TokenStream::visit_call(const std::string& name)
     PARSE_DEBUG();
 
     if (token_type() != TOK_SYMBOL || token_str() != "(")
-        return NULL;
+        return nullptr;
 
     go_next();
 
@@ -638,7 +638,7 @@ arg_t TokenStream::visit_call(const std::string& name)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 
     for (;;)
@@ -650,7 +650,7 @@ arg_t TokenStream::visit_call(const std::string& name)
         }
         else if (token_str() != ",")
         {
-            return NULL;
+            return nullptr;
         }
         go_next();
 
@@ -675,7 +675,7 @@ arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
 
     auto expr = visit_expression();
     if (!expr)
-        return NULL;
+        return nullptr;
 
     auto list = make_arg<AstContainer>(type, get_lineno(), name);
     list->add(expr);
@@ -700,7 +700,7 @@ arg_t TokenStream::visit_expression_list(AstType type, const std::string& name)
         if (!expr)
         {
             get_index() = index;
-            return NULL;
+            return nullptr;
         }
         list->add(expr);
     }
@@ -751,7 +751,7 @@ arg_t AstContainer::eval() const
         break;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -760,7 +760,7 @@ fn_t EGA_get_fn(const std::string& name)
     EVAL_DEBUG();
     fn_map_t::iterator it = s_fn_map.find(name);
     if (it == s_fn_map.end())
-        return NULL;
+        return nullptr;
     return it->second;
 }
 
@@ -815,7 +815,7 @@ EGA_eval_fn(const std::string& name, const args_t& args, int lineno)
     {
         return EGA_eval_program(args);
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check)
@@ -943,9 +943,9 @@ EGA_compare_0(arg_t a1, arg_t a2)
             for (size_t i = 0; i < size; ++i)
             {
                 auto ai = EGA_compare_0((*array1)[i], (*array2)[i]);
-                if (ai == NULL)
+                if (ai == nullptr)
                 {
-                    return NULL;
+                    return nullptr;
                 }
                 if (EGA_get_int(ai) != 0)
                 {
@@ -986,7 +986,7 @@ EGA_compare_0(arg_t a1, arg_t a2)
         throw EGA_type_mismatch(a1->get_lineno());
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_binary(const args_t& args)
@@ -1086,7 +1086,7 @@ arg_t EGA_FN EGA_compare(const args_t& args)
     {
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_less(const args_t& args)
@@ -1097,7 +1097,7 @@ arg_t EGA_FN EGA_less(const args_t& args)
         ai->get_int() = (ai->get_int() < 0);
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_greater(const args_t& args)
@@ -1108,7 +1108,7 @@ arg_t EGA_FN EGA_greater(const args_t& args)
         ai->get_int() = (ai->get_int() > 0);
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_less_equal(const args_t& args)
@@ -1119,7 +1119,7 @@ arg_t EGA_FN EGA_less_equal(const args_t& args)
         ai->get_int() = (ai->get_int() <= 0);
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_greater_equal(const args_t& args)
@@ -1130,7 +1130,7 @@ arg_t EGA_FN EGA_greater_equal(const args_t& args)
         ai->get_int() = (ai->get_int() >= 0);
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_equal(const args_t& args)
@@ -1141,7 +1141,7 @@ arg_t EGA_FN EGA_equal(const args_t& args)
         ai->get_int() = (ai->get_int() == 0);
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_not_equal(const args_t& args)
@@ -1152,7 +1152,7 @@ arg_t EGA_FN EGA_not_equal(const args_t& args)
         ai->get_int() = (ai->get_int() != 0);
         return ai;
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_print(const args_t& args)
@@ -1166,7 +1166,7 @@ arg_t EGA_FN EGA_print(const args_t& args)
             EGA_do_print("%s", ast->dump(false).c_str());
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_println(const args_t& args)
@@ -1175,7 +1175,7 @@ arg_t EGA_FN EGA_println(const args_t& args)
 
     EGA_print(args);
     EGA_do_print("\n");
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_dump(const args_t& args)
@@ -1191,7 +1191,7 @@ arg_t EGA_FN EGA_dump(const args_t& args)
             EGA_do_print("%s", ast->dump(true).c_str());
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_dumpln(const args_t& args)
@@ -1200,7 +1200,7 @@ arg_t EGA_FN EGA_dumpln(const args_t& args)
 
     EGA_dump(args);
     EGA_do_print("\n");
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_len(const args_t& args)
@@ -1226,7 +1226,7 @@ arg_t EGA_FN EGA_len(const args_t& args)
             throw EGA_type_mismatch(args[0]->get_lineno());
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_cat(const args_t& args)
@@ -1274,7 +1274,7 @@ arg_t EGA_FN EGA_cat(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_plus(const args_t& args)
@@ -1306,7 +1306,7 @@ arg_t EGA_FN EGA_minus(const args_t& args)
             int i1 = EGA_get_int(ast1);
             return make_arg<AstInt>(-i1);
         }
-        return NULL;
+        return nullptr;
     }
 
     if (args.size() == 2)
@@ -1322,7 +1322,7 @@ arg_t EGA_FN EGA_minus(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_mul(const args_t& args)
@@ -1361,7 +1361,7 @@ arg_t EGA_FN EGA_div(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_mod(const args_t& args)
@@ -1382,7 +1382,7 @@ arg_t EGA_FN EGA_mod(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_if(const args_t& args)
@@ -1408,7 +1408,7 @@ arg_t EGA_FN EGA_if(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void EGA_set_var(const std::string& name, arg_t arg)
@@ -1436,8 +1436,8 @@ arg_t EGA_FN EGA_set(const args_t& args)
     }
     else
     {
-        EGA_set_var(name, NULL);
-        return NULL;
+        EGA_set_var(name, nullptr);
+        return nullptr;
     }
 }
 
@@ -1458,8 +1458,8 @@ arg_t EGA_FN EGA_define(const args_t& args)
     }
     else
     {
-        EGA_set_var(name, NULL);
-        return NULL;
+        EGA_set_var(name, nullptr);
+        return nullptr;
     }
 }
 
@@ -1587,7 +1587,7 @@ arg_t EGA_FN EGA_exit(const args_t& args)
     if (args.size() == 1)
         throw EGA_exit_exception(args[0]);
     else
-        throw EGA_exit_exception(NULL);
+        throw EGA_exit_exception(nullptr);
 }
 
 arg_t EGA_FN EGA_break(const args_t& args)
@@ -1692,7 +1692,7 @@ arg_t EGA_FN EGA_at(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_not(const args_t& args)
@@ -1705,7 +1705,7 @@ arg_t EGA_FN EGA_not(const args_t& args)
         return make_arg<AstInt>(!i);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_or(const args_t& args)
@@ -1753,7 +1753,7 @@ arg_t EGA_FN EGA_compl(const args_t& args)
         return make_arg<AstInt>(~i);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_bitor(const args_t& args)
@@ -1770,7 +1770,7 @@ arg_t EGA_FN EGA_bitor(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_bitand(const args_t& args)
@@ -1787,7 +1787,7 @@ arg_t EGA_FN EGA_bitand(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_xor(const args_t& args)
@@ -1804,7 +1804,7 @@ arg_t EGA_FN EGA_xor(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_left(const args_t& args)
@@ -1852,7 +1852,7 @@ arg_t EGA_FN EGA_left(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_right(const args_t& args)
@@ -1902,7 +1902,7 @@ arg_t EGA_FN EGA_right(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static arg_t EGA_mid3(const args_t& args)
@@ -1954,7 +1954,7 @@ static arg_t EGA_mid3(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static arg_t EGA_mid4(const args_t& args)
@@ -2015,7 +2015,7 @@ static arg_t EGA_mid4(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_mid(const args_t& args)
@@ -2027,7 +2027,7 @@ arg_t EGA_FN EGA_mid(const args_t& args)
     if (args.size() == 4)
         return EGA_mid4(args);
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_find(const args_t& args)
@@ -2068,7 +2068,7 @@ arg_t EGA_FN EGA_find(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_replace(const args_t& args)
@@ -2113,7 +2113,7 @@ arg_t EGA_FN EGA_replace(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_remove(const args_t& args)
@@ -2154,7 +2154,7 @@ arg_t EGA_FN EGA_remove(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_typeid(const args_t& args)
@@ -2200,7 +2200,7 @@ arg_t EGA_FN EGA_int(const args_t& args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_str(const args_t& args)
@@ -2213,7 +2213,7 @@ arg_t EGA_FN EGA_str(const args_t& args)
         return make_arg<AstStr>(str);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 arg_t EGA_FN EGA_array(const args_t& args)
@@ -2433,7 +2433,7 @@ int EGA_interactive(const char *filename, bool echo)
         if (!EGA_eval_text_ex(buf))
             break;
 
-        (*s_input_fn)(NULL, 0);
+        (*s_input_fn)(nullptr, 0);
     }
 
     return 0;
@@ -2466,7 +2466,7 @@ bool EGA_file_input(const char *filename)
         fclose(fp);
 
         EGA_eval_text_ex(str.c_str());
-        (*s_input_fn)(NULL, 0);
+        (*s_input_fn)(nullptr, 0);
         return true;
     }
 
@@ -2509,7 +2509,7 @@ int main(int argc, char **argv)
     {
 #ifdef _WIN32
         char file[MAX_PATH];
-        WideCharToMultiByte(CP_ACP, 0, wargv[1], -1, file, MAX_PATH, NULL, NULL);
+        WideCharToMultiByte(CP_ACP, 0, wargv[1], -1, file, MAX_PATH, nullptr, nullptr);
         std::string arg = file;
 #else
         std::string arg = argv[1];
