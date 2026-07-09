@@ -23,9 +23,9 @@ typedef std::unordered_map<std::string, arg_t> var_map_t;
 
 static fn_map_t s_fn_map;
 static var_map_t s_var_map;
-static volatile bool s_interactive = false;
-static volatile bool s_echo_input = false;
-static volatile bool s_stopping = false;
+static bool s_interactive = false;
+static bool s_echo_input = false;
+static bool s_stopping = false;
 
 fn_t EGA_get_fn(const std::string& name);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args, int lineno);
@@ -40,22 +40,22 @@ std::string AstInt::dump(bool q) const
     return mstr_to_string(m_value);
 }
 
-inline int mzcrt_isprint(char c)
+inline int mzcrt_isprint(unsigned char c)
 {
-    return 0x20 <= (unsigned char)c && (unsigned char)c <= 0x7E;
+    return 0x20 <= c && c <= 0x7E;
 }
 
-inline int mzcrt_iscntrl(char c)
+inline int mzcrt_iscntrl(unsigned char c)
 {
-    return (unsigned char)c < 0x20 || (unsigned char)c >= 0x7F;
+    return c < 0x20 || c >= 0x7F;
 }
 
-inline int mzcrt_isspace(char c)
+inline int mzcrt_isspace(unsigned char c)
 {
     return strchr(" \t\n\r\f\v", c) != NULL;
 }
 
-inline int mzcrt_isgraph(char c)
+inline int mzcrt_isgraph(unsigned char c)
 {
     return !mzcrt_isspace(c) && mzcrt_isprint(c);
 }
@@ -130,13 +130,13 @@ std::string AstStr::dump(bool q) const
 //////////////////////////////////////////////////////////////////////////////
 
 // Is the specified character valid for the first character of the identifier?
-inline bool is_ident_fchar(char ch)
+inline bool is_ident_fchar(unsigned char ch)
 {
     return std::isalpha(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != NULL;
 }
 
 // Is the specified character valid for the second character of the identifier?
-inline bool is_ident_char(char ch)
+inline bool is_ident_char(unsigned char ch)
 {
     return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != NULL;
 }
@@ -397,6 +397,11 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
             ++pch;
             for (;;)
             {
+                if (!*pch)
+                {
+                    EGA_do_print("ERROR: unterminated string\n");
+                    return false;
+                }
                 if (*pch == '"')
                 {
                     if (pch[1] == '"')
@@ -1248,7 +1253,11 @@ arg_t EGA_FN EGA_cat(const args_t& args)
             {
                 for (size_t i = 0; i < args.size(); ++i)
                 {
-                    if (auto array2 = std::static_pointer_cast<AstContainer>(args[i]))
+                    auto ast = EGA_eval_arg(args[i], true);
+                    if (ast->get_type() != AST_ARRAY)
+                        throw EGA_type_mismatch(args[i]->get_lineno());
+
+                    if (auto array2 = EGA_get_array(ast))
                     {
                         for (size_t k = 0; k < array2->size(); ++k)
                         {
@@ -1660,7 +1669,7 @@ arg_t EGA_FN EGA_at(const args_t& args)
                         break;
                     case AST_STR:
                         {
-                            std::string str = EGA_get_str(args[0]);
+                            std::string str = EGA_get_str(ast1);
                             size_t index = EGA_get_int(ast2);
                             if (index < str.size())
                             {
@@ -2089,13 +2098,9 @@ arg_t EGA_FN EGA_replace(const args_t& args)
                             if (auto ai = EGA_compare_0(arg, ast2))
                             {
                                 if (ai->get_int() == 0)
-                                {
-                                    ary1->add(ast3);
-                                }
+                                    ary1->add(ast3->clone());
                                 else
-                                {
-                                    ary1->add(arg);
-                                }
+                                    ary1->add(arg->clone());
                             }
                         }
                         return ary1;
@@ -2136,7 +2141,7 @@ arg_t EGA_FN EGA_remove(const args_t& args)
                         {
                             if (ai->get_int() != 0)
                             {
-                                ary1->add(arg);
+                                ary1->add(arg->clone());
                             }
                         }
                     }
@@ -2217,7 +2222,7 @@ arg_t EGA_FN EGA_array(const args_t& args)
     auto array = make_arg<AstContainer>(AST_ARRAY);
     for (auto arg : args)
     {
-        array->add(arg->eval());
+        array->add(EGA_eval_arg(arg, true));
     }
 
     return array;
@@ -2337,7 +2342,7 @@ void EGA_show_help(void)
 {
     EGA_do_print("EGA has the following functions:\n");
     std::vector<std::string> names;
-    for (auto pair : s_fn_map)
+    for (const auto& pair : s_fn_map)
     {
         names.push_back(pair.first);
     }
