@@ -641,6 +641,7 @@ arg_t EGA_eval_arg(const arg_t& ast, bool do_check);
 int EGA_get_int(const arg_t& ast);
 std::string EGA_get_str(const arg_t& ast);
 std::shared_ptr<AstContainer> EGA_get_array(const arg_t& ast);
+void EGA_print_logo(const char *filename = nullptr);
 
 } // namespace EGA
 

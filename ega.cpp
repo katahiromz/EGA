@@ -2416,19 +2416,24 @@ void EGA_show_help(const std::string& name)
     EGA_do_print("  usage: %s\n", it->second->help.c_str());
 }
 
+void EGA_print_logo(const char *filename)
+{
+    EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    EGA_do_print("@ EGA Version %d by katahiromz                  @\n", EGA_HPP_);
+    if (!filename)
+        EGA_do_print("@ Type 'exit' to exit. Type 'help' to see help. @\n");
+    EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+}
+
 int EGA_interactive(const char *filename, bool echo)
 {
     char buf[512];
 
     s_interactive = true;
     s_echo_input = echo;
-	s_stopping = false;
+    s_stopping = false;
 
-    EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-    EGA_do_print("@ EGA Version %d by katahiromz                  @\n", EGA_HPP_);
-    if (!filename)
-        EGA_do_print("@ Type 'exit' to exit. Type 'help' to see help. @\n");
-    EGA_do_print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    EGA_print_logo(filename);
 
     if (filename)
     {
