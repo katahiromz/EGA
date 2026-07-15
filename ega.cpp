@@ -40,31 +40,21 @@ std::string AstInt::dump(bool q) const
     return mstr_to_string(m_value);
 }
 
-inline int mzcrt_isprint(unsigned char c)
-{
-    return 0x20 <= c && c <= 0x7E;
-}
-
-inline int mzcrt_iscntrl(unsigned char c)
+inline int is_cntrl(unsigned char c)
 {
     return c < 0x20 || c >= 0x7F;
 }
 
-inline int mzcrt_isspace(unsigned char c)
+inline int is_space(unsigned char c)
 {
     return strchr(" \t\n\r\f\v", c) != nullptr;
-}
-
-inline int mzcrt_isgraph(unsigned char c)
-{
-    return !mzcrt_isspace(c) && mzcrt_isprint(c);
 }
 
 bool mstr_is_binary(const std::string& str)
 {
     for (auto ch : str)
     {
-        if (mzcrt_iscntrl(ch) || ch == '"')
+        if (is_cntrl(ch) || ch == '"')
             return true;
     }
     return false;
@@ -82,7 +72,7 @@ std::string mstr_quote2(const std::string& str)
     {
         unsigned char ch = str[i];
 
-        if (mzcrt_iscntrl(ch) || ch == '"')
+        if (is_cntrl(ch) || ch == '"')
         {
             if (!first)
             {
@@ -145,16 +135,32 @@ inline const bool *ega_ident_extra_table()
     return table;
 }
 
+inline bool is_digit(unsigned char ch)
+{
+    return '0' <= ch && ch <= '9';
+}
+
+inline bool is_alpha(unsigned char ch)
+{
+    ch |= 0x20;
+    return 'a' <= ch && ch <= 'z';
+}
+
+inline bool is_alnum(unsigned char ch)
+{
+    return is_alpha(ch) || is_digit(ch);
+}
+
 // Is the specified character valid for the first character of the identifier?
 inline bool is_ident_fchar(unsigned char ch)
 {
-    return std::isalpha(ch) || ega_ident_extra_table()[ch];
+    return is_alpha(ch) || ega_ident_extra_table()[ch];
 }
 
 // Is the specified character valid for the second character of the identifier?
 inline bool is_ident_char(unsigned char ch)
 {
-    return std::isalnum(ch) || ega_ident_extra_table()[ch];
+    return is_alnum(ch) || ega_ident_extra_table()[ch];
 }
 
 /*static*/ int Token::s_alive_count = 0;
@@ -369,10 +375,8 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
             continue;
         }
 
-        if (std::isspace((unsigned char)*pch))
-        {
+        if (is_space(*pch))
             continue;
-        }
 
         std::string str;
         if (is_ident_fchar(*pch))
@@ -390,11 +394,11 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
             continue;
         }
 
-        if (std::isdigit((unsigned char)*pch))
+        if (is_digit(*pch))
         {
             const char *start = pch;
             ++pch;
-            while (std::isdigit((unsigned char)*pch))
+            while (is_digit(*pch))
                 ++pch;
             add(TOK_INT, lineno, std::string(start, pch));
             --pch;
