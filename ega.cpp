@@ -1506,14 +1506,10 @@ arg_t EGA_FN EGA_for(const args_t& args)
             int i1 = EGA_get_int(ast1);
             int i2 = EGA_get_int(ast2);
 
-            size_t count = 0;
-            for (int i = i1; i <= i2; ++i, ++count)
+            for (int i = i1; i <= i2; ++i)
             {
-                if ((count & 0xFF) == 0)
-                {
-                    if (EGA_is_stopping())
-                        throw EGA_control_break(0);
-                }
+                if (EGA_is_stopping())
+                    throw EGA_control_break(0);
 
                 auto ai = make_arg<AstInt>(i);
                 auto var = std::static_pointer_cast<AstVar>(args[0]);
@@ -1548,14 +1544,10 @@ arg_t EGA_FN EGA_foreach(const args_t& args)
         {
             if (auto array = EGA_get_array(ast))
             {
-                size_t count = 0;
-                for (size_t i = 0; i < array->size(); ++i, ++count)
+                for (size_t i = 0; i < array->size(); ++i)
                 {
-                    if ((count & 0xFF) == 0)
-                    {
-                        if (EGA_is_stopping())
-                            throw EGA_control_break(0);
-                    }
+                    if (EGA_is_stopping())
+                        throw EGA_control_break(0);
 
                     EGA_set_var(var->get_name(), (*array)[i]);
 
@@ -1580,14 +1572,10 @@ arg_t EGA_FN EGA_while(const args_t& args)
     EVAL_DEBUG();
 
     arg_t arg;
-    size_t count = 0;
-    for (;; ++count)
+    for (;;)
     {
-        if ((count & 0xFF) == 0)
-        {
-            if (EGA_is_stopping())
-                throw EGA_control_break(0);
-        }
+        if (EGA_is_stopping())
+            throw EGA_control_break(0);
 
         auto ast1 = EGA_eval_arg(args[0], true);
         if (ast1)
