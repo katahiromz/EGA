@@ -819,6 +819,9 @@ EGA_eval_program(const args_t& args)
 
     for (size_t i = 0; i < args.size(); ++i)
     {
+        if (EGA_is_stopping())
+            throw EGA_control_break(0);
+
         arg = args[i]->eval();
     }
 
