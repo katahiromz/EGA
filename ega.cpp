@@ -2372,8 +2372,10 @@ void
 EGA_uninit(void)
 {
     s_fn_map.clear();
-	s_var_map.clear();
-	s_stopping = false;
+    s_var_map.clear();
+    s_stopping = false;
+    assert(Token::s_alive_count == 0);
+    assert(AstBase::s_alive_count == 0);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2583,9 +2585,6 @@ int main(int argc, char **argv)
     }
 
     EGA_uninit();
-
-    assert(Token::s_alive_count == 0);
-    assert(AstBase::s_alive_count == 0);
     return 0;
 }
 #ifdef _WIN32
