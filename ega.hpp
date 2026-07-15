@@ -531,7 +531,7 @@ public:
     {
     }
 
-    std::string get_name() const
+    const std::string& get_name() const
     {
         return m_name;
     }
@@ -615,6 +615,13 @@ public:
 protected:
     std::string m_str;
     std::vector<arg_t> m_children;
+
+    // For AST_CALL nodes: the resolved function is looked up by name once
+    // (lazily, on first eval) and cached here so repeated evaluations
+    // (e.g. inside for/while/foreach loops) skip the hash-map lookup.
+    // The function table is only populated during EGA_init(), so this
+    // cache is safe to keep for the node's whole lifetime.
+    mutable fn_t m_fn_cache;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -630,10 +637,10 @@ int EGA_interactive(const char *filename = nullptr, bool echo = false);
 bool EGA_file_input(const char *filename);
 bool EGA_stop(void);
 bool EGA_is_stopping(void);
-arg_t EGA_eval_arg(arg_t ast, bool do_check);
-int EGA_get_int(arg_t ast);
-std::string EGA_get_str(arg_t ast);
-std::shared_ptr<AstContainer> EGA_get_array(arg_t ast);
+arg_t EGA_eval_arg(const arg_t& ast, bool do_check);
+int EGA_get_int(const arg_t& ast);
+std::string EGA_get_str(const arg_t& ast);
+std::shared_ptr<AstContainer> EGA_get_array(const arg_t& ast);
 
 } // namespace EGA
 

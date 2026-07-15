@@ -31,9 +31,9 @@ fn_t EGA_get_fn(const std::string& name);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args, int lineno);
 arg_t EGA_eval_var(const std::string& name, int lineno);
 arg_t EGA_eval_program(const args_t& args);
-arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check);
-arg_t EGA_eval_arg(arg_t ast, bool do_check);
-arg_t EGA_eval_arg(arg_t ast);
+arg_t EGA_eval_arg(const arg_t& ast, int lineno, bool do_check);
+arg_t EGA_eval_arg(const arg_t& ast, bool do_check);
+arg_t EGA_eval_arg(const arg_t& ast);
 
 std::string AstInt::dump(bool q) const
 {
@@ -129,16 +129,32 @@ std::string AstStr::dump(bool q) const
 
 //////////////////////////////////////////////////////////////////////////////
 
+// Precomputed table of the extra (non-alnum) characters allowed in identifiers,
+// built once. Replaces a strchr() linear scan (done for almost every
+// character while lexing) with an O(1) table lookup.
+inline const bool *ega_ident_extra_table()
+{
+    static bool table[256] = {};
+    static bool initialized = false;
+    if (!initialized)
+    {
+        for (const unsigned char *p = (const unsigned char *)"_+-[]<>=!~*&|%^?:/"; *p; ++p)
+            table[*p] = true;
+        initialized = true;
+    }
+    return table;
+}
+
 // Is the specified character valid for the first character of the identifier?
 inline bool is_ident_fchar(unsigned char ch)
 {
-    return std::isalpha(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != nullptr;
+    return std::isalpha(ch) || ega_ident_extra_table()[ch];
 }
 
 // Is the specified character valid for the second character of the identifier?
 inline bool is_ident_char(unsigned char ch)
 {
-    return std::isalnum(ch) || std::strchr("_+-[]<>=!~*&|%^?:/", ch) != nullptr;
+    return std::isalnum(ch) || ega_ident_extra_table()[ch];
 }
 
 /*static*/ int Token::s_alive_count = 0;
@@ -353,7 +369,7 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
             continue;
         }
 
-        if (std::isspace(*pch))
+        if (std::isspace((unsigned char)*pch))
         {
             continue;
         }
@@ -361,32 +377,26 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
         std::string str;
         if (is_ident_fchar(*pch))
         {
-            str += *pch;
+            const char *start = pch;
             for (;;)
             {
                 ++pch;
                 if (!*pch || !is_ident_char(*pch))
                     break;
-                str += *pch;
             }
 
-            add(TOK_IDENT, lineno, str);
+            add(TOK_IDENT, lineno, std::string(start, pch));
             --pch;
             continue;
         }
 
-        if (std::isdigit(*pch))
+        if (std::isdigit((unsigned char)*pch))
         {
-            str += *pch;
+            const char *start = pch;
             ++pch;
-            for (;;)
-            {
-                if (!std::isdigit(*pch))
-                    break;
-                str += *pch;
+            while (std::isdigit((unsigned char)*pch))
                 ++pch;
-            }
-            add(TOK_INT, lineno, str);
+            add(TOK_INT, lineno, std::string(start, pch));
             --pch;
             continue;
         }
@@ -395,6 +405,7 @@ bool TokenStream::do_lexical(const char *input, int& lineno)
         {
         case '"':
             ++pch;
+            str.reserve(32);
             for (;;)
             {
                 if (!*pch)
@@ -741,7 +752,20 @@ arg_t AstContainer::eval() const
         break;
 
     case AST_CALL:
-        return EGA_eval_fn(m_str, m_children, m_lineno);
+        if (m_str.empty())
+            return EGA_eval_program(m_children);
+
+        if (!m_fn_cache)
+            m_fn_cache = EGA_get_fn(m_str);
+
+        if (m_fn_cache)
+        {
+            if (m_fn_cache->min_args <= m_children.size() && m_children.size() <= m_fn_cache->max_args)
+                return (*(m_fn_cache->proc))(m_children);
+            else
+                throw EGA_arity_exception(m_str, m_lineno);
+        }
+        return nullptr;
 
     case AST_PROGRAM:
         return EGA_eval_program(m_children);
@@ -818,7 +842,7 @@ EGA_eval_fn(const std::string& name, const args_t& args, int lineno)
     return nullptr;
 }
 
-arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check)
+arg_t EGA_eval_arg(const arg_t& ast, int lineno, bool do_check)
 {
     EVAL_DEBUG();
     if (EGA_is_stopping())
@@ -831,12 +855,12 @@ arg_t EGA_eval_arg(arg_t ast, int lineno, bool do_check)
     return ret;
 }
 
-arg_t EGA_eval_arg(arg_t ast, bool do_check)
+arg_t EGA_eval_arg(const arg_t& ast, bool do_check)
 {
     return EGA_eval_arg(ast, ast->get_lineno(), do_check);
 }
 
-arg_t EGA_eval_arg(arg_t ast)
+arg_t EGA_eval_arg(const arg_t& ast)
 {
     return EGA_eval_arg(ast, false);
 }
@@ -890,7 +914,7 @@ bool EGA_eval_text_ex(const char *text)
     return true;
 }
 
-int EGA_get_int(arg_t ast)
+int EGA_get_int(const arg_t& ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_INT)
@@ -898,7 +922,7 @@ int EGA_get_int(arg_t ast)
     return std::static_pointer_cast<AstInt>(ast)->get_int();
 }
 
-std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
+std::shared_ptr<AstContainer> EGA_get_array(const arg_t& ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_ARRAY)
@@ -906,7 +930,7 @@ std::shared_ptr<AstContainer> EGA_get_array(arg_t ast)
     return std::static_pointer_cast<AstContainer>(ast);
 }
 
-std::string EGA_get_str(arg_t ast)
+std::string EGA_get_str(const arg_t& ast)
 {
     EVAL_DEBUG();
     if (ast->get_type() != AST_STR)
@@ -915,7 +939,7 @@ std::string EGA_get_str(arg_t ast)
 }
 
 std::shared_ptr<AstInt>
-EGA_compare_0(arg_t a1, arg_t a2)
+EGA_compare_0(const arg_t& a1, const arg_t& a2)
 {
     EVAL_DEBUG();
 
@@ -994,7 +1018,7 @@ arg_t EGA_FN EGA_binary(const args_t& args)
     EVAL_DEBUG();
 
     std::string str;
-    for (auto arg : args)
+    for (const auto& arg : args)
     {
         if (auto ast = EGA_eval_arg(arg, true))
         {
@@ -2095,7 +2119,7 @@ arg_t EGA_FN EGA_replace(const args_t& args)
                         auto ary2 = EGA_get_array(ast1);
                         for (size_t i = 0; i < ary2->size(); ++i)
                         {
-                            auto arg = (*ary2)[i];
+                            const auto& arg = (*ary2)[i];
                             if (auto ai = EGA_compare_0(arg, ast2))
                             {
                                 if (ai->get_int() == 0)
@@ -2137,7 +2161,7 @@ arg_t EGA_FN EGA_remove(const args_t& args)
                     auto ary2 = EGA_get_array(ast1);
                     for (size_t i = 0; i < ary2->size(); ++i)
                     {
-                        auto arg = (*ary2)[i];
+                        const auto& arg = (*ary2)[i];
                         if (auto ai = EGA_compare_0(arg, ast2))
                         {
                             if (ai->get_int() != 0)
@@ -2221,7 +2245,7 @@ arg_t EGA_FN EGA_array(const args_t& args)
     EVAL_DEBUG();
 
     auto array = make_arg<AstContainer>(AST_ARRAY);
-    for (auto arg : args)
+    for (const auto& arg : args)
     {
         array->add(EGA_eval_arg(arg, true));
     }
@@ -2232,6 +2256,8 @@ arg_t EGA_FN EGA_array(const args_t& args)
 bool EGA_init(void)
 {
     s_stopping = false;
+
+    s_fn_map.reserve(96);
 
     EGA_set_input_fn(EGA_default_input);
     EGA_set_print_fn(EGA_default_print);
