@@ -6,10 +6,12 @@
 #include "mstr.hpp"
 #ifdef _WIN32
     #define UTF_WIDE_IS_UTF16
+    #include <windows.h>
 #endif
 #include "UTF/utf.hpp"
 #include <unordered_map>
 #include <algorithm>
+#include <atomic>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
@@ -25,7 +27,7 @@ static fn_map_t s_fn_map;
 static var_map_t s_var_map;
 static bool s_interactive = false;
 static bool s_echo_input = false;
-static bool s_stopping = false;
+static volatile bool s_stopping = false;
 
 fn_t EGA_get_fn(const std::string& name);
 arg_t EGA_eval_fn(const std::string& name, const args_t& args, int lineno);
@@ -739,7 +741,7 @@ arg_t AstVar::eval() const
 
 arg_t AstContainer::eval() const
 {
-	if (EGA_is_stopping())
+    if (EGA_is_stopping())
         throw EGA_control_break(0);
 
     switch (m_type)
@@ -2491,7 +2493,7 @@ int EGA_interactive(const char *filename, bool echo)
 
 bool EGA_file_input(const char *filename)
 {
-	std::string str;
+    std::string str;
     if (FILE *fp = fopen(filename, "r"))
     {
         char buf[512];
@@ -2527,11 +2529,14 @@ bool EGA_file_input(const char *filename)
 bool EGA_stop(void)
 {
     s_stopping = true;
-	return true;
+    return true;
 }
 
 bool EGA_is_stopping(void)
 {
+#ifdef _WIN32
+    Sleep(0);
+#endif
     return s_stopping;
 }
 
