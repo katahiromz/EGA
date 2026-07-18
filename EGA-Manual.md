@@ -107,7 +107,7 @@ Change in Version 8:
 
 ## Comments
 
-The comment of EGA begins with the first atmark (`@`) of a line, and ends with newline.
+The comment of EGA begins with the first at symbol (`@`) of a line, and ends with newline.
 The comments are ignored in execution of EGA program.
 
 For example:
@@ -153,9 +153,9 @@ You can compare two strings by `==`, `!=`, `<`, `<=`, `>`, `>=` functions.
 
 See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `str` functions.
 
-## Binarys
+## Binaries
 
-In EGA, a binary data is a string. See `binary` function.
+In EGA, the binary data is a string. See `binary` function.
 
 ## Arrays
 
@@ -215,7 +215,7 @@ the string values. `println` and `dumpln` add a newline at the end of the output
 for(i, 1, 10000, (println(i), if(>=(i, 10), break())));
 ```
 
-This EGA program will outputs 0-to-10. Output:
+This EGA program will output 0-to-10. Output:
 
 ```txt
 1
@@ -230,7 +230,7 @@ This EGA program will outputs 0-to-10. Output:
 10
 ```
 
-The `break` special function cut the `for` loop.
+The `break` special function breaks the `for` loop.
 
 ### Sample `fact.ega`
 
@@ -245,7 +245,7 @@ for(k, 1, 12, (
 )
 ```
 
-This EGA program will outputs the factorial numbers of 1-to-12. Output:
+This EGA program will output the factorial numbers of 1-to-12. Output:
 
 ```txt
 n = 1: fact == 1
@@ -271,45 +271,6 @@ for(k, 1, 12, (
         println("n = ", n, ": fact == ", prod)
     )
 )
-```
-
-### Sample `input.ega`
-
-```txt
-set(s, input("Type a string"));
-for(i, 1, +(len(s), 4), print("#"));
-println();
-println(cat("# ", s, " #"));
-for(i, 1, +(len(s), 4), print("#"));
-println();
-```
-
-This program wraps the input string by `#`. Output:
-
-```txt
-Type a string? This is a test.
-###################
-# This is a test. #
-###################
-```
-
-The `cat` function concatnates strings.
-
-### Sample `plus.ega`
-
-```txt
-set(A, input("A="));
-set(B, input("B="));
-set(C, +(int(A), int(B)));
-println(C);
-```
-
-This program calculates the sum of input `A` and `B`. Output:
-
-```txt
-A=? 3
-B=? 5
-8
 ```
 
 ## The EGA Functions
@@ -412,7 +373,7 @@ EGA function 'cat':
   usage: cat(ary_or_str_1, ary_or_str_2, ...)
 ```
 
-Concatnates the specified arrays and/or strings. Returns an array or a string.
+Concatenates the specified arrays and/or strings. Returns an array or a string.
 
 ### EGA `compare` Function
 
@@ -541,16 +502,16 @@ EGA function 'for':
   usage: for(var, min, max, expr)
 ```
 
-Does loop from `min` and `max`.
+Does loop from `min` to `max` (inclusive).
 
 The `expr` argument will be evaluated repeatedly.
 The `min` and `max` values must be integers.
 The `var` is the name of a loop variable.
 
-1. At first, `min` will be stored into the `var` variable.
-2. Then, `expr` will be evaluated.
-3. `var` will be incremented upto `max`.
-4. If `var` is less than `max`, then back to 2.
+1. First, `min` is stored into the `var` variable.
+2. `expr` is evaluated.
+3. `var` is incremented by 1.
+4. If `var` is less than or equal to `max`, go back to step 2.
 
 You can break the loop by `break` function.
 
@@ -599,7 +560,7 @@ EGA function 'hex':
   usage: hex(value)
 ```
 
-Converts an integer value to a hexidemical string.
+Converts an integer value to a hexadecimal string.
 Returns a string.
 
 ### EGA `if` Function
@@ -662,7 +623,7 @@ Same as `<`.
 ### EGA `less_equal` Function
 
 ```txt
-EGA function 'less':
+EGA function 'less_equal':
   arity: 2
   usage: less_equal(value1, value2)
 ```
@@ -699,7 +660,7 @@ EGA function 'mid':
   usage: mid(ary_or_str, index, count[, value])
 ```
 
-Returns the sequance of the specified range of an array or a string.
+Returns the sequence of the specified range of an array or a string.
 `ary_or_str` must be an array or a string.
 The range starts from offset `index`.
 The length of the range is `count`.
@@ -979,14 +940,14 @@ EGA function 'RES_load':
 ### EGA `RES_save` Function
 
 ```txt
-EGA function 'RES_load':
+EGA function 'RES_save':
   arity: 1..2
   usage: RES_save(filename[, options])
 ```
 
 `RES_save` saves the resource file.
 
-`options` is an empty string or the combitions of the following strings.
+`options` is an empty string or the combinations of the following strings.
 
 - `"(idc-static)"`
 - `"(compress)"`
@@ -1011,14 +972,12 @@ EGA function 'RES_clone_by_lang':
   usage: RES_clone_by_lang(type, name, src_lang, dest_lang)
 ```
 
-`RES_clone_by_name` clones the resource data as another resource language.
-
-`type` must be an integer or a string of a resource type. If `type` is `"*"`, then search all resource types.
-`name` must be an integer or a string of a resource name. If `name` is `"*"`, then search all resource names.
-`src_lang` must be an integer that specifies the source language ID. If `lang` is `-(1)`, then search all resource languages.
+Clones a resource item from one language to another language.
+`type` must be an integer or a string of a resource type. If type is `"*"`, then all resource types are searched.
+`name` must be an integer or a string of a resource name. If name is `"*"`, then all resource names are searched.
+`src_lang` must be an integer that specifies the source language ID. If src_lang is `-(1)`, then all resource languages are searched.
 `dest_lang` must be an integer that specifies the destination language ID.
-
-Returns `1` if cloned. Otherwise returns zero.
+Returns `1` if successfully cloned. Otherwise returns `0`.
 
 ### EGA `RES_clone_by_name` Function
 
@@ -1041,7 +1000,7 @@ Returns `1` if cloned. Otherwise returns zero.
 ```txt
 EGA function 'RES_const':
   arity: 1
-  usage: usage: RES_const(name)
+  usage: RES_const(name)
 ```
 
 The `RES_const` function queries the database for the value of a constant.
@@ -1147,8 +1106,8 @@ EGA function 'RES_str_set':
 If `str_id` specified, then write a UTF-8 string to the string table.
 If the string was empty, then the resource string will be cleared.
 If `str_id` not specified, then set an array of pairs of string ID and text to the string table.
-Returns one if successful.
-Returns zero if failed.
+Returns `1` if successful.
+Returns `0` if failed.
 
 ### EGA `RES_get_text` Function
 
@@ -1170,8 +1129,8 @@ EGA function 'RES_set_text':
 ```
 
 `RES_set_text` sets the text of the resource item and compile the text.
-Returns one if successful.
-Returns zero if failed.
+Returns `1` if successful.
+Returns `0` if failed.
 
 ## How can I extend EGA?
 
