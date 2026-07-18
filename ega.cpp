@@ -11,11 +11,11 @@
 #include "UTF/utf.hpp"
 #include <unordered_map>
 #include <algorithm>
-#include <atomic>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
 #include <cctype>
+#include <ctime>
 
 namespace EGA
 {
@@ -1802,51 +1802,63 @@ arg_t EGA_FN EGA_bitor(const args_t& args)
 {
     EVAL_DEBUG();
 
+    int i1 = 0;
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        i1 = EGA_get_int(ast1);
+        for (size_t i = 1; i < args.size(); ++i)
         {
-            int i1 = EGA_get_int(ast1);
-            int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 | i2);
+            if (auto ast2 = EGA_eval_arg(args[i], true))
+            {
+                int i2 = EGA_get_int(ast2);
+                i1 |= i2;
+            }
         }
     }
 
-    return nullptr;
+    return make_arg<AstInt>(i1);
 }
 
 arg_t EGA_FN EGA_bitand(const args_t& args)
 {
     EVAL_DEBUG();
 
+    int i1 = 0;
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        i1 = EGA_get_int(ast1);
+        for (size_t i = 1; i < args.size(); ++i)
         {
-            int i1 = EGA_get_int(ast1);
-            int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 & i2);
+            if (auto ast2 = EGA_eval_arg(args[i], true))
+            {
+                int i2 = EGA_get_int(ast2);
+                i1 &= i2;
+            }
         }
     }
 
-    return nullptr;
+    return make_arg<AstInt>(i1);
 }
 
 arg_t EGA_FN EGA_xor(const args_t& args)
 {
     EVAL_DEBUG();
 
+    int i1 = 0;
     if (auto ast1 = EGA_eval_arg(args[0], true))
     {
-        if (auto ast2 = EGA_eval_arg(args[1], true))
+        i1 = EGA_get_int(ast1);
+        for (size_t i = 1; i < args.size(); ++i)
         {
-            int i1 = EGA_get_int(ast1);
-            int i2 = EGA_get_int(ast2);
-            return make_arg<AstInt>(i1 ^ i2);
+            if (auto ast2 = EGA_eval_arg(args[i], true))
+            {
+                int i2 = EGA_get_int(ast2);
+                i1 ^= i2;
+            }
         }
     }
 
-    return nullptr;
+    return make_arg<AstInt>(i1);
 }
 
 arg_t EGA_FN EGA_left(const args_t& args)
@@ -2271,6 +2283,55 @@ arg_t EGA_FN EGA_array(const args_t& args)
     return array;
 }
 
+static std::string str_right(const std::string& str, size_t length)
+{
+    if (str.size() <= length)
+        return str;
+    return str.substr(str.size() - length, length);
+}
+
+static std::string tm_str(const std::tm* ptm)
+{
+    std::string str;
+    str.reserve(sizeof("YYYY-MM-DD hh:mm:ss"));
+    str += str_right("000" + std::to_string(ptm->tm_year + 1900), 4);
+    str += "-";
+    str += str_right("0" + std::to_string(ptm->tm_mon + 1), 2);
+    str += "-";
+    str += str_right("0" + std::to_string(ptm->tm_mday), 2);
+    str += " ";
+    str += str_right("0" + std::to_string(ptm->tm_hour), 2);
+    str += ":";
+    str += str_right("0" + std::to_string(ptm->tm_min), 2);
+    str += ":";
+    str += str_right("0" + std::to_string(ptm->tm_sec), 2);
+    return str;
+}
+
+arg_t EGA_FN EGA_localtime(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    std::time_t t = std::time(nullptr);
+    std::tm* ptm = std::localtime(&t);
+    if (!ptm)
+        return nullptr;
+
+    return make_arg<AstStr>(tm_str(ptm));
+}
+
+arg_t EGA_FN EGA_gmtime(const args_t& args)
+{
+    EVAL_DEBUG();
+
+    std::time_t t = std::time(nullptr);
+    std::tm* ptm = std::gmtime(&t);
+    if (!ptm)
+        return nullptr;
+
+    return make_arg<AstStr>(tm_str(ptm));
+}
+
 bool EGA_init(void)
 {
     s_stopping = false;
@@ -2341,19 +2402,19 @@ bool EGA_init(void)
     // logical
     EGA_add_fn("not", 1, 1, EGA_not, "not(value)");
     EGA_add_fn("!", 1, 1, EGA_not, "not(value)");
-    EGA_add_fn("or", 2, 32767, EGA_or, "or(value1, value2)");
-    EGA_add_fn("||", 2, 32767, EGA_or, "or(value1, value2)");
-    EGA_add_fn("and", 2, 32767, EGA_and, "and(value1, value2)");
-    EGA_add_fn("&&", 2, 32767, EGA_and, "and(value1, value2)");
+    EGA_add_fn("or", 2, 32767, EGA_or, "or(value1, value2, ...)");
+    EGA_add_fn("||", 2, 32767, EGA_or, "or(value1, value2, ...)");
+    EGA_add_fn("and", 2, 32767, EGA_and, "and(value1, value2, ...)");
+    EGA_add_fn("&&", 2, 32767, EGA_and, "and(value1, value2, ...)");
 
     // bit operation
     EGA_add_fn("compl", 1, 1, EGA_compl, "compl(value)");
     EGA_add_fn("~", 1, 1, EGA_compl, "compl(value)");
-    EGA_add_fn("bitor", 2, 2, EGA_bitor, "bitor(value1, value2)");
-    EGA_add_fn("|", 2, 2, EGA_bitor, "bitor(value1, value2)");
-    EGA_add_fn("bitand", 2, 2, EGA_bitand, "bitand(value1, value2)");
-    EGA_add_fn("&", 2, 2, EGA_bitand, "bitand(value1, value2)");
-    EGA_add_fn("xor", 2, 2, EGA_xor, "xor(value1, value2)");
+    EGA_add_fn("bitor", 2, 32767, EGA_bitor, "bitor(value1, value2, ...)");
+    EGA_add_fn("|", 2, 32767, EGA_bitor, "bitor(value1, value2, ...)");
+    EGA_add_fn("bitand", 2, 32767, EGA_bitand, "bitand(value1, value2, ...)");
+    EGA_add_fn("&", 2, 32767, EGA_bitand, "bitand(value1, value2, ...)");
+    EGA_add_fn("xor", 2, 32767, EGA_xor, "xor(value1, value2, ...)");
     EGA_add_fn("^", 2, 2, EGA_xor, "xor(value1, value2)");
 
     // array/string manipulation
@@ -2369,6 +2430,10 @@ bool EGA_init(void)
     EGA_add_fn("remove", 2, 2, EGA_remove, "remove(ary_or_str, target)");
     EGA_add_fn("u8fromu16", 1, 1, EGA_u8fromu16, "u8fromu16(utf16str)");
     EGA_add_fn("u16fromu8", 1, 1, EGA_u16fromu8, "u16fromu8(utf8str)");
+
+    // date/time manipulation
+    EGA_add_fn("localtime", 0, 0, EGA_localtime, "localtime()");
+    EGA_add_fn("gmtime", 0, 0, EGA_gmtime, "gmtime()");
 
     return true;
 }

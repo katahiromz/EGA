@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual Version 17
+# The Programming Language EGA Reference Manual Version 18
 
 Written by Katayama Hirofumi MZ.
 
@@ -17,7 +17,7 @@ Please start up EGA. The following text will be displayed:
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 13 by katahiromz                  @
+@ EGA Version 14 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -28,7 +28,7 @@ Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. 
 
 ```txt
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 13 by katahiromz                  @
+@ EGA Version 14 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -74,6 +74,11 @@ EGA>
 The detailed descriptions of the EGA functions will be described later.
 
 ## What's New
+
+Change in Version 14:
+
+- Changed arity of function `bitor`(`|`), `bitand`(`&`), and `xor`(`^`).
+- Added `localtime` and `gmtime` functions.
 
 Change in Version 13:
 
@@ -369,11 +374,11 @@ Returns a binary string.
 
 ```txt
 EGA function 'bitand':
-  arity: 2
-  usage: bitand(value1, value2)
+  arity: 2..32767
+  usage: bitand(value1, value2[, ...])
 ```
 
-Calculates bitwise AND of two integers. Returns an integer.
+Calculates bitwise AND of two integers, or more. Returns an integer.
 
 Same as `&`.
 
@@ -381,11 +386,11 @@ Same as `&`.
 
 ```txt
 EGA function 'bitor':
-  arity: 2
-  usage: bitor(value1, value2)
+  arity: 2..32767
+  usage: bitor(value1, value2[, ...])
 ```
 
-Calculates bitwise OR of two integers. Returns an integer.
+Calculates bitwise OR of two integers, or more. Returns an integer.
 
 Same as `|`.
 
@@ -417,7 +422,7 @@ EGA function 'compare':
   usage: compare(value1, value2)
 ```
 
-Compares two values. Returns 0 if `value1` and `value2` are equal, -1 if `value1` was less, or 1 if `value1` was greater.
+Compares two values. Returns 0 if `value1` and `value2` are equal, -(1) if `value1` was less, or 1 if `value1` was greater.
 
 ### EGA `compl` Function
 
@@ -526,7 +531,7 @@ EGA function 'find':
 ```
 
 Finds a target value from an array or a string.
-Returns the zero-based offset of the found target. Returns -1 if not found.
+Returns the zero-based offset of the found target. Returns -(1) if not found.
 
 ### EGA `for` Function
 
@@ -665,6 +670,26 @@ EGA function 'less':
 Compares two values. Returns 1 if `value1` was less than `value2` or equal. Otherwise returns zero.
 
 Same as `<=`.
+
+### EGA `localtime` Function
+
+```txt
+EGA function 'localtime':
+  arity: 0
+  usage: localtime()
+```
+
+Returns the local date/time string like `YYYY-MM-DD hh:mm:ss`.
+
+### EGA `gmtime` Function
+
+```txt
+EGA function 'gmtime':
+  arity: 0
+  usage: gmtime()
+```
+
+Returns the UTC date/time string like `YYYY-MM-DD hh:mm:ss`.
 
 ### EGA `mid` Function
 
@@ -864,7 +889,7 @@ EGA function 'typeid':
 
 Returns the type ID of the value.
 
-If the value is NULL, then returns `-1`.
+If the value is NULL, then returns `-(1)`.
 If the value is an integer, then returns zero.
 If the value is a string, then returns `1`.
 If the value is an array, then returns `2`.
@@ -913,11 +938,11 @@ You can break the loop by `break` function.
 
 ```txt
 EGA function 'xor':
-  arity: 2
-  usage: xor(value1, value2)
+  arity: 2..32767
+  usage: xor(value1, value2, ...)
 ```
 
-Calculates bitwise XOR of two integers. Returns an integer.
+Calculates bitwise XOR of two integers, or more. Returns an integer.
 
 Same as `^`.
 
@@ -983,14 +1008,14 @@ For example: `RES_save("C:\Users\katahiromz\Desktop\a.res", "(sep-lang)(compress
 ```txt
 EGA function 'RES_clone_by_lang':
   arity: 4
-  usage: RES_clone_by_name(type, name, src_lang, dest_lang)
+  usage: RES_clone_by_lang(type, name, src_lang, dest_lang)
 ```
 
 `RES_clone_by_name` clones the resource data as another resource language.
 
 `type` must be an integer or a string of a resource type. If `type` is `"*"`, then search all resource types.
 `name` must be an integer or a string of a resource name. If `name` is `"*"`, then search all resource names.
-`src_lang` must be an integer that specifies the source language ID. If `lang` is `-1`, then search all resource languages.
+`src_lang` must be an integer that specifies the source language ID. If `lang` is `-(1)`, then search all resource languages.
 `dest_lang` must be an integer that specifies the destination language ID.
 
 Returns `1` if cloned. Otherwise returns zero.
@@ -1035,7 +1060,7 @@ EGA function 'RES_delete':
 
 `type` must be an integer or a string of a resource type. If `type` is `"*"` or omitted, then search all resource types.
 `name` must be an integer or a string of a resource name. If `name` is `"*"` or omitted, then search all resource names.
-`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
+`lang` must be an integer that specifies the language ID. If `lang` is `-(1)` or omitted, then search all resource languages.
 
 Returns `1` if deleted. Otherwise returns zero.
 
@@ -1062,7 +1087,7 @@ EGA function 'RES_search':
 
 `type` must be an integer or a string of a resource type. If `type` is `"*"` or omitted, then search all resource types.
 `name` must be an integer or a string of a resource name. If `name` is `"*"` or omitted, then search all resource names.
-`lang` must be an integer that specifies the language ID. If `lang` is `-1` or omitted, then search all resource languages.
+`lang` must be an integer that specifies the language ID. If `lang` is `-(1)` or omitted, then search all resource languages.
 
 ### EGA `RES_select` Function
 
