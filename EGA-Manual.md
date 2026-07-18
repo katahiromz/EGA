@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual Version 18
+# The Programming Language EGA Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -107,7 +107,8 @@ Change in Version 8:
 
 ## Comments
 
-The comment of EGA begins with the first at symbol (`@`) of a line, and ends with newline.
+A comment begins with the at symbol (`@`) at the beginning of a line and ends at the newline.
+
 The comments are ignored in execution of EGA program.
 
 For example:
@@ -170,7 +171,7 @@ See also `left`, `len`, `mid`, `right`, `replace`, `remove` and `array` function
 
 ## Booleans
 
-In EGA, the boolean value is an integer value. Zero means false. Non-zero means true.
+In EGA, the boolean value is an integer value. Zero means false. Non-`0` means true.
 
 See `not`, `and`, `or` functions.
 
@@ -245,7 +246,7 @@ for(k, 1, 12, (
 )
 ```
 
-This EGA program will output the factorial numbers of 1-to-12. Output:
+This EGA program prints the factorial values for numbers from `1` to `12`. Output:
 
 ```txt
 n = 1: fact == 1
@@ -262,7 +263,7 @@ n = 11: fact == 39916800
 n = 12: fact == 479001600
 ```
 
-The `define` special function defines a macro variable. This program is same as:
+The `define` special function defines a macro variable. This is the same as:
 
 ```txt
 for(k, 1, 12, (
@@ -433,7 +434,7 @@ EGA function 'do':
   usage: do(expr, ...)
 ```
 
-Does loop while `expr` is non-zero.
+Does loop while `expr` is non-`0`.
 The arguments will be evaluated in order.
 Returns the last argument.
 You can break the execution by `break` function.
@@ -469,7 +470,7 @@ EGA function 'equal':
   usage: equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if two values are equal. zero if not equal.
+Compares two values. Returns `1` if two values are equal. `0` if not equal.
 
 Same as `==`.
 
@@ -492,7 +493,7 @@ EGA function 'find':
 ```
 
 Finds a target value from an array or a string.
-Returns the zero-based offset of the found target. Returns -(1) if not found.
+Returns the `0`-based offset of the found target. Returns `-(1)` if not found.
 
 ### EGA `for` Function
 
@@ -536,7 +537,7 @@ EGA function 'greater':
   usage: greater(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was greater than `value2`. zero if not greater.
+Compares two values. Returns `1` if `value1` was greater than `value2`. `0` if not greater.
 
 Same as `>`.
 
@@ -548,7 +549,7 @@ EGA function 'greater_equal':
   usage: greater_equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was greater than `value2` or equal. Otherwise returns zero.
+Compares two values. Returns `1` if `value1` was greater than `value2` or equal. Otherwise returns `0`.
 
 Same as `>=`.
 
@@ -573,8 +574,8 @@ EGA function 'if':
 
 Chooses the execution by the condition.
 
-If the integer value `cond` was non-zero, then `true_case` will be evaluated.
-If `cond` was zero, then `false_case` will be evaluated if any.
+If the integer value `cond` was non-`0`, then `true_case` will be evaluated.
+If `cond` was `0`, then `false_case` will be evaluated if any.
 Returns the evaluated value of `true_case` or `false_case`.
 
 ### EGA `int` Function
@@ -616,7 +617,7 @@ EGA function 'less':
   usage: less(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was less than `value2`. zero if not less.
+Compares two values. Returns 1 if `value1` was less than `value2`. `0` if not less.
 
 Same as `<`.
 
@@ -628,7 +629,7 @@ EGA function 'less_equal':
   usage: less_equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was less than `value2` or equal. Otherwise returns zero.
+Compares two values. Returns 1 if `value1` was less than `value2` or equal. Otherwise returns `0`.
 
 Same as `<=`.
 
@@ -689,7 +690,7 @@ EGA function 'mod':
 ```
 
 Calculates the remainder of division of two integers.
-`int2` must be non-zero.
+`int2` must be non-`0`.
 Returns an integer.
 Same as `%`.
 
@@ -726,7 +727,7 @@ EGA function 'not_equal':
   usage: not_equal(value1, value2)
 ```
 
-Compares two values. Returns 1 if `value1` was different from `value2`. Otherwise returns zero.
+Compares two values. Returns 1 if `value1` was different from `value2`. Otherwise returns `0`.
 Same as `!=`.
 
 ### EGA `or` Function
@@ -851,7 +852,7 @@ EGA function 'typeid':
 Returns the type ID of the value.
 
 If the value is NULL, then returns `-(1)`.
-If the value is an integer, then returns zero.
+If the value is an integer, then returns `0`.
 If the value is a string, then returns `1`.
 If the value is an array, then returns `2`.
 
@@ -886,11 +887,11 @@ EGA function 'while':
   usage: while(cond, expr)
 ```
 
-Does loop while the specified condition is non-zero.
+Does loop while the specified condition is non-`0`.
 The `expr` argument will be evaluated repeatedly.
 The `cond` is the condition.
 
-1. At first `cond` will be evaluated. If it was zero, then loop will be ended.
+1. At first `cond` will be evaluated. If it was `0`, then loop will be ended.
 2. `expr` will be evaluated. Back to 1.
 
 You can break the loop by `break` function.
@@ -973,9 +974,9 @@ EGA function 'RES_clone_by_lang':
 ```
 
 Clones a resource item from one language to another language.
-`type` must be an integer or a string of a resource type. If type is `"*"`, then all resource types are searched.
-`name` must be an integer or a string of a resource name. If name is `"*"`, then all resource names are searched.
-`src_lang` must be an integer that specifies the source language ID. If src_lang is `-(1)`, then all resource languages are searched.
+`type` must be an integer or a string of a resource type. If `type` is `"*"`, then all resource types are searched.
+`name` must be an integer or a string of a resource name. If `name` is `"*"`, then all resource names are searched.
+`src_lang` must be an integer that specifies the source language ID. If `src_lang` is `-(1)`, then all resource languages are searched.
 `dest_lang` must be an integer that specifies the destination language ID.
 Returns `1` if successfully cloned. Otherwise returns `0`.
 
@@ -987,13 +988,13 @@ EGA function 'RES_clone_by_name':
   usage: RES_clone_by_name(type, src_name, dest_name)
 ```
 
-`RES_clone_by_name` clones the resource data as another resource name.
+Clones a resource item and gives it a new name.
 
-`type` must be an integer or a string of a resource type. If `type` is `"*"`, then search all resource types.
-`src_name` must be an integer or a string of a resource name. If `src_name` is `"*"`, then search all resource names.
+`type` must be an integer or a string of a resource type. If `type` is `"*"`, then all resource types are searched.
+`src_name` must be an integer or a string of a resource name. If `src_name` is `"*"`, then all resource names are searched.
 `dest_name` must be an integer or a string of a new resource name.
 
-Returns `1` if cloned. Otherwise returns zero.
+Returns `1` if successfully cloned. Otherwise returns `0`.
 
 ### EGA `RES_const` Function
 
@@ -1005,7 +1006,7 @@ EGA function 'RES_const':
 
 The `RES_const` function queries the database for the value of a constant.
 
-`name` must be a constant name. Returns the value if successful, otherwise zero.
+`name` must be a constant name. Returns the value if successful, otherwise `0`.
 
 ### EGA `RES_delete` Function
 
@@ -1021,7 +1022,7 @@ EGA function 'RES_delete':
 `name` must be an integer or a string of a resource name. If `name` is `"*"` or omitted, then search all resource names.
 `lang` must be an integer that specifies the language ID. If `lang` is `-(1)` or omitted, then search all resource languages.
 
-Returns `1` if deleted. Otherwise returns zero.
+Returns `1` if deleted. Otherwise returns `0`.
 
 ### EGA `RES_get_binary` Function
 
@@ -1057,7 +1058,7 @@ EGA function 'RES_select':
 ```
 
 `RES_select` selects an item on the RisohEditor treeview.
-Returns `1` if successful, zero if failed.
+Returns `1` if successful, `0` if failed.
 
 ### EGA `RES_set_binary` Function
 
@@ -1068,7 +1069,7 @@ EGA function 'RES_set_binary':
 ```
 
 `RES_set_binary` sets the binary data as the specified resource type, resource name, and language.
-Returns 1 if successful, zero if failed.
+Returns `1` if successful, `0` if failed.
 
 ### EGA `RES_unload_resh` Function
 
@@ -1128,7 +1129,7 @@ EGA function 'RES_set_text':
   usage: RES_set_text(type, name, lang, text)
 ```
 
-`RES_set_text` sets the text of the resource item and compile the text.
+`RES_set_text` sets the text of the resource item and compiles the text.
 Returns `1` if successful.
 Returns `0` if failed.
 
