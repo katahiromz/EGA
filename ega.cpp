@@ -1280,7 +1280,8 @@ bool EGA_file_security(std::string& filename)
     std::wstring file_path = full_path;
 
     // Lowercase
-    std::wstring module_dir_lower, file_path_lower;
+    std::wstring module_dir_lower = module_dir;
+    std::wstring file_path_lower = file_path;
     for (auto& c : module_dir_lower) if (c >= L'A' && c <= L'Z') c += 32;
     for (auto& c : file_path_lower)  if (c >= L'A' && c <= L'Z') c += 32;
 
