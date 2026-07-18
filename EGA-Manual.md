@@ -645,6 +645,8 @@ EGA function 'load':
 Loads the file contents.
 Returns the binary string or `0`.
 
+NOTE: RisohEditor EGA cannot read files outside the application's execution path.
+
 ### EGA `localtime` Function
 
 ```txt
@@ -654,8 +656,6 @@ EGA function 'localtime':
 ```
 
 Returns the local date/time string like `YYYY-MM-DD hh:mm:ss`.
-
-NOTE: RisohEditor EGA cannot read files outside the application's execution path.
 
 ### EGA `gmtime` Function
 
@@ -965,6 +965,8 @@ EGA function 'RES_load':
 
 `options` is an empty string or `"(no-load-res-h)"`;
 
+NOTE: RisohEditor EGA cannot read files outside the application's execution path.
+
 ### EGA `RES_save` Function
 
 ```txt
@@ -991,6 +993,8 @@ EGA function 'RES_save':
 - `"(ms-msgtbl)"`
 
 For example: `RES_save("C:\Users\katahiromz\Desktop\a.res", "(sep-lang)(compress)")`;
+
+NOTE: RisohEditor EGA cannot write files outside the application's execution path.
 
 ### EGA `RES_clone_by_lang` Function
 
