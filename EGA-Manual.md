@@ -79,6 +79,7 @@ Change in Version 14:
 
 - Changed arity of function `bitor`(`|`), `bitand`(`&`), and `xor`(`^`).
 - Added `localtime` and `gmtime` functions.
+- Added `load` and `save` functions.
 
 Change in Version 13:
 
@@ -633,6 +634,17 @@ Compares two values. Returns 1 if `value1` was less than `value2` or equal. Othe
 
 Same as `<=`.
 
+### EGA `load` Function
+
+```txt
+EGA function 'load':
+  arity: 1
+  usage: load(filename)
+```
+
+Loads the file contents.
+Returns the binary string or `0`.
+
 ### EGA `localtime` Function
 
 ```txt
@@ -815,6 +827,17 @@ EGA function 'right':
 ```
 
 Returns an array or a string of `count` items at the right side of an array or a string.
+
+### EGA `save` Function
+
+```txt
+EGA function 'save':
+  arity: 2
+  usage: save(filename, contents)
+```
+
+Writes a file with contents.
+Returns `1` if file writing is successful. Returns `0` otherwise.
 
 ### EGA `set` Function
 

@@ -37,6 +37,13 @@ arg_t EGA_eval_arg(const arg_t& ast, int lineno, bool do_check);
 arg_t EGA_eval_arg(const arg_t& ast, bool do_check);
 arg_t EGA_eval_arg(const arg_t& ast);
 
+static std::string str_right(const std::string& str, size_t length)
+{
+    if (str.size() <= length)
+        return str;
+    return str.substr(str.size() - length, length);
+}
+
 std::string AstInt::dump(bool q) const
 {
     return mstr_to_string(m_value);
@@ -2283,13 +2290,6 @@ arg_t EGA_FN EGA_array(const args_t& args)
     return array;
 }
 
-static std::string str_right(const std::string& str, size_t length)
-{
-    if (str.size() <= length)
-        return str;
-    return str.substr(str.size() - length, length);
-}
-
 static std::string tm_str(const std::tm* ptm)
 {
     std::string str;
@@ -2330,6 +2330,68 @@ arg_t EGA_FN EGA_gmtime(const args_t& args)
         return nullptr;
 
     return make_arg<AstStr>(tm_str(ptm));
+}
+
+arg_t EGA_FN EGA_load(const args_t& args)
+{
+    EVAL_DEBUG();
+    std::string filename = EGA_get_str(args[0]);
+
+#ifdef _WIN32
+    wchar_t path[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, filename.c_str(), -1, path, _countof(path));
+    FILE *fp = _wfopen(path, L"rb");
+#else
+    FILE *fp = fopen(filename, "rb");
+#endif
+    if (!fp)
+        return make_arg<AstInt>(0);
+
+    if (!fseek(fp, 0, SEEK_END))
+    {
+        fclose(fp);
+        return make_arg<AstInt>(0);
+    }
+
+    long filesize = ftell(fp);
+
+    if (!fseek(fp, 0, SEEK_SET))
+    {
+        fclose(fp);
+        return make_arg<AstInt>(0);
+    }
+
+    std::string contents;
+    contents.resize(filesize);
+
+    bool has_read = fread(contents.data(), 1, contents.size(), fp);
+    fclose(fp);
+
+    if (!has_read)
+        return make_arg<AstInt>(0);
+
+    return make_arg<AstStr>(contents);
+}
+
+arg_t EGA_FN EGA_save(const args_t& args)
+{
+    EVAL_DEBUG();
+    std::string filename = EGA_get_str(args[0]);
+    std::string contents = EGA_get_str(args[1]);
+
+#ifdef _WIN32
+    wchar_t path[MAX_PATH];
+    MultiByteToWideChar(CP_UTF8, 0, filename.c_str(), -1, path, _countof(path));
+    FILE *fp = _wfopen(path, L"wb");
+#else
+    FILE *fp = fopen(filename, "wb");
+#endif
+    if (!fp)
+        return make_arg<AstInt>(0);
+
+    bool written = fwrite(contents.data(), 1, contents.size(), fp);
+    fclose(fp);
+    return make_arg<AstInt>(written);
 }
 
 bool EGA_init(void)
@@ -2434,6 +2496,10 @@ bool EGA_init(void)
     // date/time manipulation
     EGA_add_fn("localtime", 0, 0, EGA_localtime, "localtime()");
     EGA_add_fn("gmtime", 0, 0, EGA_gmtime, "gmtime()");
+
+    // file manipulation
+    EGA_add_fn("load", 1, 1, EGA_load, "load(filename)");
+    EGA_add_fn("save", 2, 2, EGA_save, "save(filename, bin)");
 
     return true;
 }
