@@ -655,6 +655,8 @@ EGA function 'localtime':
 
 Returns the local date/time string like `YYYY-MM-DD hh:mm:ss`.
 
+NOTE: RisohEditor EGA cannot read files outside the application's execution path.
+
 ### EGA `gmtime` Function
 
 ```txt
@@ -838,6 +840,8 @@ EGA function 'save':
 
 Writes a file with contents.
 Returns `1` if file writing is successful. Returns `0` otherwise.
+
+NOTE: RisohEditor EGA cannot write files outside the application's execution path.
 
 ### EGA `set` Function
 

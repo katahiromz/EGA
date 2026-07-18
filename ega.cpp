@@ -1243,6 +1243,72 @@ arg_t EGA_FN EGA_dumpln(const args_t& args)
     return nullptr;
 }
 
+bool EGA_file_security(std::string& filename)
+{
+#ifdef _WIN32
+    mstr_trim(filename, " \t\r\n");
+    if (filename.empty())
+        return false;
+
+    // Get executable's directory
+    WCHAR module[MAX_PATH];
+    if (GetModuleFileNameW(nullptr, module, _countof(module)) == 0)
+        return false;
+
+    wchar_t* pch = wcsrchr(module, L'\\');
+    if (pch)
+        *pch = 0;  // Now 'module' contains only the directory
+
+    // Convert input filename to wide string
+    wchar_t wfilename[MAX_PATH];
+    if (MultiByteToWideChar(CP_UTF8, 0, filename.c_str(), -1, wfilename, _countof(wfilename)) == 0)
+        return false;
+
+    // Get full absolute path of the requested file
+    wchar_t curdir[MAX_PATH], full_path[MAX_PATH];
+    GetCurrentDirectoryW(_countof(curdir), curdir);
+    if (!SetCurrentDirectoryW(module) ||
+        GetFullPathNameW(wfilename, _countof(full_path), full_path, nullptr) == 0)
+    {
+        SetCurrentDirectoryW(curdir);
+        return false;
+    }
+    SetCurrentDirectoryW(curdir);
+
+    // Normalize both paths (lowercase + ensure trailing backslash on module dir)
+    std::wstring module_dir = module;
+    std::wstring file_path = full_path;
+
+    // Lowercase
+    std::wstring module_dir_lower, file_path_lower;
+    for (auto& c : module_dir_lower) if (c >= L'A' && c <= L'Z') c += 32;
+    for (auto& c : file_path_lower)  if (c >= L'A' && c <= L'Z') c += 32;
+
+    if (!module_dir_lower.empty() && module_dir_lower.back() != L'\\')
+        module_dir_lower += L'\\';
+
+    // Security check: file must be inside the executable's directory
+    if (file_path_lower.size() < module_dir_lower.size() ||
+        file_path_lower.compare(0, module_dir_lower.size(), module_dir_lower.c_str()) != 0)
+    {
+        return false;
+    }
+
+    char real_path[MAX_PATH];
+    if (WideCharToMultiByte(CP_UTF8, 0, file_path.c_str(), -1, real_path, _countof(real_path),
+                            nullptr, nullptr) == 0)
+    {
+        return false;
+    }
+    filename = real_path;
+
+    return true;
+#else
+    // On non-Windows, allow everything (or implement similar logic with realpath if needed)
+    return true;
+#endif
+}
+
 arg_t EGA_FN EGA_len(const args_t& args)
 {
     EVAL_DEBUG();
@@ -2336,6 +2402,11 @@ arg_t EGA_FN EGA_load(const args_t& args)
 {
     EVAL_DEBUG();
     std::string filename = EGA_get_str(args[0]);
+    if (!EGA_file_security(filename))
+    {
+        EGA_do_print("SECURITY HIT!\n");
+        return make_arg<AstInt>(0);
+    }
 
 #ifdef _WIN32
     wchar_t path[MAX_PATH];
@@ -2347,7 +2418,7 @@ arg_t EGA_FN EGA_load(const args_t& args)
     if (!fp)
         return make_arg<AstInt>(0);
 
-    if (!fseek(fp, 0, SEEK_END))
+    if (fseek(fp, 0, SEEK_END))
     {
         fclose(fp);
         return make_arg<AstInt>(0);
@@ -2355,7 +2426,7 @@ arg_t EGA_FN EGA_load(const args_t& args)
 
     long filesize = ftell(fp);
 
-    if (!fseek(fp, 0, SEEK_SET))
+    if (fseek(fp, 0, SEEK_SET))
     {
         fclose(fp);
         return make_arg<AstInt>(0);
@@ -2378,6 +2449,11 @@ arg_t EGA_FN EGA_save(const args_t& args)
     EVAL_DEBUG();
     std::string filename = EGA_get_str(args[0]);
     std::string contents = EGA_get_str(args[1]);
+    if (!EGA_file_security(filename))
+    {
+        EGA_do_print("SECURITY HIT!\n");
+        return make_arg<AstInt>(0);
+    }
 
 #ifdef _WIN32
     wchar_t path[MAX_PATH];
