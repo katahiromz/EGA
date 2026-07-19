@@ -1182,7 +1182,7 @@ EGA function 'RES_unload_resh':
   usage: RES_unload_resh()
 ```
 
-`RES_unload_resh` unloads the "`resource.h`" file.
+`RES_unload_resh` unloads the `"resource.h"` file.
 Always returns `1`.
 
 ## How can I extend EGA?
