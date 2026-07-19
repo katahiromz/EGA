@@ -71,6 +71,9 @@ bool mstr_is_binary(const std::string& str)
 
 std::string mstr_quote2(const std::string& str)
 {
+	if (str.size() > 0x7FFF / 2)
+		return "(too large)";
+
     if (!mstr_is_binary(str))
         return mstr_quote(str);
 
@@ -79,6 +82,9 @@ std::string mstr_quote2(const std::string& str)
     std::string buf;
     for (size_t i = 0; i < str.size(); ++i)
     {
+		if (EGA_is_stopping())
+			throw EGA_control_break(0);
+
         unsigned char ch = str[i];
 
         if (is_cntrl(ch) || ch == '"')
@@ -1248,11 +1254,6 @@ bool EGA_file_security(std::string& filename)
 #if defined(_WIN32) && defined(RISOHEDITOR)
     mstr_trim(filename, " \t\r\n");
     if (filename.empty())
-        return false;
-
-    auto right = str_right(filename, 4);
-    _strlwr(right.data());
-    if (right == ".dll")
         return false;
 
     // Get executable's directory
@@ -2438,7 +2439,7 @@ arg_t EGA_FN EGA_load(const args_t& args)
     std::string contents;
     contents.resize(filesize);
 
-    bool has_read = fread(contents.data(), 1, contents.size(), fp);
+    bool has_read = !!fread(&contents[0], 1, contents.size(), fp);
     fclose(fp);
 
     if (!has_read)
@@ -2468,7 +2469,7 @@ arg_t EGA_FN EGA_save(const args_t& args)
     if (!fp)
         return make_arg<AstInt>(0);
 
-    bool written = fwrite(contents.data(), 1, contents.size(), fp);
+    bool written = !!fwrite(contents.data(), 1, contents.size(), fp);
     fclose(fp);
     return make_arg<AstInt>(written);
 }
