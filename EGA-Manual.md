@@ -944,58 +944,18 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_clone_by_name`
 - `RES_const`
 - `RES_delete`
+- `RES_extract`
 - `RES_get_binary`
+- `RES_get_text`
 - `RES_load`
 - `RES_save`
 - `RES_search`
 - `RES_select`
 - `RES_set_binary`
+- `RES_set_text`
 - `RES_str_get`
 - `RES_str_set`
 - `RES_unload_resh`
-
-### EGA `RES_load` Function
-
-```txt
-EGA function 'RES_load':
-  arity: 1..2
-  usage: RES_load(filename[, options])
-```
-
-`RES_load` loads the resource file.
-
-`options` is an empty string or `"(no-load-res-h)"`;
-
-NOTE: RisohEditor EGA cannot read files outside the application's execution path.
-
-### EGA `RES_save` Function
-
-```txt
-EGA function 'RES_save':
-  arity: 1..2
-  usage: RES_save(filename[, options])
-```
-
-`RES_save` saves the resource file.
-
-`options` is an empty string or the combinations of the following strings.
-
-- `"(idc-static)"`
-- `"(compress)"`
-- `"(sep-lang)"`
-- `"(no-res-folder)"`
-- `"(lang-macro)"`
-- `"(less-comments)"`
-- `"(wrap-manifest)"`
-- `"(begin-end)"`
-- `"(utf-16)"`
-- `"(bom)"`
-- `"(backup)"`
-- `"(ms-msgtbl)"`
-
-For example: `RES_save("C:\Users\katahiromz\Desktop\a.res", "(sep-lang)(compress)")`;
-
-NOTE: RisohEditor EGA cannot write files outside the application's execution path.
 
 ### EGA `RES_clone_by_lang` Function
 
@@ -1084,6 +1044,60 @@ EGA function 'RES_get_binary':
 `RES_get_binary` gets the binary data of the specified resource data.
 Returns the binary string.
 
+### EGA `RES_get_text` Function
+
+```txt
+EGA function 'RES_get_text':
+  arity: 3..3
+  usage: RES_get_text(type, name, lang)
+```
+
+`RES_get_text` gets the text of the resource.
+If failed, returns an empty string.
+
+### EGA `RES_load` Function
+
+```txt
+EGA function 'RES_load':
+  arity: 1..2
+  usage: RES_load(filename[, options])
+```
+
+`RES_load` loads the resource file.
+
+`options` is an empty string or `"(no-load-res-h)"`;
+
+NOTE: RisohEditor EGA cannot read files outside the application's execution path.
+
+### EGA `RES_save` Function
+
+```txt
+EGA function 'RES_save':
+  arity: 1..2
+  usage: RES_save(filename[, options])
+```
+
+`RES_save` saves the resource file.
+
+`options` is an empty string or the combinations of the following strings.
+
+- `"(idc-static)"`
+- `"(compress)"`
+- `"(sep-lang)"`
+- `"(no-res-folder)"`
+- `"(lang-macro)"`
+- `"(less-comments)"`
+- `"(wrap-manifest)"`
+- `"(begin-end)"`
+- `"(utf-16)"`
+- `"(bom)"`
+- `"(backup)"`
+- `"(ms-msgtbl)"`
+
+For example: `RES_save("C:\Users\katahiromz\Desktop\a.res", "(sep-lang)(compress)")`;
+
+NOTE: RisohEditor EGA cannot write files outside the application's execution path.
+
 ### EGA `RES_search` Function
 
 ```txt
@@ -1120,16 +1134,17 @@ EGA function 'RES_set_binary':
 `RES_set_binary` sets the binary data as the specified resource type, resource name, and language.
 Returns `1` if successful, `0` if failed.
 
-### EGA `RES_unload_resh` Function
+### EGA `RES_set_text` Function
 
 ```txt
-EGA function 'RES_unload_resh':
-  arity: 0
-  usage: RES_unload_resh()
+EGA function 'RES_set_text':
+  arity: 4..4
+  usage: RES_set_text(type, name, lang, text)
 ```
 
-`RES_unload_resh` unloads the "`resource.h`" file.
-Always returns `1`.
+`RES_set_text` sets the text of the resource item and compiles the text.
+Returns `1` if successful.
+Returns `0` if failed.
 
 ### EGA `RES_str_get` Function
 
@@ -1159,28 +1174,16 @@ If `str_id` not specified, then set an array of pairs of string ID and text to t
 Returns `1` if successful.
 Returns `0` if failed.
 
-### EGA `RES_get_text` Function
+### EGA `RES_unload_resh` Function
 
 ```txt
-EGA function 'RES_get_text':
-  arity: 3..3
-  usage: RES_get_text(type, name, lang)
+EGA function 'RES_unload_resh':
+  arity: 0
+  usage: RES_unload_resh()
 ```
 
-`RES_get_text` gets the text of the resource.
-If failed, returns an empty string.
-
-### EGA `RES_set_text` Function
-
-```txt
-EGA function 'RES_set_text':
-  arity: 4..4
-  usage: RES_set_text(type, name, lang, text)
-```
-
-`RES_set_text` sets the text of the resource item and compiles the text.
-Returns `1` if successful.
-Returns `0` if failed.
+`RES_unload_resh` unloads the "`resource.h`" file.
+Always returns `1`.
 
 ## How can I extend EGA?
 
