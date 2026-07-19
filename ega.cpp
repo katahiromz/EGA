@@ -257,6 +257,11 @@ void EGA_do_print(const char *fmt, ...)
     va_end(va);
 }
 
+void EGA_hit_security(void)
+{
+    EGA_do_print("SECURITY HIT!\n");
+}
+
 void Token::print() const
 {
     EGA_do_print("%s", dump().c_str());
@@ -2408,7 +2413,7 @@ arg_t EGA_FN EGA_load(const args_t& args)
     std::string filename = EGA_get_str(args[0]);
     if (!EGA_file_security(filename))
     {
-        EGA_do_print("SECURITY HIT!\n");
+        EGA_hit_security();
         return make_arg<AstInt>(0);
     }
 
@@ -2455,7 +2460,7 @@ arg_t EGA_FN EGA_save(const args_t& args)
     std::string contents = EGA_get_str(args[1]);
     if (!EGA_file_security(filename))
     {
-        EGA_do_print("SECURITY HIT!\n");
+        EGA_hit_security();
         return make_arg<AstInt>(0);
     }
 
