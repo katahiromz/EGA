@@ -1245,9 +1245,14 @@ arg_t EGA_FN EGA_dumpln(const args_t& args)
 
 bool EGA_file_security(std::string& filename)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && defined(RISOHEDITOR)
     mstr_trim(filename, " \t\r\n");
     if (filename.empty())
+        return false;
+
+    auto right = str_right(filename, 4);
+    _strlwr(right.data());
+    if (right == ".dll")
         return false;
 
     // Get executable's directory
@@ -1302,12 +1307,9 @@ bool EGA_file_security(std::string& filename)
         return false;
     }
     filename = real_path;
+#endif
 
     return true;
-#else
-    // On non-Windows, allow everything (or implement similar logic with realpath if needed)
-    return true;
-#endif
 }
 
 arg_t EGA_FN EGA_len(const args_t& args)
