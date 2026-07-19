@@ -37,12 +37,12 @@ EGA> print(+(1, 2));
 EGA>
 ```
 
-To quit EGA, please enter "`exit`".
+To quit EGA, please enter `exit`.
 
 The syntax of the EGA is similar to one or more function call(s) of C language.
 But, every operator in EGA is a function.
 
-Enter "`help`" to see all the EGA functions:
+Enter `help` to see all the EGA functions:
 
 ```txt
 EGA> help;
@@ -60,7 +60,7 @@ EGA has the following functions:
 EGA> 
 ```
 
-To see brief usage of `print` function, enter "`help print`".
+To see brief usage of `print` function, enter `help print`.
 
 ```txt
 EGA> help print;
@@ -332,6 +332,7 @@ EGA function 'binary':
 
 Creates a binary string of the specified parameters.
 Each parameter is an integer or a string.
+
 Returns a binary string.
 
 ### EGA `bitand` Function
@@ -411,6 +412,7 @@ EGA function 'define':
 Defines an EGA macro variable. `var` is a variable.
 Unlike the `set` function, the `expr` argument will be not evaluated.
 If `expr` is omitted, `var` will be reset.
+
 Returns `expr`.
 
 Same as `:=`.
@@ -424,6 +426,7 @@ EGA function 'div':
 ```
 
 Divides an integer value `int1` by another integer value `int2`.
+
 Returns an integer.
 
 Same as `/`.
@@ -438,7 +441,9 @@ EGA function 'do':
 
 Does loop while `expr` is non-`0`.
 The arguments will be evaluated in order.
+
 Returns the last argument.
+
 You can break the execution by `break` function.
 
 ### EGA `dump` Function
@@ -495,6 +500,7 @@ EGA function 'find':
 ```
 
 Finds a target value from an array or a string.
+
 Returns the `0`-based offset of the found target. Returns `-(1)` if not found.
 
 ### EGA `for` Function
@@ -564,6 +570,7 @@ EGA function 'hex':
 ```
 
 Converts an integer value to a hexadecimal string.
+
 Returns a string.
 
 ### EGA `if` Function
@@ -578,6 +585,7 @@ Chooses the execution by the condition.
 
 If the integer value `cond` was non-`0`, then `true_case` will be evaluated.
 If `cond` was `0`, then `false_case` will be evaluated if any.
+
 Returns the evaluated value of `true_case` or `false_case`.
 
 ### EGA `int` Function
@@ -589,6 +597,7 @@ EGA function 'int':
 ```
 
 Converts a value to an integer value.
+
 Returns an integer.
 
 ### EGA `left` Function
@@ -644,6 +653,7 @@ EGA function 'load':
 ```
 
 Loads the file contents.
+
 Returns the binary string or `0`.
 
 NOTE: RisohEditor EGA cannot read files outside the application's execution path.
@@ -678,6 +688,7 @@ EGA function 'mid':
 
 Returns the sequence of the specified range of an array or a string.
 `ary_or_str` must be an array or a string.
+
 The range starts from offset `index`.
 The length of the range is `count`.
 If `value` is specified, the range will be replaced with a value of `value`.
@@ -692,6 +703,7 @@ EGA function 'minus':
 
 Negates or subtract.
 `int1` and `int2` must be integers.
+
 Returns an integer.
 
 Same as `-`.
@@ -706,7 +718,9 @@ EGA function 'mod':
 
 Calculates the remainder of division of two integers.
 `int2` must be non-`0`.
+
 Returns an integer.
+
 Same as `%`.
 
 ### EGA `mul` Function
@@ -718,6 +732,7 @@ EGA function 'mul':
 ```
 
 Calculates multiplication of two integers or more.
+
 Returns an integer.
 
 Same as `*`.
@@ -731,7 +746,9 @@ EGA function 'not':
 ```
 
 Calculates logical NOT of the value.
+
 Returns an integer.
+
 Same as `!`.
 
 ### EGA `not_equal` Function
@@ -754,6 +771,7 @@ EGA function 'or':
 ```
 
 Calculates logical OR of two or more values.
+
 Returns an integer.
 
 Same as `||`.
@@ -767,6 +785,7 @@ EGA function 'plus':
 ```
 
 Calculates sum of two integer values or more.
+
 Returns an integer.
 
 Same as `+`.
@@ -805,7 +824,9 @@ Returns an array or a string, whose parts are removed.
 
 If `ary_or_str` is an array, the items with the same value as `target` are removed.
 If `ary_or_str` is a string, the substrings `target` are removed.
+
 Returns the array or the string of the results.
+
 This function doesn't change `ary_or_str`.
 
 ### EGA `replace` Function
@@ -818,7 +839,9 @@ EGA function 'replace':
 
 If `ary_or_str` is an array, every item with the same value as the `from` value are replaced with the `to` value.
 If `ary_or_str` is a string, the substrings `from` are replaced with the `to` string.
+
 Returns the array or the string of the results.
+
 This function doesn't change `ary_or_str`.
 
 ### EGA `right` Function
@@ -840,6 +863,7 @@ EGA function 'save':
 ```
 
 Writes a file with contents.
+
 Returns `1` if file writing is successful. Returns `0` otherwise.
 
 NOTE: RisohEditor EGA cannot write files outside the application's execution path.
@@ -854,6 +878,7 @@ EGA function 'set':
 
 Creates a variable whose value is `value`.
 If `value` is not specified, the variable is cleared.
+
 Returns the value.
 
 Same as `=`.
@@ -867,6 +892,7 @@ EGA function 'str':
 ```
 
 Converts the value to a string.
+
 Returns a string.
 
 ### EGA `typeid` Function
@@ -970,6 +996,7 @@ Clones a resource item from one language to another language.
 `name` must be an integer or a string of a resource name. If `name` is `"*"`, then all resource names are searched.
 `src_lang` must be an integer that specifies the source language ID. If `src_lang` is `-(1)`, then all resource languages are searched.
 `dest_lang` must be an integer that specifies the destination language ID.
+
 Returns `1` if successfully cloned. Otherwise returns `0`.
 
 ### EGA `RES_clone_by_name` Function
@@ -1042,6 +1069,7 @@ EGA function 'RES_get_binary':
 ```
 
 `RES_get_binary` gets the binary data of the specified resource data.
+
 Returns the binary string.
 
 ### EGA `RES_get_text` Function
@@ -1121,6 +1149,7 @@ EGA function 'RES_select':
 ```
 
 `RES_select` selects an item on the RisohEditor treeview.
+
 Returns `1` if successful, `0` if failed.
 
 ### EGA `RES_set_binary` Function
@@ -1132,6 +1161,7 @@ EGA function 'RES_set_binary':
 ```
 
 `RES_set_binary` sets the binary data as the specified resource type, resource name, and language.
+
 Returns `1` if successful, `0` if failed.
 
 ### EGA `RES_set_text` Function
@@ -1143,6 +1173,7 @@ EGA function 'RES_set_text':
 ```
 
 `RES_set_text` sets the text of the resource item and compiles the text.
+
 Returns `1` if successful.
 Returns `0` if failed.
 
@@ -1171,6 +1202,7 @@ EGA function 'RES_str_set':
 If `str_id` specified, then write a UTF-8 string to the string table.
 If the string was empty, then the resource string will be cleared.
 If `str_id` not specified, then set an array of pairs of string ID and text to the string table.
+
 Returns `1` if successful.
 Returns `0` if failed.
 
@@ -1183,6 +1215,7 @@ EGA function 'RES_unload_resh':
 ```
 
 `RES_unload_resh` unloads the `"resource.h"` file.
+
 Always returns `1`.
 
 ## How can I extend EGA?
