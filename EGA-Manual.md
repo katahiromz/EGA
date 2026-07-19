@@ -20,24 +20,20 @@ Please start up EGA. The following text will be displayed:
 @ EGA Version 14 by katahiromz                  @
 @ Type 'exit' to exit. Type 'help' to see help. @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-EGA> 
 ```
 
 Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. `3` will be shown.
 
 ```txt
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ EGA Version 14 by katahiromz                  @
-@ Type 'exit' to exit. Type 'help' to see help. @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 EGA> print(+(1, 2));
 3
-EGA>
 ```
 
 To quit EGA, please enter `exit`.
+
+```txt
+EGA> exit;
+```
 
 The syntax of the EGA is similar to one or more function call(s) of C language.
 But, every operator in EGA is a function.
@@ -45,7 +41,7 @@ But, every operator in EGA is a function.
 Enter `help` to see all the EGA functions:
 
 ```txt
-EGA> help;
+EGA> help
 EGA has the following functions:
   !
   !=
@@ -56,8 +52,6 @@ EGA has the following functions:
   and
   array
   ...
-
-EGA> 
 ```
 
 To see brief usage of `print` function, enter `help print`.
@@ -67,8 +61,6 @@ EGA> help print;
 EGA function 'print':
   arity: 0..32767
   usage: print(value, ...)
-
-EGA> 
 ```
 
 The detailed descriptions of the EGA functions will be described later.

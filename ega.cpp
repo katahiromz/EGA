@@ -2614,6 +2614,7 @@ void EGA_show_help(void)
     {
         EGA_do_print("  %s\n", name.c_str());
     }
+    (*s_input_fn)(nullptr, 0);
 }
 
 void EGA_show_help(const std::string& name)
@@ -2637,6 +2638,7 @@ void EGA_show_help(const std::string& name)
     }
 
     EGA_do_print("  usage: %s\n", it->second->help.c_str());
+    (*s_input_fn)(nullptr, 0);
 }
 
 void EGA_print_logo(const char *filename)
@@ -2669,7 +2671,7 @@ int EGA_interactive(const char *filename, bool echo)
 
     for (;;)
     {
-        EGA_do_print("\nEGA> ");
+        EGA_do_print("\n");
         std::fflush(stdout);
 
         if (!(*s_input_fn)(buf, sizeof(buf)))
@@ -2678,7 +2680,7 @@ int EGA_interactive(const char *filename, bool echo)
         mstr_trim(buf, " \t\r\n\f\v;");
 
         if (s_echo_input)
-            EGA_do_print("%s;\n", buf);
+            EGA_do_print("EGA> %s;\n", buf);
 
         if (strcmp(buf, "exit") == 0)
             break;
@@ -2689,8 +2691,7 @@ int EGA_interactive(const char *filename, bool echo)
             continue;
         }
 
-        if (memcmp(buf, "help", 4) == 0 &&
-            std::isspace(buf[4]))
+        if (memcmp(buf, "help", 4) == 0 && is_space(buf[4]))
         {
             std::string name = &buf[5];
             mstr_trim(name, " \t\r\n\f\v;");
