@@ -1,4 +1,4 @@
-# The Programming Language EGA Reference Manual
+# The EGA Reference Manual
 
 Written by Katayama Hirofumi MZ.
 
@@ -22,7 +22,7 @@ Please start up EGA. The following text will be displayed:
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ```
 
-Enter an EGA expression (for example, `print(+(1, 2));`) and press `Enter` key. `3` will be shown.
+Enter an EGA expression (for example, `print(+(1, 2))`) and press `Enter` key. `3` will be shown.
 
 ```txt
 EGA> print(+(1, 2));
@@ -41,7 +41,7 @@ But, every operator in EGA is a function.
 Enter `help` to see all the EGA functions:
 
 ```txt
-EGA> help
+EGA> help;
 EGA has the following functions:
   !
   !=
@@ -210,7 +210,7 @@ the string values. `println` and `dumpln` add a newline at the end of the output
 for(i, 1, 10000, (println(i), if(>=(i, 10), break())));
 ```
 
-This EGA program will output 0-to-10. Output:
+This EGA program will output `1`-to-`10`. Output:
 
 ```txt
 1
