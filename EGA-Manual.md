@@ -940,19 +940,19 @@ Same as `^`.
 
 RisohEditor EGA has the following functions as EGA extension:
 
-- `RES_load`
-- `RES_save`
 - `RES_clone_by_lang`
 - `RES_clone_by_name`
 - `RES_const`
 - `RES_delete`
 - `RES_get_binary`
+- `RES_load`
+- `RES_save`
 - `RES_search`
 - `RES_select`
 - `RES_set_binary`
-- `RES_unload_resh`
 - `RES_str_get`
 - `RES_str_set`
+- `RES_unload_resh`
 
 ### EGA `RES_load` Function
 
