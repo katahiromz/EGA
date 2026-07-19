@@ -529,6 +529,16 @@ Does loop using an array.
 The item in the `ary` array will be evaluated and stored into variable `var` repeatedly.
 You can break the loop by `break` function.
 
+### EGA `gmtime` Function
+
+```txt
+EGA function 'gmtime':
+  arity: 0
+  usage: gmtime()
+```
+
+Returns the UTC date/time string like `YYYY-MM-DD hh:mm:ss`.
+
 ### EGA `greater` Function
 
 ```txt
@@ -659,16 +669,6 @@ EGA function 'localtime':
 ```
 
 Returns the local date/time string like `YYYY-MM-DD hh:mm:ss`.
-
-### EGA `gmtime` Function
-
-```txt
-EGA function 'gmtime':
-  arity: 0
-  usage: gmtime()
-```
-
-Returns the UTC date/time string like `YYYY-MM-DD hh:mm:ss`.
 
 ### EGA `mid` Function
 
