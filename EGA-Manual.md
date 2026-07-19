@@ -1064,7 +1064,7 @@ EGA function 'RES_extract':
   usage: RES_extract(type, name, lang[, filename])
 ```
 
-`RES_delete` deletes the resource items.
+`RES_delete` extracts the resource items.
 
 `type` must be an integer or a string of a resource type.
 `name` must be an integer or a string of a resource name.
