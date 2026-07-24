@@ -72,7 +72,6 @@ Change in Version 14:
 - Changed arity of function `bitor`(`|`), `bitand`(`&`), and `xor`(`^`).
 - Added `localtime` and `gmtime` functions.
 - Added `load` and `save` functions.
-- Added `RES_extract` function.
 
 Change in Version 13:
 
@@ -962,7 +961,6 @@ RisohEditor EGA has the following functions as EGA extension:
 - `RES_clone_by_name`
 - `RES_const`
 - `RES_delete`
-- `RES_extract`
 - `RES_get_binary`
 - `RES_get_text`
 - `RES_load`
@@ -1034,23 +1032,6 @@ EGA function 'RES_delete':
 `lang` must be an integer that specifies the language ID. If `lang` is `-(1)` or omitted, then search all resource languages.
 
 Returns `1` if deleted. Otherwise returns `0`.
-
-### EGA `RES_extract` Function
-
-```txt
-EGA function 'RES_extract':
-  arity: 3..4
-  usage: RES_extract(type, name, lang[, filename])
-```
-
-`RES_extract` extracts a resource item.
-
-`type` must be an integer or a string of a resource type.
-`name` must be an integer or a string of a resource name.
-`lang` must be an integer that specifies the language ID.
-`filename` must be a string that specifies the filename to extract.
-
-Returns the extracted filename if successful. Otherwise returns `0`.
 
 ### EGA `RES_get_binary` Function
 
